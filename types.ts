@@ -50,10 +50,6 @@ export interface Incident {
   }[];
 }
 
-/**
- * Interface representing a drone in the fleet.
- * Fixes: Module '"../types"' has no exported member 'Drone'.
- */
 export interface Drone {
   id: string;
   name: string;
@@ -103,4 +99,29 @@ export interface Guard {
   location: string;
   status: 'Patrolling' | 'Stationary' | 'On Break';
   assignment: string;
+}
+
+export interface Integration {
+  id: string;
+  name: string;
+  icon: string;
+  status: 'CONNECTED' | 'DEGRADED' | 'DISCONNECTED';
+  lastSync: string;
+  health: number;
+  feedCount?: number;
+  errors?: string[];
+}
+
+export interface UserPermission {
+  role: string;
+  canDeploy: boolean;
+  canManual: boolean;
+  manualLimit: number; // in minutes
+  canApprovePatrols: boolean;
+  canChangeSLA: boolean;
+  canReport: boolean;
+  canSettings: boolean;
+  canEmergency: boolean;
+  canRequestExtensions: boolean;
+  canAnalytics: boolean;
 }
