@@ -1,155 +1,238 @@
 
-import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-// Added ThreatType to imports to fix type assignment errors
-import { Incident, ThreatType } from '../types';
+import React, { useState, useMemo } from 'react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  Cell, PieChart, Pie, LineChart, Line, Legend 
+} from 'recharts';
+import { Incident, ThreatType, TimelineEvent } from '../types';
 
-// Updated mockIncidents to satisfy the Incident interface requirements
 const mockIncidents: Incident[] = [
   { 
     id: 'INC-2025-082', 
-    timestamp: 'Oct 24, 22:14', 
-    title: 'Motion Detected - Zone B', 
+    timestamp: '2025-10-24 22:14', 
+    title: 'Motion Detected - Storage B', 
     threat: ThreatType.HUMAN, 
     severity: 'CRITICAL', 
     status: 'Investigating', 
-    slaBreach: '-2m',
-    location: 'Zone B',
+    location: 'North Storage B',
     slaLimit: 300,
-    elapsed: 420
+    elapsed: 420,
+    slaBreach: '-2m 00s',
+    respondedBy: 'Isabelle M.',
+    responseTime: '7m 00s',
+    assignedTo: 'Sentinel-1',
+    timeline: [
+      { time: '22:14:00', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
+      { time: '22:14:30', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' },
+      { time: '22:16:10', event: 'Escalated to Team Lead', details: 'Visual confirmation required', type: 'escalation' }
+    ],
+    evidence: [
+      { type: 'video', url: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=400', caption: 'FPV Sector B' },
+      { type: 'image', url: 'https://images.unsplash.com/photo-1551817958-c5b5d1b74a33?auto=format&fit=crop&q=80&w=400', caption: 'Snapshot 22:15' }
+    ]
   },
   { 
     id: 'INC-2025-081', 
-    timestamp: 'Oct 24, 18:30', 
-    title: 'HVAC Vibration', 
+    timestamp: '2025-10-24 18:30', 
+    title: 'HVAC Unit Vibration', 
     threat: ThreatType.ENVIRONMENTAL, 
-    severity: 'HIGH', 
+    severity: 'MEDIUM', 
     status: 'Resolved',
     location: 'Sector 4',
     slaLimit: 600,
-    elapsed: 300
+    elapsed: 300,
+    respondedBy: 'Auto-dispatch',
+    responseTime: '5m 00s',
+    assignedTo: 'Watcher-3',
+    falseAlarmReason: 'HVAC resonance anomaly',
+    timeline: [
+      { time: '18:30:00', event: 'Alert Triggered', type: 'alert' },
+      { time: '18:35:00', event: 'Resolved', details: 'Marked as false alarm', type: 'resolution' }
+    ]
   },
   { 
     id: 'INC-2025-080', 
-    timestamp: 'Oct 23, 09:15', 
-    title: 'Camera Offline - Zone A', 
+    timestamp: '2025-10-23 09:15', 
+    title: 'Signal Degradation', 
     threat: ThreatType.SENSOR, 
-    severity: 'MEDIUM', 
+    severity: 'LOW', 
     status: 'Closed',
-    location: 'Zone A',
+    location: 'Main Gate',
     slaLimit: 1200,
-    elapsed: 1100
+    elapsed: 1100,
+    respondedBy: 'System Admin',
+    responseTime: '18m 20s',
+    assignedTo: 'None',
+    timeline: []
   }
 ];
 
 const analyticData = [
-  { name: 'Day 1', time: 90 },
-  { name: 'Day 3', time: 75 },
-  { name: 'Day 7', time: 135 },
-  { name: 'Day 14', time: 60 },
-  { name: 'Day 18', time: 105 },
-  { name: 'Day 21', time: 69 },
-  { name: 'Day 30', time: 114 }
+  { name: 'Mon', time: 180, target: 180 },
+  { name: 'Tue', time: 140, target: 180 },
+  { name: 'Wed', time: 210, target: 180 },
+  { name: 'Thu', time: 160, target: 180 },
+  { name: 'Fri', time: 250, target: 180 },
+  { name: 'Sat', time: 90, target: 180 },
+  { name: 'Sun', time: 120, target: 180 },
 ];
 
-type TabType = 'list' | 'analytics' | 'reports';
+const threatDistribution = [
+  { name: 'Human', value: 45, color: '#ef4444' },
+  { name: 'Environmental', value: 25, color: '#10b981' },
+  { name: 'Sensor', value: 20, color: '#f97316' },
+  { name: 'Other', value: 10, color: '#334155' },
+];
+
+const reportData = [
+  { id: 'REP-001', incId: 'INC-2025-082', type: 'Police Report', status: 'Pending', deadlineMins: 4, size: '2.4 MB' },
+  { id: 'REP-002', incId: 'INC-2025-081', type: 'Insurance', status: 'Delivered', deadlineMins: 0, size: '1.1 MB' },
+  { id: 'REP-003', incId: 'INC-2025-080', type: 'Internal Audit', status: 'Draft', deadlineMins: 12, size: '450 KB' },
+];
 
 const Incidents: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'analytics' | 'reports'>('list');
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
+  
+  // Filter States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [severityFilter, setSeverityFilter] = useState('All');
+  const [threatFilter, setThreatFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
 
-  const renderList = () => (
+  const filteredIncidents = useMemo(() => {
+    return mockIncidents.filter(inc => {
+      const searchMatch = inc.title.toLowerCase().includes(searchTerm.toLowerCase()) || inc.id.toLowerCase().includes(searchTerm.toLowerCase());
+      const severityMatch = severityFilter === 'All' || inc.severity === severityFilter.toUpperCase();
+      const threatMatch = threatFilter === 'All' || inc.threat === threatFilter.toUpperCase();
+      const statusMatch = statusFilter === 'All' || inc.status === statusFilter;
+      return searchMatch && severityMatch && threatMatch && statusMatch;
+    });
+  }, [searchTerm, severityFilter, threatFilter, statusFilter]);
+
+  const renderIncidentList = () => (
     <div className="flex flex-col gap-6 h-full overflow-hidden">
+      {/* Summary Strip */}
       <div className="grid grid-cols-5 gap-4">
         {[
-          { label: 'Total Incidents (30d)', value: '24', color: 'text-white' },
-          { label: 'Investigating', value: '3', color: 'text-warning' },
-          { label: 'Escalated', value: '1', color: 'text-danger' },
-          { label: 'False Alarms', value: '8', color: 'text-gray-300' },
-          { label: 'Avg Response', value: '02:14', sub: 'vs 03:00 Target', color: 'text-success' },
+          { label: 'Total (30d)', value: '24', icon: 'list_alt' },
+          { label: 'Investigating', value: '3', icon: 'visibility', color: 'text-warning' },
+          { label: 'Escalated', value: '1', icon: 'priority_high', color: 'text-danger' },
+          { label: 'False Alarms', value: '8', icon: 'cancel', color: 'text-gray-400' },
+          { label: 'Avg Response', value: '02:14', icon: 'timer', color: 'text-primary' }
         ].map((stat, i) => (
-          <div key={i} className="bg-panel border border-white/5 p-4 rounded-xl shadow-sm">
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1">{stat.label}</p>
-            <div className="flex items-baseline gap-2">
-              <p className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</p>
-              {stat.sub && <span className="text-[9px] text-text-muted">{stat.sub}</span>}
+          <div key={i} className="bg-panel border border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+            <div className="size-10 rounded-xl bg-background border border-white/5 flex items-center justify-center">
+              <span className={`material-symbols-outlined text-gray-500 ${stat.color}`}>{stat.icon}</span>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{stat.label}</p>
+              <p className={`text-xl font-display font-bold text-white ${stat.color}`}>{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-panel border border-white/5 p-3 rounded-lg flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
-          <input className="w-full bg-background border border-white/5 text-white text-xs rounded pl-10 pr-4 py-2 focus:ring-1 focus:ring-primary outline-none" placeholder="Search incidents..." type="text"/>
+      {/* Filter Bar */}
+      <div className="bg-panel border border-white/5 p-4 rounded-2xl flex flex-wrap gap-4 items-center">
+        <div className="relative flex-1 min-w-[300px]">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
+          <input 
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="w-full bg-background border border-white/5 text-white text-[11px] rounded-xl pl-12 pr-4 py-3 outline-none focus:border-primary/50 transition-all font-bold uppercase tracking-widest placeholder-gray-700" 
+            placeholder="Search incident database..."
+          />
         </div>
-        <div className="flex items-center gap-3">
-          {['Severity: All', 'Threat: All', 'Status: All'].map((filter, i) => (
-            <div key={i} className="relative">
-              <select className="appearance-none bg-background border border-white/5 text-white text-xs rounded pl-4 pr-10 py-2 focus:ring-1 focus:ring-primary outline-none cursor-pointer">
-                <option>{filter}</option>
+        <div className="flex gap-2">
+          {['Severity', 'Threat', 'Status'].map((f) => (
+            <div key={f} className="relative">
+              <select 
+                onChange={e => {
+                  if (f === 'Severity') setSeverityFilter(e.target.value);
+                  if (f === 'Threat') setThreatFilter(e.target.value);
+                  if (f === 'Status') setStatusFilter(e.target.value);
+                }}
+                className="appearance-none bg-background border border-white/5 text-white text-[10px] font-bold rounded-xl pl-4 pr-10 py-3 uppercase tracking-widest outline-none cursor-pointer"
+              >
+                <option value="All">{f}: All</option>
+                {f === 'Severity' && ['Critical', 'High', 'Medium', 'Low'].map(o => <option key={o}>{o}</option>)}
+                {f === 'Threat' && ['Human', 'Environmental', 'Sensor'].map(o => <option key={o}>{o}</option>)}
+                {f === 'Status' && ['Investigating', 'Responding', 'Resolved', 'Escalated'].map(o => <option key={o}>{o}</option>)}
               </select>
-              <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none text-lg">expand_more</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-panel border border-white/5 rounded-lg overflow-hidden shadow-sm flex-1 min-h-0">
-        <div className="h-full overflow-y-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-background/50 text-[10px] uppercase text-text-muted border-b border-white/5 sticky top-0 z-10 backdrop-blur-md">
-              <tr>
-                <th className="px-6 py-4 font-bold tracking-widest w-1/6">Timestamp & ID</th>
-                <th className="px-6 py-4 font-bold tracking-widest w-1/4">Title & Threat</th>
-                <th className="px-6 py-4 font-bold tracking-widest w-1/6">Severity</th>
-                <th className="px-6 py-4 font-bold tracking-widest w-1/6">Status</th>
-                <th className="px-6 py-4 font-bold tracking-widest w-1/6">Response</th>
-                <th className="px-6 py-4 font-bold tracking-widest text-right">Actions</th>
+      {/* Table Content */}
+      <div className="bg-panel border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex-1 min-h-0">
+        <div className="h-full overflow-y-auto custom-scrollbar">
+          <table className="w-full text-left text-[11px] border-collapse">
+            <thead className="bg-background/50 sticky top-0 z-10 backdrop-blur-md">
+              <tr className="border-b border-white/5 text-[9px] uppercase text-gray-500 font-bold tracking-[0.2em]">
+                <th className="px-6 py-5">Timestamp & ID</th>
+                <th className="px-6 py-5">Incident & Threat</th>
+                <th className="px-6 py-5">Severity</th>
+                <th className="px-6 py-5">Status</th>
+                <th className="px-6 py-5">Operator</th>
+                <th className="px-6 py-5">SLA Status</th>
+                <th className="px-6 py-5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {mockIncidents.map(inc => (
-                <tr key={inc.id} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-6 py-5 align-top">
-                    <div className="font-bold text-white">{inc.id}</div>
-                    <div className="text-[10px] text-text-muted mt-1">{inc.timestamp}</div>
+              {filteredIncidents.map(inc => (
+                <tr 
+                  key={inc.id} 
+                  onClick={() => setSelectedIncident(inc)}
+                  className="hover:bg-white/5 transition-colors cursor-pointer group"
+                >
+                  <td className="px-6 py-5">
+                    <div className="font-bold text-white mb-1">{inc.id}</div>
+                    <div className="text-gray-600 font-mono text-[10px]">{inc.timestamp}</div>
                   </td>
-                  <td className="px-6 py-5 align-top">
-                    <div className="font-bold text-white leading-snug">{inc.title}</div>
-                    <div className="mt-2">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-white/5 text-gray-400 border border-white/10">
-                        {inc.threat}
-                      </span>
+                  <td className="px-6 py-5">
+                    <div className="font-bold text-gray-200 mb-2 leading-tight max-w-[200px]">{inc.title}</div>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[8px] font-bold text-gray-500 uppercase tracking-widest">{inc.threat}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 align-top">
-                    <span className={`font-bold text-[10px] uppercase tracking-wider ${
+                  <td className="px-6 py-5">
+                    <span className={`font-bold tracking-widest ${
                       inc.severity === 'CRITICAL' ? 'text-danger' : 
                       inc.severity === 'HIGH' ? 'text-warning' : 'text-primary'
                     }`}>{inc.severity}</span>
                   </td>
-                  <td className="px-6 py-5 align-top">
+                  <td className="px-6 py-5">
                     <div className="flex items-center gap-2">
-                      <span className={`w-1.5 h-1.5 rounded-full ${
+                      <span className={`size-1.5 rounded-full ${
                         inc.status === 'Investigating' ? 'bg-warning animate-pulse' :
-                        inc.status === 'Resolved' ? 'bg-success' : 'bg-gray-500'
+                        inc.status === 'Resolved' ? 'bg-success' : 
+                        inc.status === 'Escalated' ? 'bg-danger' : 'bg-gray-500'
                       }`}></span>
-                      <span className="text-white font-medium">{inc.status}</span>
+                      <span className="text-gray-300 font-bold uppercase tracking-wider">{inc.status}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 align-top">
-                    <div className="text-white text-xs font-mono">Auto-dispatch</div>
-                    {/* Accessing slaBreach correctly as an optional property */}
+                  <td className="px-6 py-5 text-gray-400 font-medium">{inc.respondedBy}</td>
+                  <td className="px-6 py-5">
                     {inc.slaBreach ? (
-                      <div className="text-[9px] text-danger font-bold mt-1 uppercase tracking-tight">SLA BREACHED ({inc.slaBreach})</div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-danger font-bold uppercase">Breached</span>
+                        <span className="text-danger/60 font-mono text-[9px]">{inc.slaBreach}</span>
+                      </div>
                     ) : (
-                      <div className="text-[9px] text-success font-bold mt-1 uppercase tracking-tight">On-time</div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-success font-bold uppercase">On-Time</span>
+                        <span className="text-gray-600 font-mono text-[9px]">{inc.responseTime}</span>
+                      </div>
                     )}
                   </td>
-                  <td className="px-6 py-5 align-top text-right">
-                    <button className="text-text-muted hover:text-white transition-colors">
-                      <span className="material-symbols-outlined text-lg">visibility</span>
-                    </button>
+                  <td className="px-6 py-5 text-right">
+                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="material-symbols-outlined text-gray-500 hover:text-white transition-colors">description</button>
+                      <button className="material-symbols-outlined text-gray-500 hover:text-danger transition-colors">flag</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -161,192 +244,317 @@ const Incidents: React.FC = () => {
   );
 
   const renderAnalytics = () => (
-    <div className="flex flex-col gap-6 h-full overflow-y-auto pr-1 custom-scrollbar">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-panel border border-white/5 p-5 rounded-xl">
-          <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">Total Incidents (30D)</h3>
-          <div className="text-3xl font-display font-bold text-white">24</div>
-        </div>
-        <div className="bg-panel border border-white/5 p-5 rounded-xl">
-          <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">Avg Response Time</h3>
-          <div className="text-3xl font-display font-bold text-emerald-400 font-mono">2m 14s</div>
-        </div>
-        <div className="bg-panel border border-white/5 p-5 rounded-xl">
-          <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">SLA Breach Rate</h3>
-          <div className="text-3xl font-display font-bold text-danger font-mono">4.2%</div>
-        </div>
-        <div className="bg-panel border border-white/5 p-5 rounded-xl">
-          <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">False Alarm Rate</h3>
-          <div className="text-3xl font-display font-bold text-white">33%</div>
-        </div>
+    <div className="h-full overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-10">
+      <div className="grid grid-cols-4 gap-6">
+        {[
+          { l: 'SLA Breach Rate', v: '4.2%', s: 'Last 30 days', c: 'text-danger' },
+          { l: 'False Alarm Rate', v: '33%', s: '12% decrease', c: 'text-gray-400' },
+          { l: 'Avg Response', v: '2m 14s', s: 'Target: 3m', c: 'text-primary' },
+          { l: 'Common Threat', v: 'Human Intruder', s: '45% total', c: 'text-white' }
+        ].map((m, i) => (
+          <div key={i} className="bg-panel border border-white/5 p-8 rounded-3xl shadow-xl">
+             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest block mb-2">{m.l}</span>
+             <div className={`text-4xl font-display font-bold ${m.c} tracking-tighter`}>{m.v}</div>
+             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest block mt-3">{m.s}</span>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[400px]">
-        <div className="lg:col-span-2 bg-panel border border-white/5 p-6 rounded-xl flex flex-col relative overflow-hidden shadow-sm">
-          <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-6">Response Time Trend vs SLA</h3>
-          <div className="flex-1 relative">
-            <div className="absolute left-0 right-0 top-[60%] border-t border-dashed border-danger z-10 opacity-40">
-              <span className="text-[10px] text-danger font-bold uppercase tracking-widest absolute right-4 -top-5">SLA Target (3m)</span>
+      <div className="grid grid-cols-12 gap-8">
+        <div className="col-span-12 lg:col-span-8 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-8 shadow-2xl">
+          <div className="flex justify-between items-center">
+            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Response Time Trend vs SLA Target</h3>
+            <div className="flex items-center gap-6">
+               <div className="flex items-center gap-2">
+                 <div className="size-2 rounded-full bg-primary"></div>
+                 <span className="text-[9px] font-bold text-gray-500 uppercase">Avg Response</span>
+               </div>
+               <div className="flex items-center gap-2">
+                 <div className="w-4 h-0.5 border-t border-dashed border-danger"></div>
+                 <span className="text-[9px] font-bold text-danger uppercase tracking-widest">SLA Limit</span>
+               </div>
             </div>
+          </div>
+          <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analyticData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <Bar dataKey="time" radius={[2, 2, 0, 0]}>
-                  {analyticData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.time > 120 ? '#0891b2' : '#06b6d4'} className="hover:opacity-80 transition-opacity cursor-pointer" />
-                  ))}
-                </Bar>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="#64748b" dy={10} />
-              </BarChart>
+              <LineChart data={analyticData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={15} />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{backgroundColor: '#151a23', border: '1px solid #ffffff10', borderRadius: '12px'}}
+                  itemStyle={{color: '#06b6d4', fontSize: '11px', fontWeight: 'bold'}}
+                />
+                <Line type="monotone" dataKey="time" stroke="#06b6d4" strokeWidth={4} dot={{ r: 4, fill: '#06b6d4' }} activeDot={{ r: 8 }} />
+                <Line type="stepAfter" dataKey="target" stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-        
-        <div className="bg-panel border border-white/5 p-6 rounded-xl flex flex-col shadow-sm">
-          <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-6">Threat Type Distribution</h3>
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="relative size-40 rounded-full flex items-center justify-center shadow-inner mb-6" 
-                 style={{ background: 'conic-gradient(#ef4444 0deg 180deg, #6b7280 180deg 288deg, #f97316 288deg 360deg)' }}>
-              <div className="size-32 rounded-full bg-panel flex flex-col items-center justify-center border border-white/5">
-                <span className="text-2xl font-bold text-white font-display">24</span>
-                <span className="text-[8px] text-text-muted font-bold uppercase tracking-widest">Total</span>
-              </div>
+
+        <div className="col-span-12 lg:col-span-4 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-10 shadow-2xl">
+          <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Threat Type Distribution</h3>
+          <div className="h-[250px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={threatDistribution} 
+                  innerRadius={60} 
+                  outerRadius={100} 
+                  paddingAngle={8} 
+                  dataKey="value"
+                >
+                  {threatDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+               <span className="text-3xl font-display font-bold text-white leading-none">24</span>
+               <span className="text-[9px] text-gray-600 font-bold uppercase mt-1">Total Cases</span>
             </div>
-            <div className="w-full space-y-3">
-              {[
-                { label: 'Human Intruder', percent: '50%', color: 'bg-danger' },
-                { label: 'Environmental', percent: '30%', color: 'bg-gray-500' },
-                { label: 'Sensor Fault', percent: '20%', color: 'bg-warning' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-2">
-                    <span className={`size-2 rounded-full ${item.color}`}></span>
-                    <span className="text-gray-300 font-medium">{item.label}</span>
+          </div>
+          <div className="space-y-4">
+             {threatDistribution.map(item => (
+               <div key={item.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-2 rounded-full" style={{backgroundColor: item.color}}></div>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.name}</span>
                   </div>
-                  <span className="font-mono text-gray-500 font-bold">{item.percent}</span>
-                </div>
-              ))}
-            </div>
+                  <span className="text-[11px] font-mono font-bold text-white">{item.value}%</span>
+               </div>
+             ))}
           </div>
         </div>
       </div>
-
-      <div className="bg-panel border border-white/5 p-6 rounded-xl shadow-sm">
-        <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-4">Top False Alarm Causes</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { cause: 'HVAC Vibration', count: 4 },
-            { cause: 'Door Left Open', count: 2 },
-            { cause: 'Sensor Miscalibration', count: 2 },
-          ].map((item, i) => (
-            <div key={i} className="bg-background border border-white/5 p-4 rounded-lg flex items-center justify-between group hover:border-primary/30 transition-all cursor-pointer">
-              <span className="text-xs font-medium text-gray-300 group-hover:text-white">{item.cause}</span>
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{item.count} incidents</span>
-            </div>
-          ))}
-        </div>
+      
+      <div className="bg-panel border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+         <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-10">Root Causes (False Alarms)</h3>
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { label: 'HVAC Resonance', count: 12, trend: '+2' },
+              { label: 'Wildlife Activity', count: 8, trend: '-4' },
+              { label: 'Sensor Calibration', count: 5, trend: '+1' },
+              { label: 'Light Anomalies', count: 3, trend: '0' }
+            ].map((cause, i) => (
+              <div key={i} className="bg-background/40 border border-white/5 p-6 rounded-2xl flex flex-col gap-4 group hover:border-primary/20 transition-all">
+                <div className="flex justify-between items-start">
+                  <span className="text-3xl font-display font-bold text-white">{cause.count}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${cause.trend.includes('+') ? 'text-danger' : 'text-emerald-500'}`}>
+                    {cause.trend} trend
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{cause.label}</span>
+              </div>
+            ))}
+         </div>
       </div>
     </div>
   );
 
   const renderReports = () => (
-    <div className="flex flex-col lg:flex-row gap-6 items-start">
-      <div className="w-full lg:w-1/3 h-64 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center hover:bg-white/5 hover:border-primary/20 transition-all cursor-pointer group bg-transparent">
-        <div className="size-12 rounded-full bg-panel border border-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
-          <span className="material-symbols-outlined text-primary text-2xl">assessment</span>
-        </div>
-        <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-widest">Generate New Report</h3>
-        <p className="text-[10px] text-text-muted font-bold uppercase tracking-tighter">Select incident & format</p>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <button className="h-[280px] border-2 border-dashed border-white/5 hover:border-primary/30 hover:bg-primary/5 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all group">
+         <div className="size-16 rounded-3xl bg-panel border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+           <span className="material-symbols-outlined text-primary text-3xl">add</span>
+         </div>
+         <div className="text-center">
+           <h4 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-1">New Incident Report</h4>
+           <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Select Incident to Start</p>
+         </div>
+      </button>
 
-      <div className="w-full lg:w-1/3 bg-panel border border-white/5 rounded-2xl p-6 shadow-2xl flex flex-col h-64 justify-between relative group hover:border-white/20 transition-all">
-        <div>
-          <div className="flex justify-between items-start mb-4">
-            <div className="inline-flex items-center px-2 py-1 rounded bg-danger/10 border border-danger/20">
-              <span className="material-symbols-outlined text-danger text-xs mr-1">timer</span>
-              <span className="text-[9px] font-bold text-danger uppercase tracking-widest">Deadline: 12m</span>
+      {reportData.map(rep => {
+        const isUrgent = rep.deadlineMins > 0 && rep.deadlineMins <= 5;
+        return (
+          <div key={rep.id} className="bg-panel border border-white/5 rounded-[2.5rem] p-8 flex flex-col justify-between shadow-2xl group hover:border-white/10 transition-all">
+            <div className="flex justify-between items-start">
+               <div className="flex flex-col gap-1">
+                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">{rep.id}</span>
+                 <h4 className="text-xl font-display font-bold text-white tracking-tight">{rep.type}</h4>
+               </div>
+               <span className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                 rep.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500' : 
+                 rep.status === 'Pending' ? 'bg-warning/10 text-warning' : 'bg-white/5 text-gray-500'
+               }`}>
+                 {rep.status}
+               </span>
             </div>
-            <button className="text-gray-500 hover:text-white transition-colors">
-              <span className="material-symbols-outlined text-xl">more_vert</span>
-            </button>
-          </div>
-          <h3 className="text-base font-bold text-white mb-1 tracking-tight">Incident #082 – Police Report</h3>
-          <p className="text-xs text-text-muted leading-relaxed">Required for critical intrusion event submission. Draft incomplete.</p>
-        </div>
-        <div className="flex gap-3 mt-auto">
-          <button className="flex-1 bg-primary hover:bg-primary/90 text-black text-[10px] font-bold py-2.5 rounded-lg transition-all uppercase tracking-widest shadow-lg shadow-primary/20">
-            Finalize
-          </button>
-          <button className="flex-1 bg-background hover:bg-white/5 text-gray-400 border border-white/10 text-[10px] font-bold py-2.5 rounded-lg transition-all uppercase tracking-widest">
-            View Draft
-          </button>
-        </div>
-      </div>
 
-      <div className="w-full lg:w-1/3 bg-panel border border-white/5 rounded-2xl p-6 shadow-2xl flex flex-col h-64 justify-between relative group hover:border-white/20 transition-all">
-        <div>
-          <div className="flex justify-between items-start mb-4">
-            <div className="inline-flex items-center px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
-              <span className="material-symbols-outlined text-emerald-500 text-xs mr-1">check_circle</span>
-              <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Delivered</span>
+            {rep.deadlineMins > 0 && (
+              <div className={`mt-8 p-4 rounded-2xl flex items-center justify-between border ${
+                isUrgent ? 'bg-danger/10 border-danger/30 animate-pulse' : 'bg-background/80 border-white/5'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <span className={`material-symbols-outlined text-[18px] ${isUrgent ? 'text-danger' : 'text-gray-500'}`}>timer</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${isUrgent ? 'text-danger' : 'text-gray-500'}`}>Report Deadline</span>
+                </div>
+                <span className={`text-[12px] font-mono font-bold ${isUrgent ? 'text-danger' : 'text-white'}`}>{rep.deadlineMins}m remaining</span>
+              </div>
+            )}
+
+            <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Source Incident</span>
+                 <span className="text-xs font-bold text-gray-400">{rep.incId}</span>
+              </div>
+              <div className="flex gap-2">
+                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                   <span className="material-symbols-outlined text-lg">download</span>
+                 </button>
+                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                   <span className="material-symbols-outlined text-lg">share</span>
+                 </button>
+              </div>
             </div>
-            <span className="text-[10px] text-text-muted font-bold uppercase">2h ago</span>
           </div>
-          <h3 className="text-base font-bold text-white mb-1 tracking-tight">Monthly Audit – Oct</h3>
-          <p className="text-xs text-text-muted leading-relaxed">Recipient: Internal Compliance Team. Verified and archived.</p>
-        </div>
-        <div className="flex gap-3 mt-auto">
-          <button className="flex-1 bg-background hover:bg-white/5 text-gray-400 border border-white/10 text-[10px] font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
-            <span className="material-symbols-outlined text-[16px]">download</span>
-            PDF
-          </button>
-          <button className="flex-1 bg-background hover:bg-white/5 text-gray-400 border border-white/10 text-[10px] font-bold py-2.5 rounded-lg transition-all uppercase tracking-widest">
-            Resend
-          </button>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Tab Header Sidebar-style Logic managed inside view but tab switching is here */}
-      <div className="shrink-0 mb-6">
-        <div className="flex gap-8 border-b border-white/5">
+    <div className="flex flex-col h-full bg-background relative">
+      {/* TABS */}
+      <div className="shrink-0 mb-8 border-b border-white/5">
+        <div className="flex gap-10">
           {[
-            { id: 'list', label: 'Incident List' },
-            { id: 'analytics', label: 'Analytics' },
-            { id: 'reports', label: 'Reports' },
-          ].map((tab) => (
-            <button
+            { id: 'list', label: 'Incident Database' },
+            { id: 'analytics', label: 'Tactical Analytics' },
+            { id: 'reports', label: 'Report Center' }
+          ].map(tab => (
+            <button 
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={`pb-3 text-sm font-bold uppercase tracking-widest transition-all relative ${
-                activeTab === tab.id 
-                  ? 'text-primary' 
-                  : 'text-text-muted hover:text-white'
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`pb-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative ${
+                activeTab === tab.id ? 'text-primary' : 'text-gray-600 hover:text-white'
               }`}
             >
               {tab.label}
               {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_rgba(6,182,212,0.4)]"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_12px_rgba(6,182,212,0.6)] rounded-full"></div>
               )}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden">
-        {activeTab === 'list' && renderList()}
+      <div className="flex-1 min-h-0">
+        {activeTab === 'list' && renderIncidentList()}
         {activeTab === 'analytics' && renderAnalytics()}
         {activeTab === 'reports' && renderReports()}
       </div>
 
-      {/* Footer / Floating Button Placeholder */}
-      <div className="fixed bottom-10 right-10 z-50">
-        <button className="bg-primary hover:bg-primary/90 text-black font-bold p-4 rounded-full shadow-2xl flex items-center justify-center group transition-all transform active:scale-95">
-          <span className="material-symbols-outlined text-2xl">add</span>
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap px-0 group-hover:px-2 uppercase tracking-widest text-[10px] font-bold">New Incident</span>
-        </button>
+      {/* DETAIL MODAL */}
+      {selectedIncident && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-4xl h-full bg-panel border-l border-white/10 flex flex-col shadow-[-40px_0_60px_-15px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-500">
+            {/* Modal Header */}
+            <div className="p-10 border-b border-white/5 flex justify-between items-start bg-background/20">
+               <div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <h2 className="text-4xl font-display font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
+                    <span className={`px-4 py-1 rounded-full text-[10px] font-bold border ${
+                      selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger' : 'bg-primary/10 border-primary/30 text-primary'
+                    }`}>{selectedIncident.severity}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-400 mb-2">{selectedIncident.title}</h3>
+                  <div className="flex gap-4 items-center">
+                    <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">{selectedIncident.location}</span>
+                    <span className="size-1 rounded-full bg-gray-800"></span>
+                    <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{selectedIncident.threat} Threat</span>
+                  </div>
+               </div>
+               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-gray-600 hover:text-white transition-all text-3xl">close</button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-12">
+               {/* Timeline Section */}
+               <section>
+                 <h4 className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-10">Mission Timeline & Escalations</h4>
+                 <div className="space-y-0 pl-4 border-l border-white/5 relative">
+                    {selectedIncident.timeline.map((item, idx) => (
+                      <div key={idx} className="relative pb-10 group last:pb-0">
+                         <div className={`absolute -left-[21px] size-4 rounded-full border-2 bg-panel transition-all ${
+                           item.type === 'escalation' ? 'border-danger' : 
+                           item.type === 'alert' ? 'border-warning' : 'border-primary'
+                         }`}></div>
+                         <div className="flex flex-col gap-1.5 ml-6">
+                            <span className="text-[10px] font-mono text-gray-600 font-bold">{item.time}</span>
+                            <span className={`text-sm font-bold ${item.type === 'escalation' ? 'text-danger' : 'text-white'}`}>{item.event}</span>
+                            {item.details && <p className="text-xs text-gray-500 font-medium">{item.details}</p>}
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+               </section>
+
+               {/* Evidence Section */}
+               <section>
+                 <h4 className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-6">Tactical Evidence</h4>
+                 <div className="grid grid-cols-2 gap-6">
+                    {selectedIncident.evidence?.map((ev, i) => (
+                      <div key={i} className="group relative rounded-3xl overflow-hidden aspect-video bg-background border border-white/5 shadow-inner">
+                         <img src={ev.url} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" alt={ev.caption}/>
+                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                         <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-widest">{ev.caption}</span>
+                            <span className="material-symbols-outlined text-white text-lg">fullscreen</span>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+               </section>
+
+               {/* Metadata Section */}
+               <section className="bg-background/40 border border-white/5 rounded-[2.5rem] p-10 grid grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                     <div className="flex flex-col gap-1">
+                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Assigned Operator</span>
+                       <span className="text-sm font-bold text-white">{selectedIncident.respondedBy}</span>
+                     </div>
+                     <div className="flex flex-col gap-1">
+                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Primary Mission Asset</span>
+                       <span className="text-sm font-bold text-primary">{selectedIncident.assignedTo}</span>
+                     </div>
+                  </div>
+                  <div className="space-y-6">
+                     <div className="flex flex-col gap-1">
+                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">SLA Response Performance</span>
+                       <span className={`text-sm font-bold ${selectedIncident.slaBreach ? 'text-danger' : 'text-emerald-500'}`}>
+                         {selectedIncident.slaBreach ? `Breached (${selectedIncident.slaBreach})` : 'Compliant (On-time)'}
+                       </span>
+                     </div>
+                     <div className="flex flex-col gap-1">
+                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Status Code</span>
+                       <span className="text-sm font-bold text-gray-300">{selectedIncident.status}</span>
+                     </div>
+                  </div>
+               </section>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-10 border-t border-white/5 bg-background/20 flex gap-4">
+              <button className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 transition-all">
+                Export Detailed PDF
+              </button>
+              <button className="px-10 bg-background border border-white/10 text-white hover:bg-white/5 font-bold py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] transition-all">
+                Share Externally
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FLOATING ACTION BUTTON */}
+      <div className="fixed bottom-10 right-10 z-[60]">
+         <button className="bg-primary hover:bg-primary/90 text-black px-10 py-4 rounded-full shadow-2xl flex items-center gap-4 transition-all transform active:scale-95 group overflow-hidden">
+           <span className="material-symbols-outlined text-2xl">add</span>
+           <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Manual Entry</span>
+         </button>
       </div>
     </div>
   );

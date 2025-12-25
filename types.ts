@@ -19,17 +19,52 @@ export enum ThreatType {
   OTHER = 'OTHER'
 }
 
+export interface TimelineEvent {
+  time: string;
+  event: string;
+  details?: string;
+  type: 'alert' | 'action' | 'escalation' | 'resolution';
+}
+
+export interface Incident {
+  id: string;
+  timestamp: string;
+  title: string;
+  threat: ThreatType;
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  status: 'Investigating' | 'Responding' | 'Resolved' | 'Closed' | 'Escalated';
+  assignedTo: string;
+  location: string;
+  slaLimit: number; // in seconds
+  elapsed: number; // in seconds
+  isLikelyFalseAlarm?: boolean;
+  slaBreach?: string;
+  respondedBy: string;
+  responseTime: string;
+  falseAlarmReason?: string;
+  timeline: TimelineEvent[];
+  evidence?: {
+    type: 'video' | 'image' | 'log';
+    url: string;
+    caption: string;
+  }[];
+}
+
+/**
+ * Interface representing a drone in the fleet.
+ * Fixes: Module '"../types"' has no exported member 'Drone'.
+ */
 export interface Drone {
   id: string;
   name: string;
   status: FleetStatus;
   risk: RiskLevel;
   battery: number;
-  batteryTimeRemaining?: string;
-  health: number; // 0-100 score
-  nominalCapacity: number; // For predictive maintenance
+  batteryTimeRemaining: string;
+  health: number;
+  nominalCapacity: number;
   link: string;
-  linkStrength: number; // 0-100
+  linkStrength: number;
   cycles: number;
   cyclesRemaining: number;
   lastSync: string;
@@ -42,22 +77,6 @@ export interface Drone {
   nextServiceHours: number;
 }
 
-export interface Incident {
-  id: string;
-  timestamp: string;
-  title: string;
-  threat: ThreatType;
-  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-  status: 'Investigating' | 'Resolved' | 'Closed';
-  assignedTo?: string;
-  location: string;
-  slaLimit: number; // in seconds
-  elapsed: number; // in seconds
-  isLikelyFalseAlarm?: boolean;
-  // Added slaBreach to fix property access errors in Incidents page
-  slaBreach?: string;
-}
-
 export interface PatrolRoute {
   id: string;
   name: string;
@@ -67,6 +86,15 @@ export interface PatrolRoute {
   lastRun: string;
   coverage: number;
   status: 'ACTIVE' | 'SCHEDULED' | 'DRAFT';
+  drones: string[];
+  guards: string[];
+  hasCoverageGap: boolean;
+  gapDuration?: string;
+  frequency: string;
+  startTime: string; // "HH:mm"
+  endTime: string;   // "HH:mm"
+  approvalStatus: 'Pending' | 'Approved' | 'N/A';
+  isNightMode: boolean;
 }
 
 export interface Guard {

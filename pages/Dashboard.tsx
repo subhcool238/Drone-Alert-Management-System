@@ -16,6 +16,7 @@ const Dashboard: React.FC = () => {
   const [threatFilter, setThreatFilter] = useState('All');
   const [mapLayers, setMapLayers] = useState({ drones: true, guards: true, blindSpots: true });
 
+  // Fixed Incident initialization by adding mandatory properties: respondedBy, responseTime, and timeline
   const [alerts, setAlerts] = useState<Incident[]>([
     {
       id: 'ALT-01',
@@ -28,7 +29,10 @@ const Dashboard: React.FC = () => {
       status: 'Investigating',
       assignedTo: 'Sentinel-1',
       timestamp: '2m ago',
-      isLikelyFalseAlarm: false
+      isLikelyFalseAlarm: false,
+      respondedBy: 'Isabelle M.',
+      responseTime: 'N/A',
+      timeline: []
     },
     {
       id: 'ALT-02',
@@ -41,7 +45,10 @@ const Dashboard: React.FC = () => {
       status: 'Investigating',
       assignedTo: 'None',
       timestamp: '12m ago',
-      isLikelyFalseAlarm: true
+      isLikelyFalseAlarm: true,
+      respondedBy: 'System',
+      responseTime: 'N/A',
+      timeline: []
     },
     {
       id: 'ALT-03',
@@ -54,7 +61,10 @@ const Dashboard: React.FC = () => {
       status: 'Investigating',
       assignedTo: 'None',
       timestamp: '15m ago',
-      isLikelyFalseAlarm: false
+      isLikelyFalseAlarm: false,
+      respondedBy: 'System',
+      responseTime: 'N/A',
+      timeline: []
     }
   ]);
 
