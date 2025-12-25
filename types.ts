@@ -42,7 +42,14 @@ export interface Incident {
   respondedBy: string;
   responseTime: string;
   falseAlarmReason?: string;
+  confidence?: number; // AI confidence score 0-100
+  priority?: 'P1' | 'P2' | 'P3' | 'P4';
+  eta?: string;
+  assignmentStatus?: 'En route' | 'Queued' | 'None';
   timeline: TimelineEvent[];
+  isCarriedOver?: boolean;
+  previousOwner?: string;
+  handoverNote?: string;
   evidence?: {
     type: 'video' | 'image' | 'log';
     url: string;
@@ -124,4 +131,11 @@ export interface UserPermission {
   canEmergency: boolean;
   canRequestExtensions: boolean;
   canAnalytics: boolean;
+}
+
+export interface ShiftInfo {
+  name: string;
+  timeRange: string;
+  operator: string;
+  priorityNote: string;
 }

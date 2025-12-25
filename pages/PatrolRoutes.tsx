@@ -66,6 +66,7 @@ const PatrolRoutes: React.FC = () => {
   const [selectedRoute, setSelectedRoute] = useState<PatrolRoute>(mockRoutes[0]);
   const [showGapsOnly, setShowGapsOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [timeScope, setTimeScope] = useState('Last 24h');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
@@ -73,9 +74,14 @@ const PatrolRoutes: React.FC = () => {
     return routes.filter(r => {
       const searchMatch = r.name.toLowerCase().includes(searchTerm.toLowerCase());
       const gapMatch = !showGapsOnly || r.hasCoverageGap;
-      return searchMatch && gapMatch;
+      
+      let timeMatch = true;
+      if (timeScope === 'Current shift') timeMatch = r.status === 'ACTIVE';
+      if (timeScope === 'Previous shift') timeMatch = r.lastRun.includes('today') || r.lastRun.includes('Yesterday');
+
+      return searchMatch && gapMatch && timeMatch;
     });
-  }, [routes, searchTerm, showGapsOnly]);
+  }, [routes, searchTerm, showGapsOnly, timeScope]);
 
   const handleSmartSuggestion = async () => {
     setIsAiLoading(true);
@@ -106,14 +112,25 @@ const PatrolRoutes: React.FC = () => {
             <span className="bg-white/5 px-2 py-0.5 rounded text-[10px] text-gray-500 font-bold uppercase">{filteredRoutes.length} Tracks</span>
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-4">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-[20px]">search</span>
             <input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-background border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[12px] text-white focus:border-primary/50 placeholder-gray-600 outline-none transition-all" 
-              placeholder="Search by route name..." 
+              placeholder="Search routes..." 
             />
+          </div>
+
+          <div className="relative mb-6">
+            <select 
+              value={timeScope}
+              onChange={e => setTimeScope(e.target.value)}
+              className="w-full appearance-none bg-background border border-white/10 text-gray-400 text-[10px] font-bold rounded-xl px-4 py-3 uppercase tracking-widest outline-none cursor-pointer focus:border-primary/30"
+            >
+              {['Current shift', 'Previous shift', 'Last 24h'].map(o => <option key={o} value={o}>Scope: {o}</option>)}
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none text-lg">expand_more</span>
           </div>
 
           <div className="flex items-center justify-between px-1">

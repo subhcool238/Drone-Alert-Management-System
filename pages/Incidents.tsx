@@ -21,6 +21,9 @@ const mockIncidents: Incident[] = [
     respondedBy: 'Isabelle M.',
     responseTime: '7m 00s',
     assignedTo: 'Sentinel-1',
+    isCarriedOver: true,
+    previousOwner: 'Marc (Day Shift)',
+    handoverNote: 'Sensor flickering noticed, check power stability.',
     timeline: [
       { time: '22:14:00', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
       { time: '22:14:30', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' },
@@ -99,6 +102,7 @@ const Incidents: React.FC = () => {
   const [severityFilter, setSeverityFilter] = useState('All');
   const [threatFilter, setThreatFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [timeScope, setTimeScope] = useState('Last 24h');
 
   const filteredIncidents = useMemo(() => {
     return mockIncidents.filter(inc => {
@@ -106,9 +110,15 @@ const Incidents: React.FC = () => {
       const severityMatch = severityFilter === 'All' || inc.severity === severityFilter.toUpperCase();
       const threatMatch = threatFilter === 'All' || inc.threat === threatFilter.toUpperCase();
       const statusMatch = statusFilter === 'All' || inc.status === statusFilter;
-      return searchMatch && severityMatch && threatMatch && statusMatch;
+      
+      // Basic time scope filter logic (mocked)
+      let timeMatch = true;
+      if (timeScope === 'Current shift') timeMatch = inc.id === 'INC-2025-082';
+      if (timeScope === 'Previous shift') timeMatch = inc.id === 'INC-2025-081';
+
+      return searchMatch && severityMatch && threatMatch && statusMatch && timeMatch;
     });
-  }, [searchTerm, severityFilter, threatFilter, statusFilter]);
+  }, [searchTerm, severityFilter, threatFilter, statusFilter, timeScope]);
 
   const renderIncidentList = () => (
     <div className="flex flex-col gap-6 h-full overflow-hidden">
@@ -145,10 +155,12 @@ const Incidents: React.FC = () => {
           />
         </div>
         <div className="flex gap-2">
-          {['Severity', 'Threat', 'Status'].map((f) => (
+          {['Time scope', 'Severity', 'Threat', 'Status'].map((f) => (
             <div key={f} className="relative">
               <select 
+                value={f === 'Time scope' ? timeScope : undefined}
                 onChange={e => {
+                  if (f === 'Time scope') setTimeScope(e.target.value);
                   if (f === 'Severity') setSeverityFilter(e.target.value);
                   if (f === 'Threat') setThreatFilter(e.target.value);
                   if (f === 'Status') setStatusFilter(e.target.value);
@@ -156,6 +168,7 @@ const Incidents: React.FC = () => {
                 className="appearance-none bg-background border border-white/5 text-white text-[10px] font-bold rounded-xl pl-4 pr-10 py-3 uppercase tracking-widest outline-none cursor-pointer"
               >
                 <option value="All">{f}: All</option>
+                {f === 'Time scope' && ['Current shift', 'Previous shift', 'Last 24h'].map(o => <option key={o} value={o}>{o}</option>)}
                 {f === 'Severity' && ['Critical', 'High', 'Medium', 'Low'].map(o => <option key={o}>{o}</option>)}
                 {f === 'Threat' && ['Human', 'Environmental', 'Sensor'].map(o => <option key={o}>{o}</option>)}
                 {f === 'Status' && ['Investigating', 'Responding', 'Resolved', 'Escalated'].map(o => <option key={o}>{o}</option>)}
@@ -193,7 +206,12 @@ const Incidents: React.FC = () => {
                     <div className="text-gray-600 font-mono text-[10px]">{inc.timestamp}</div>
                   </td>
                   <td className="px-6 py-5">
-                    <div className="font-bold text-gray-200 mb-2 leading-tight max-w-[200px]">{inc.title}</div>
+                    <div className="flex items-center gap-3 mb-2">
+                       <div className="font-bold text-gray-200 leading-tight max-w-[200px]">{inc.title}</div>
+                       {inc.isCarriedOver && (
+                          <span className="material-symbols-outlined text-[14px] text-indigo-400" title={`Carried over from: ${inc.previousOwner}`}>sync_alt</span>
+                       )}
+                    </div>
                     <div className="flex gap-2">
                       <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[8px] font-bold text-gray-500 uppercase tracking-widest">{inc.threat}</span>
                     </div>
@@ -329,28 +347,6 @@ const Incidents: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <div className="bg-panel border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
-         <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-10">Root Causes (False Alarms)</h3>
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { label: 'HVAC Resonance', count: 12, trend: '+2' },
-              { label: 'Wildlife Activity', count: 8, trend: '-4' },
-              { label: 'Sensor Calibration', count: 5, trend: '+1' },
-              { label: 'Light Anomalies', count: 3, trend: '0' }
-            ].map((cause, i) => (
-              <div key={i} className="bg-background/40 border border-white/5 p-6 rounded-2xl flex flex-col gap-4 group hover:border-primary/20 transition-all">
-                <div className="flex justify-between items-start">
-                  <span className="text-3xl font-display font-bold text-white">{cause.count}</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${cause.trend.includes('+') ? 'text-danger' : 'text-emerald-500'}`}>
-                    {cause.trend} trend
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{cause.label}</span>
-              </div>
-            ))}
-         </div>
-      </div>
     </div>
   );
 
@@ -453,21 +449,34 @@ const Incidents: React.FC = () => {
           <div className="w-full max-w-4xl h-full bg-panel border-l border-white/10 flex flex-col shadow-[-40px_0_60px_-15px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-500">
             {/* Modal Header */}
             <div className="p-10 border-b border-white/5 flex justify-between items-start bg-background/20">
-               <div>
+               <div className="flex-1 pr-10">
                   <div className="flex items-center gap-4 mb-4">
                     <h2 className="text-4xl font-display font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
                     <span className={`px-4 py-1 rounded-full text-[10px] font-bold border ${
                       selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger' : 'bg-primary/10 border-primary/30 text-primary'
                     }`}>{selectedIncident.severity}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-400 mb-2">{selectedIncident.title}</h3>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-gray-400">{selectedIncident.title}</h3>
+                    {selectedIncident.isCarriedOver && (
+                      <div className="group relative flex items-center">
+                        <span className="bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-widest flex items-center gap-2 cursor-help">
+                          <span className="material-symbols-outlined text-[14px]">sync_alt</span> Carried over from previous shift
+                        </span>
+                        <div className="absolute top-full left-0 mt-2 p-3 bg-panel border border-white/10 rounded-xl shadow-2xl z-50 w-64 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Assigned to: {selectedIncident.previousOwner}</p>
+                          <p className="text-xs text-gray-300 italic">"{selectedIncident.handoverNote}"</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">{selectedIncident.location}</span>
                     <span className="size-1 rounded-full bg-gray-800"></span>
                     <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{selectedIncident.threat} Threat</span>
                   </div>
                </div>
-               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-gray-600 hover:text-white transition-all text-3xl">close</button>
+               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-gray-600 hover:text-white transition-all text-3xl shrink-0">close</button>
             </div>
 
             {/* Modal Content */}
@@ -537,7 +546,7 @@ const Incidents: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-10 border-t border-white/5 bg-background/20 flex gap-4">
+            <div className="p-10 border-t border-white/5 bg-background/20 flex gap-4 shrink-0">
               <button className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 transition-all">
                 Export Detailed PDF
               </button>

@@ -3,6 +3,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
 
+// Using a consistent high-quality drone image that matches the requested aesthetic
+const UNIFIED_DRONE_IMAGE = 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&q=80&w=800';
+
 const mockDrones: Drone[] = [
   {
     id: 'D-001',
@@ -18,7 +21,7 @@ const mockDrones: Drone[] = [
     cycles: 132,
     cyclesRemaining: 1868,
     lastSync: '2s ago',
-    image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&q=80&w=400',
+    image: UNIFIED_DRONE_IMAGE,
     type: 'Indoor Guardian Pro',
     fwVersion: 'v2.4.1',
     flightTimeToday: '4h 12m',
@@ -40,7 +43,7 @@ const mockDrones: Drone[] = [
     cycles: 450,
     cyclesRemaining: 1550,
     lastSync: '10m ago',
-    image: 'https://images.unsplash.com/photo-1527977966376-1c8418f9f108?auto=format&fit=crop&q=80&w=400',
+    image: UNIFIED_DRONE_IMAGE,
     type: 'Thermal Scout',
     fwVersion: 'v2.3.0',
     flightTimeToday: '2h 05m',
@@ -62,7 +65,7 @@ const mockDrones: Drone[] = [
     cycles: 1205,
     cyclesRemaining: 795,
     lastSync: '1h ago',
-    image: 'https://images.unsplash.com/photo-1506947411487-a56738267384?auto=format&fit=crop&q=80&w=400',
+    image: UNIFIED_DRONE_IMAGE,
     type: 'High-Altitude Recon',
     fwVersion: 'v1.9.8',
     flightTimeToday: '8h 44m',
@@ -215,7 +218,7 @@ const FleetManagement: React.FC = () => {
             >
               <div className="flex justify-between items-start z-10">
                 <div className="flex gap-4">
-                  <div className="size-12 rounded-2xl bg-background border border-white/10 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
+                  <div className="size-12 rounded-2xl bg-background flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform">
                     <img className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all" src={drone.image} alt={drone.name}/>
                   </div>
                   <div>
@@ -229,7 +232,7 @@ const FleetManagement: React.FC = () => {
                   </div>
                 </div>
                 <div className={`px-2 py-1 rounded-lg border text-[9px] font-bold uppercase tracking-widest ${getRiskColor(drone.risk)}`}>
-                  {drone.risk} Risk
+                  {drone.risk} Risk Level
                 </div>
               </div>
               
@@ -269,7 +272,7 @@ const FleetManagement: React.FC = () => {
       {/* RIGHT DETAILS: Predictive Maintenance & Telemetry */}
       <section className="flex-1 bg-panel rounded-[2rem] border border-white/5 p-10 overflow-y-auto flex flex-col gap-12 custom-scrollbar shadow-2xl">
         <div className="flex flex-col xl:flex-row gap-12 pb-12 border-b border-white/5">
-          <div className="w-full xl:w-[480px] h-72 bg-background rounded-[2rem] overflow-hidden border border-white/10 relative group">
+          <div className="w-full xl:w-[480px] h-72 bg-background rounded-[2rem] overflow-hidden relative group">
             <img className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src={selectedDrone.image} alt={selectedDrone.name}/>
             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
             <div className="absolute bottom-6 left-6 flex items-center gap-3">

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -29,6 +30,15 @@
                     fontFamily: {
                         display: ["Space Grotesk", "sans-serif"],
                         body: ["Inter", "sans-serif"]
+                    },
+                    animation: {
+                        'scan': 'scan 3s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(500%)' },
+                        }
                     }
                 }
             }
