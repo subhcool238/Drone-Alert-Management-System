@@ -1,5 +1,5 @@
 {
-  "name": "Sentinel Sky - Security Ops",
+  "name": "Drone Alert Management System",
   "description": "A comprehensive drone security fleet management and command center with AI-assisted patrols, real-time telemetry, and manual control override capabilities.",
   "requestFramePermissions": [
     "camera",

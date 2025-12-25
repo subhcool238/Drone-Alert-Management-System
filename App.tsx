@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
@@ -12,12 +11,18 @@ import Settings from './pages/Settings';
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen w-screen bg-background overflow-hidden text-gray-100">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         <Header />
-        <main className="flex-1 overflow-hidden">
-          <div className="h-full overflow-auto p-6">
+        {/* 
+          We remove 'overflow-y-auto' from the main wrapper to allow 
+          pages like Dashboard to handle their own internal scrolling layouts 
+          using h-full. Pages that need body scrolling should add it themselves
+          or rely on the child container.
+        */}
+        <main className="flex-1 overflow-hidden relative p-6">
+          <div className="h-full w-full">
             {children}
           </div>
         </main>
@@ -37,6 +42,7 @@ const App: React.FC = () => {
           <Route path="/patrols" element={<PatrolRoutes />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/settings/*" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </MainLayout>
     </HashRouter>

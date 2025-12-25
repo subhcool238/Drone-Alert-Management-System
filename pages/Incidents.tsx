@@ -1,12 +1,45 @@
 
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Incident } from '../types';
+// Added ThreatType to imports to fix type assignment errors
+import { Incident, ThreatType } from '../types';
 
+// Updated mockIncidents to satisfy the Incident interface requirements
 const mockIncidents: Incident[] = [
-  { id: 'INC-2025-082', timestamp: 'Oct 24, 22:14', title: 'Motion Detected - Zone B', threat: 'Human Intruder', severity: 'CRITICAL', status: 'Investigating', slaBreach: '-2m' },
-  { id: 'INC-2025-081', timestamp: 'Oct 24, 18:30', title: 'HVAC Vibration', threat: 'Environmental', severity: 'HIGH', status: 'Resolved' },
-  { id: 'INC-2025-080', timestamp: 'Oct 23, 09:15', title: 'Camera Offline - Zone A', threat: 'Sensor Fault', severity: 'MEDIUM', status: 'Closed' }
+  { 
+    id: 'INC-2025-082', 
+    timestamp: 'Oct 24, 22:14', 
+    title: 'Motion Detected - Zone B', 
+    threat: ThreatType.HUMAN, 
+    severity: 'CRITICAL', 
+    status: 'Investigating', 
+    slaBreach: '-2m',
+    location: 'Zone B',
+    slaLimit: 300,
+    elapsed: 420
+  },
+  { 
+    id: 'INC-2025-081', 
+    timestamp: 'Oct 24, 18:30', 
+    title: 'HVAC Vibration', 
+    threat: ThreatType.ENVIRONMENTAL, 
+    severity: 'HIGH', 
+    status: 'Resolved',
+    location: 'Sector 4',
+    slaLimit: 600,
+    elapsed: 300
+  },
+  { 
+    id: 'INC-2025-080', 
+    timestamp: 'Oct 23, 09:15', 
+    title: 'Camera Offline - Zone A', 
+    threat: ThreatType.SENSOR, 
+    severity: 'MEDIUM', 
+    status: 'Closed',
+    location: 'Zone A',
+    slaLimit: 1200,
+    elapsed: 1100
+  }
 ];
 
 const analyticData = [
@@ -106,6 +139,7 @@ const Incidents: React.FC = () => {
                   </td>
                   <td className="px-6 py-5 align-top">
                     <div className="text-white text-xs font-mono">Auto-dispatch</div>
+                    {/* Accessing slaBreach correctly as an optional property */}
                     {inc.slaBreach ? (
                       <div className="text-[9px] text-danger font-bold mt-1 uppercase tracking-tight">SLA BREACHED ({inc.slaBreach})</div>
                     ) : (
