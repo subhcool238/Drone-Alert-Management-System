@@ -136,7 +136,7 @@ const PatrolRoutes: React.FC = () => {
           <div className="flex items-center justify-between px-1">
              <div className="flex flex-col">
                <span className="text-[10px] text-white font-bold uppercase tracking-tight">Show Coverage Gaps</span>
-               <span className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-0.5">Highlight >30m Unpatrolled</span>
+               <span className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-0.5">Highlight &gt;30m Unpatrolled</span>
              </div>
              <button 
               onClick={() => setShowGapsOnly(!showGapsOnly)}
@@ -450,7 +450,7 @@ const PatrolRoutes: React.FC = () => {
                       </div>
                    </div>
                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
-                     Zone <span className="text-white font-bold">"North Storage"</span> is currently unpatrolled by any automated track for >45 minutes. 
+                     Zone <span className="text-white font-bold">"North Storage"</span> is currently unpatrolled by any automated track for &gt;45 minutes. 
                      Recommend adding a high-altitude waypoint at [Sector 4] or tasking a manual guard sweep.
                    </p>
                    <div className="flex gap-3 pt-2">

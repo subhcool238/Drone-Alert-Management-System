@@ -63,7 +63,7 @@ const Header: React.FC = () => {
                   <h4 className="text-[10px] font-bold text-warning uppercase tracking-widest mb-4">Coverage Intelligence</h4>
                   <div className="p-5 rounded-2xl bg-warning/5 border border-warning/20">
                     <div className="text-4xl font-display font-bold text-warning mb-1">1 Zone</div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for >45 min</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for &gt;45 min</p>
                     <button className="mt-4 text-[9px] text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign Sentinel-2</button>
                   </div>
                 </section>
