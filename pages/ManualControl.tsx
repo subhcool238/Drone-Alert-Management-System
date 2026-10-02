@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
-import { DRONES, getDroneById, getDroneByName } from '../data/drones';
+import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
 
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +15,12 @@ const ManualControl: React.FC = () => {
 
   // State for Control Logic
   const [isManual, setIsManual] = useState(false);
+
+  // Health gate: a Fault or Charging drone, or one at 50% battery or less, cannot be taken
+  // under manual control. A session already in progress can always be ended.
+  const blockReason = getManualControlBlock(selectedDrone);
+  const controlsLocked = blockReason !== null && !isManual;
+  const lockedTitle = controlsLocked ? `Not available: ${blockReason}` : undefined;
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [extensionsUsed, setExtensionsUsed] = useState(0);
   const [showExtensionModal, setShowExtensionModal] = useState(false);
@@ -280,10 +286,15 @@ const ManualControl: React.FC = () => {
                      Request Extension (+2m)
                    </button>
                  )}
-                 <button 
+                 {controlsLocked && (
+                   <span className="self-center text-[10px] font-bold text-gray-300 uppercase tracking-widest">Not available: {blockReason}</span>
+                 )}
+                 <button
                    onClick={() => isManual ? handleReturnToAutonomy() : setIsManual(true)}
-                   className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl ${
-                     isManual ? 'bg-danger text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10'
+                   disabled={controlsLocked}
+                   title={lockedTitle}
+                   className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed ${
+                     isManual ? 'bg-danger text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10 disabled:hover:bg-white'
                    }`}
                  >
                    {isManual ? 'Return to Autonomy' : 'Take Manual Control'}
@@ -311,8 +322,8 @@ const ManualControl: React.FC = () => {
                <div className="flex flex-col gap-1 items-center">
                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Control Mode</span>
                  <div className="bg-background/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
-                   <button onClick={() => setIsManual(false)} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${!isManual ? 'bg-primary text-black' : 'text-gray-500 hover:text-white'}`}>Auto</button>
-                   <button onClick={() => setIsManual(true)} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${isManual ? 'bg-amber-500 text-black' : 'text-gray-500 hover:text-white'}`}>Manual</button>
+                   <button onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed ${!isManual ? 'bg-primary text-black' : 'text-gray-500 hover:text-white'}`}>Auto</button>
+                   <button onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isManual ? 'bg-amber-500 text-black' : 'text-gray-500 hover:text-white'}`}>Manual</button>
                  </div>
                </div>
                <div className="size-1 bg-white/5 rounded-full"></div>

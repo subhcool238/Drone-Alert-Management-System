@@ -5,7 +5,7 @@ import {
   Cell, PieChart, Pie, LineChart, Line, Legend 
 } from 'recharts';
 import { Incident, ThreatType, TimelineEvent } from '../types';
-import { INCIDENTS as mockIncidents, isOpen, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency, getAvgResponse } from '../data/incidents';
+import { INCIDENTS as mockIncidents, getElapsed, getSlaState, useSecondsSinceLoad, getSlaUrgency, getAvgResponse } from '../data/incidents';
 
 const analyticData = [
   { name: 'Mon', time: 180, target: 180 },
@@ -43,6 +43,63 @@ const Incidents: React.FC = () => {
   const secondsSinceLoad = useSecondsSinceLoad();
   // Live SLA clock for open incidents (same clock as the Dashboard alert cards)
   const withLiveElapsed = (inc: Incident): Incident => ({ ...inc, elapsed: getElapsed(inc, secondsSinceLoad) });
+
+  // What the SLA slot shows for an incident. The rules live in data/incidents.ts and data/sla.ts.
+  const renderSlaCell = (inc: Incident) => {
+    const sla = getSlaState(inc, secondsSinceLoad);
+    switch (sla.kind) {
+      case 'responded':
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="text-success font-bold uppercase">Responded in {sla.text}</span>
+            <span className="text-gray-600 font-mono text-[9px]">Limit {sla.tier}</span>
+          </div>
+        );
+      case 'ticking':
+        return (
+          <div className="flex flex-col gap-1">
+            <span className={`font-bold uppercase font-mono ${getSlaUrgency(withLiveElapsed(inc))}`}>{sla.text}</span>
+            <span className="text-gray-600 font-mono text-[9px]">Remaining</span>
+          </div>
+        );
+      case 'breached':
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="text-danger font-bold uppercase">Breached</span>
+            <span className="text-danger/60 font-mono text-[9px]">Limit {sla.tier}</span>
+          </div>
+        );
+      case 'closed-breached':
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="text-danger font-bold uppercase">Breached</span>
+            <span className="text-danger/60 font-mono text-[9px]">{sla.response}</span>
+          </div>
+        );
+      case 'closed-ok':
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="text-success font-bold uppercase">On-Time</span>
+            <span className="text-gray-600 font-mono text-[9px]">{sla.response}</span>
+          </div>
+        );
+      default:
+        return <span className="text-gray-600 font-mono">-</span>;
+    }
+  };
+
+  // Text and colour for the "SLA Response Performance" line in the detail panel
+  const slaPerformance = (inc: Incident): { text: string; className: string } => {
+    const sla = getSlaState(inc, secondsSinceLoad);
+    switch (sla.kind) {
+      case 'responded': return { text: `Responded in ${sla.text} (limit ${sla.tier})`, className: 'text-emerald-500' };
+      case 'ticking': return { text: `Live: ${sla.text} remaining`, className: 'text-gray-300' };
+      case 'breached': return { text: `Breached (limit ${sla.tier})`, className: 'text-danger' };
+      case 'closed-breached': return { text: `Breached (${sla.response} vs ${sla.tier} limit)`, className: 'text-danger' };
+      case 'closed-ok': return { text: 'Compliant (On-time)', className: 'text-emerald-500' };
+      default: return { text: '-', className: 'text-gray-300' };
+    }
+  };
 
   const filteredIncidents = useMemo(() => {
     return mockIncidents.filter(inc => {
@@ -174,26 +231,7 @@ const Incidents: React.FC = () => {
                   </td>
                   <td className="px-6 py-5 text-gray-400 font-medium">{inc.respondedBy}</td>
                   <td className="px-6 py-5">
-                    {isOpen(inc) ? (
-                      inc.slaLimit ? (
-                        <div className="flex flex-col gap-1">
-                          <span className={`font-bold uppercase font-mono ${getSlaUrgency(withLiveElapsed(inc))}`}>{formatSla(withLiveElapsed(inc))}</span>
-                          <span className="text-gray-600 font-mono text-[9px]">Remaining</span>
-                        </div>
-                      ) : (
-                        <span className="text-gray-600 font-mono">-</span>
-                      )
-                    ) : inc.slaBreach ? (
-                      <div className="flex flex-col gap-1">
-                        <span className="text-danger font-bold uppercase">Breached</span>
-                        <span className="text-danger/60 font-mono text-[9px]">{inc.slaBreach}</span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-1">
-                        <span className="text-success font-bold uppercase">On-Time</span>
-                        <span className="text-gray-600 font-mono text-[9px]">{inc.responseTime}</span>
-                      </div>
-                    )}
+                    {renderSlaCell(inc)}
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -483,10 +521,8 @@ const Incidents: React.FC = () => {
                   <div className="space-y-6">
                      <div className="flex flex-col gap-1">
                        <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">SLA Response Performance</span>
-                       <span className={`text-sm font-bold ${isOpen(selectedIncident) ? 'text-gray-300' : selectedIncident.slaBreach ? 'text-danger' : 'text-emerald-500'}`}>
-                         {isOpen(selectedIncident)
-                           ? (selectedIncident.slaLimit ? `Live: ${formatSla(withLiveElapsed(selectedIncident))} remaining` : '-')
-                           : selectedIncident.slaBreach ? `Breached (${selectedIncident.slaBreach})` : 'Compliant (On-time)'}
+                       <span className={`text-sm font-bold ${slaPerformance(selectedIncident).className}`}>
+                         {slaPerformance(selectedIncident).text}
                        </span>
                      </div>
                      <div className="flex flex-col gap-1">

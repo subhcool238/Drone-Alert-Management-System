@@ -12,7 +12,7 @@ export const PATROL_ROUTES: PatrolRoute[] = [
     type: 'Standard',
     duration: '18 min',
     waypoints: 12,
-    lastRun: '14:20 today',
+    lastRun: '02:00 today',
     coverage: 100,
     status: 'ACTIVE',
     drones: [getDroneByName('Sentinel-1').name],

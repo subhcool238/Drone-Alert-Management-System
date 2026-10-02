@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { FleetStatus } from '../types';
 import { DRONES } from '../data/drones';
-import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla } from '../data/incidents';
+import { getOpenIncidents, getSlaState, useSecondsSinceLoad } from '../data/incidents';
 import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../data/patrols';
 import { buildSystemSummary } from '../data/summary';
 
@@ -25,9 +25,9 @@ const Header: React.FC = () => {
   };
 
   const notifications = [
-    { id: 1, type: 'SLA Breach', msg: 'INC-2025-082 exceeded response SLA', time: '2m ago', color: 'text-danger', icon: 'timer_off' },
+    { id: 1, type: 'SLA Breach', msg: 'INC-2025-083 awaiting response (High, potential false alarm)', time: '2m ago', color: 'text-danger', icon: 'timer_off' },
     { id: 2, type: 'Escalation', msg: 'Team Lead approval required: Perimeter Alpha', time: '12m ago', color: 'text-warning', icon: 'priority_high' },
-    { id: 3, type: 'Maintenance', msg: 'Sentinel-4 due for lens calibration', time: '1h ago', color: 'text-primary', icon: 'settings_backup_restore' },
+    { id: 3, type: 'Maintenance', msg: 'Watcher-3 lens calibration requested', time: '1h ago', color: 'text-primary', icon: 'settings_backup_restore' },
   ];
 
   return (
@@ -39,7 +39,7 @@ const Header: React.FC = () => {
             <div className="p-10 border-b border-white/5 flex justify-between items-start">
                <div>
                   <h2 className="text-3xl font-display font-bold text-white tracking-tight">Shift Handover Briefing</h2>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Operator: Isabelle M. • 14:00 - 22:00</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Operator: Isabelle M. • 22:00 - 06:00</p>
                </div>
                <button onClick={() => setShowShiftBriefing(false)} className="material-symbols-outlined text-gray-500 hover:text-white transition-colors">close</button>
             </div>
@@ -51,7 +51,12 @@ const Header: React.FC = () => {
                     {criticalIncidents.map(inc => (
                       <div key={inc.id} className="p-3 rounded-xl bg-danger/10 border border-danger/20">
                         <p className="text-xs text-white font-bold">{inc.title}: {inc.location}</p>
-                        <p className="text-[10px] text-danger/70 font-bold uppercase mt-1">SLA: {formatSla({ ...inc, elapsed: getElapsed(inc, secondsSinceLoad) })}</p>
+                        <p className="text-[10px] text-danger/70 font-bold uppercase mt-1">{(() => {
+                          const sla = getSlaState(inc, secondsSinceLoad);
+                          if (sla.kind === 'responded') return `Responded in ${sla.text}`;
+                          if (sla.kind === 'breached') return 'SLA breached';
+                          return `SLA: ${sla.kind === 'ticking' ? sla.text : '-'}`;
+                        })()}</p>
                       </div>
                     ))}
                   </div>

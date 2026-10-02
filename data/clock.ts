@@ -12,4 +12,11 @@ export const formatScenarioTime = (secondsSinceLoad: number): string => {
   return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
 };
 
+// 12 -> "12s ago", 59 -> "59s ago", 60 -> "1m ago", 3600 -> "1h ago"
+export const formatAgo = (seconds: number): string => {
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  return `${Math.floor(seconds / 3600)}h ago`;
+};
+
 export const useScenarioClock = (): string => formatScenarioTime(useSecondsSinceLoad());

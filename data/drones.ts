@@ -11,7 +11,7 @@ export const DRONES: Drone[] = [
     status: FleetStatus.ACTIVE,
     risk: RiskLevel.LOW,
     battery: 78,
-    batteryTimeRemaining: '22m',
+    batteryTimeRemaining: '35m',
     health: 98,
     nominalCapacity: 100,
     link: 'Strong',
@@ -168,4 +168,15 @@ export const STATUS_DOT: Record<FleetStatus, string> = {
   [FleetStatus.IDLE]: 'bg-primary',
   [FleetStatus.CHARGING]: 'bg-warning',
   [FleetStatus.FAULT]: 'bg-danger'
+};
+
+// Manual control health gate (flowchart: the drone must be healthy first).
+// Returns the reason text when a drone cannot be taken under manual control, or null when it can.
+export const MIN_MANUAL_BATTERY = 50;
+
+export const getManualControlBlock = (d: Drone): string | null => {
+  if (d.status === FleetStatus.FAULT) return 'Fault';
+  if (d.status === FleetStatus.CHARGING) return `Charging, ${d.battery}%`;
+  if (d.battery <= MIN_MANUAL_BATTERY) return `Battery ${d.battery}%`;
+  return null;
 };

@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
 import { countByStatus, getFleetBatteryAvg } from '../data/drones';
 import { COVERAGE_GAP, getCoverageGapCount } from '../data/patrols';
-import { formatScenarioTime } from '../data/clock';
-import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
+import { formatScenarioTime, formatAgo } from '../data/clock';
+import { getOpenIncidents, getElapsed, getSlaState, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
   const secondsSinceLoad = useSecondsSinceLoad();
   const scenarioClock = formatScenarioTime(secondsSinceLoad);
   const alerts = useMemo(
-    () => getOpenIncidents().map(i => ({ ...i, elapsed: getElapsed(i, secondsSinceLoad) })),
+    () => getOpenIncidents().map(i => ({ ...i, elapsed: getElapsed(i, secondsSinceLoad), sla: getSlaState(i, secondsSinceLoad) })),
     [secondsSinceLoad]
   );
 
@@ -196,7 +196,13 @@ const Dashboard: React.FC = () => {
                         <span className="bg-white/5 px-2 py-0.5 rounded text-[8px] font-bold text-gray-500 border border-white/5 uppercase w-fit">{alert.threat}</span>
                       </div>
                       <div className="text-right text-[10px] font-mono font-bold uppercase tracking-tighter leading-tight">
-                        <div className={getSlaUrgency(alert)}>SLA: {formatSla(alert)}</div>
+                        {alert.sla.kind === 'responded' ? (
+                          <div className="text-success">Responded in {alert.sla.text}</div>
+                        ) : alert.sla.kind === 'breached' ? (
+                          <div className="text-danger font-bold">Breached</div>
+                        ) : (
+                          <div className={getSlaUrgency(alert)}>SLA: {formatSla(alert)}</div>
+                        )}
                         <div className="mt-1">{renderConfidence(alert.confidence)}</div>
                       </div>
                     </div>
@@ -207,7 +213,7 @@ const Dashboard: React.FC = () => {
                         <span className="material-symbols-outlined text-[16px]">reply</span>
                         {alert.assignedTo || 'Unassigned'}
                       </span>
-                      <span className="text-gray-600 font-medium">{alert.relativeTime ?? alert.timestamp}</span>
+                      <span className="text-gray-600 font-medium">{alert.detectedSecondsBeforeLoad !== undefined ? formatAgo(alert.detectedSecondsBeforeLoad + secondsSinceLoad) : alert.timestamp}</span>
                     </div>
                   </div>
                 );

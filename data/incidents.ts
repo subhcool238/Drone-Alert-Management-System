@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Incident, ThreatType } from '../types';
+import { SLA_SECONDS, formatSlaTier } from './sla';
 
 // Single source of truth for incidents. The sidebar badge, Dashboard live alerts,
 // Header briefing and Incidents page all read from this list.
+//
+// Scenario: the app loads at 02:37:00. "detectedSecondsBeforeLoad" says how long
+// before that moment an alert was detected, and "respondedInSeconds" marks an
+// alert an operator has already responded to (its SLA clock stops there).
 export const INCIDENTS: Incident[] = [
   {
     id: 'INC-2025-082',
-    timestamp: '2025-10-24 22:14',
-    relativeTime: '2m ago',
+    timestamp: 'Today 02:36:48',
+    detectedSecondsBeforeLoad: 12,
+    respondedInSeconds: 12,
     title: 'Motion Detected',
     threat: ThreatType.HUMAN,
     severity: 'CRITICAL',
     status: 'Investigating',
     location: 'Storage Area B (North)',
-    slaLimit: 300,
-    elapsed: 6,
+    slaLimit: SLA_SECONDS.CRITICAL,
+    elapsed: 12,
     respondedBy: 'Isabelle M.',
     responseTime: 'N/A',
     assignedTo: 'Sentinel-1',
@@ -26,25 +32,25 @@ export const INCIDENTS: Incident[] = [
     previousOwner: 'Marc (Day Shift)',
     handoverNote: 'Sensor flickering noticed, check power stability.',
     timeline: [
-      { time: '22:14:00', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
-      { time: '22:14:30', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' }
+      { time: '02:36:48', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
+      { time: '02:37:00', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' }
     ],
     evidence: [
       { type: 'video', url: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=400', caption: 'FPV Sector B' },
-      { type: 'image', url: 'https://images.unsplash.com/photo-1551817958-c5b5d1b74a33?auto=format&fit=crop&q=80&w=400', caption: 'Snapshot 22:15' }
+      { type: 'image', url: 'https://images.unsplash.com/photo-1551817958-c5b5d1b74a33?auto=format&fit=crop&q=80&w=400', caption: 'Snapshot 02:36:50' }
     ]
   },
   {
     id: 'INC-2025-083',
-    timestamp: '2025-10-24 22:04',
-    relativeTime: '12m ago',
+    timestamp: 'Today 02:36:35',
+    detectedSecondsBeforeLoad: 25,
     title: 'Signal Degradation',
     threat: ThreatType.SENSOR,
     severity: 'HIGH',
     status: 'Investigating',
     location: 'Watcher-3 @ East Wing',
-    slaLimit: 600,
-    elapsed: 45,
+    slaLimit: SLA_SECONDS.HIGH,
+    elapsed: 25,
     respondedBy: 'System',
     responseTime: 'N/A',
     assignedTo: 'None',
@@ -57,15 +63,15 @@ export const INCIDENTS: Incident[] = [
   },
   {
     id: 'INC-2025-084',
-    timestamp: '2025-10-24 22:01',
-    relativeTime: '15m ago',
+    timestamp: 'Today 02:36:10',
+    detectedSecondsBeforeLoad: 50,
     title: 'Temp Spike',
     threat: ThreatType.ENVIRONMENTAL,
     severity: 'MEDIUM',
     status: 'Investigating',
     location: 'Server Room 4',
-    slaLimit: 300,
-    elapsed: 180,
+    slaLimit: SLA_SECONDS.MEDIUM,
+    elapsed: 50,
     respondedBy: 'System',
     responseTime: 'N/A',
     assignedTo: 'None',
@@ -77,13 +83,13 @@ export const INCIDENTS: Incident[] = [
   },
   {
     id: 'INC-2025-081',
-    timestamp: '2025-10-24 18:30',
+    timestamp: 'Yesterday 18:30',
     title: 'HVAC Unit Vibration',
     threat: ThreatType.ENVIRONMENTAL,
     severity: 'MEDIUM',
     status: 'Resolved',
     location: 'Sector 4',
-    slaLimit: 600,
+    slaLimit: SLA_SECONDS.MEDIUM,
     elapsed: 300,
     respondedBy: 'Auto-dispatch',
     responseTime: '5m 00s',
@@ -96,13 +102,13 @@ export const INCIDENTS: Incident[] = [
   },
   {
     id: 'INC-2025-080',
-    timestamp: '2025-10-23 09:15',
+    timestamp: 'Yesterday 09:15',
     title: 'Signal Degradation',
     threat: ThreatType.SENSOR,
     severity: 'LOW',
     status: 'Closed',
     location: 'Main Gate',
-    slaLimit: 1200,
+    slaLimit: SLA_SECONDS.LOW,
     elapsed: 1100,
     respondedBy: 'System Admin',
     responseTime: '18m 20s',
@@ -117,8 +123,8 @@ export const getOpenIncidents = (): Incident[] => INCIDENTS.filter(isOpen);
 
 export const getOpenCount = (): number => getOpenIncidents().length;
 
-// Live SLA clocks: open incidents keep counting from the moment the app loaded,
-// so every screen shows the same countdown.
+// Live SLA clocks: all start moments hang off the one load moment below (stored once
+// at module level, so it never restarts when you change pages).
 const loadedAt = Date.now();
 const secondsSinceLoad = () => Math.floor((Date.now() - loadedAt) / 1000);
 
@@ -131,29 +137,61 @@ export const useSecondsSinceLoad = (): number => {
   return seconds;
 };
 
-export const getElapsed = (inc: Incident, seconds: number): number =>
-  isOpen(inc) ? inc.elapsed + seconds : inc.elapsed;
-
-export const formatSla = (a: Incident): string => {
-  const remaining = Math.max(0, a.slaLimit - a.elapsed);
-  const m = Math.floor(remaining / 60);
-  const s = remaining % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+// Elapsed SLA seconds: frozen at the response time once responded, ticking for other
+// open incidents, fixed for closed ones.
+export const getElapsed = (inc: Incident, seconds: number): number => {
+  if (inc.respondedInSeconds !== undefined) return inc.respondedInSeconds;
+  return isOpen(inc) ? inc.elapsed + seconds : inc.elapsed;
 };
+
+const mmss = (total: number): string => {
+  const t = Math.max(0, total);
+  return `${Math.floor(t / 60).toString().padStart(2, '0')}:${(t % 60).toString().padStart(2, '0')}`;
+};
+
+export const formatSla = (a: Incident): string => mmss(a.slaLimit - a.elapsed);
 
 export const getSlaUrgency = (a: Incident): string => {
   const remaining = a.slaLimit - a.elapsed;
   const ratio = remaining / a.slaLimit;
-  if (ratio < 0) return 'text-danger animate-pulse font-black';
   if (ratio < 0.2) return 'text-danger animate-pulse';
   if (ratio < 0.5) return 'text-warning';
   return 'text-success';
 };
 
 // "7m 00s" -> 420. Returns null when there is no response time yet (e.g. "N/A").
-const parseResponseSeconds = (value: string): number | null => {
+export const parseResponseSeconds = (value: string): number | null => {
   const match = value.match(/^(\d+)m\s*(\d+)s$/);
   return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+};
+
+export type SlaState =
+  | { kind: 'responded'; text: string; tier: string }
+  | { kind: 'ticking'; text: string; tier: string }
+  | { kind: 'breached'; tier: string }
+  | { kind: 'closed-ok'; response: string; tier: string }
+  | { kind: 'closed-breached'; response: string; tier: string }
+  | { kind: 'none' };
+
+// One place that decides what the SLA slot shows, for every screen.
+// Open and responded: "Responded in mm:ss". Open and waiting: a countdown that stops
+// at 00:00 and becomes "breached" (never negative). Closed: on-time or breached from the
+// response time against the tier in data/sla.ts.
+export const getSlaState = (inc: Incident, seconds: number): SlaState => {
+  if (!inc.slaLimit) return { kind: 'none' };
+  const tier = formatSlaTier(inc.slaLimit);
+  if (isOpen(inc)) {
+    if (inc.respondedInSeconds !== undefined) {
+      return { kind: 'responded', text: mmss(inc.respondedInSeconds), tier };
+    }
+    const remaining = inc.slaLimit - getElapsed(inc, seconds);
+    return remaining <= 0 ? { kind: 'breached', tier } : { kind: 'ticking', text: mmss(remaining), tier };
+  }
+  const responseSeconds = parseResponseSeconds(inc.responseTime);
+  if (responseSeconds === null) return { kind: 'none' };
+  return responseSeconds <= inc.slaLimit
+    ? { kind: 'closed-ok', response: inc.responseTime, tier }
+    : { kind: 'closed-breached', response: inc.responseTime, tier };
 };
 
 // Average over incidents that actually have a response time, formatted mm:ss.

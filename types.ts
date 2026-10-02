@@ -29,7 +29,8 @@ export interface TimelineEvent {
 export interface Incident {
   id: string;
   timestamp: string;
-  relativeTime?: string; // e.g. "2m ago", shown on live alert cards
+  detectedSecondsBeforeLoad?: number; // scenario: seconds before app load that the alert was detected
+  respondedInSeconds?: number; // scenario: set once an operator has responded
   title: string;
   threat: ThreatType;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
@@ -39,7 +40,6 @@ export interface Incident {
   slaLimit: number; // in seconds
   elapsed: number; // in seconds
   isLikelyFalseAlarm?: boolean;
-  slaBreach?: string;
   respondedBy: string;
   responseTime: string;
   falseAlarmReason?: string;

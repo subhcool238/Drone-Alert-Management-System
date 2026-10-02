@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { UserPermission, Integration, ThreatType } from '../types';
+import { SLA_SECONDS, formatSlaTier } from '../data/sla';
 
 const mockPermissions: UserPermission[] = [
   { role: 'Admin', description: 'System settings', canDeploy: true, canManual: true, manualLimit: 60, canApprovePatrols: true, canChangeSLA: true, canReport: true, canSettings: true, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
@@ -106,10 +107,10 @@ const AlertRulesAndSLA = () => {
           <h3 className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em]">Severity Tiers</h3>
           <div className="grid grid-cols-4 gap-6">
             {[
-              { level: 'Critical', sla: '30s', dispatch: 'Immediate', color: 'text-danger' },
-              { level: 'High', sla: '2m', dispatch: 'Auto if fail', color: 'text-warning' },
-              { level: 'Medium', sla: '5m', dispatch: 'Manual only', color: 'text-primary' },
-              { level: 'Low', sla: '15m', dispatch: 'Log-only', color: 'text-gray-500' },
+              { level: 'Critical', sla: formatSlaTier(SLA_SECONDS.CRITICAL), dispatch: 'Immediate', color: 'text-danger' },
+              { level: 'High', sla: formatSlaTier(SLA_SECONDS.HIGH), dispatch: 'Auto if fail', color: 'text-warning' },
+              { level: 'Medium', sla: formatSlaTier(SLA_SECONDS.MEDIUM), dispatch: 'Manual only', color: 'text-primary' },
+              { level: 'Low', sla: formatSlaTier(SLA_SECONDS.LOW), dispatch: 'Log-only', color: 'text-gray-500' },
             ].map(tier => (
               <div key={tier.level} className="bg-background border border-white/5 p-6 rounded-3xl group hover:border-white/20 transition-all text-center">
                  <h4 className={`text-sm font-bold uppercase tracking-widest mb-3 ${tier.color}`}>{tier.level}</h4>

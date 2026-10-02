@@ -1,6 +1,6 @@
 import { FleetStatus, Incident } from '../types';
 import { STATUS_LABEL, countByStatus } from './drones';
-import { getOpenIncidents, getElapsed, formatSla } from './incidents';
+import { getOpenIncidents, getElapsed, getSlaState } from './incidents';
 import { COVERAGE_GAP, getCoverageGapCount } from './patrols';
 
 const SEVERITY_RANK: Record<Incident['severity'], number> = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 };
@@ -24,8 +24,13 @@ export const buildSystemSummary = (secondsSinceLoad: number): string => {
       (a.slaLimit - getElapsed(a, secondsSinceLoad)) - (b.slaLimit - getElapsed(b, secondsSinceLoad))
   )[0];
   if (top) {
-    const left = formatSla({ ...top, elapsed: getElapsed(top, secondsSinceLoad) });
-    parts.push(`Highest: ${top.severity} ${top.title}, SLA ${left} left.`);
+    // Same state as the alert card: responded, time left, or breached
+    const sla = getSlaState(top, secondsSinceLoad);
+    const slaText =
+      sla.kind === 'responded' ? `responded in ${sla.text}` :
+      sla.kind === 'ticking' ? `SLA ${sla.text} left` :
+      sla.kind === 'breached' ? 'SLA breached' : 'no SLA';
+    parts.push(`Highest: ${top.severity} ${top.title}, ${slaText}.`);
   }
 
   parts.push(
@@ -35,4 +40,4 @@ export const buildSystemSummary = (secondsSinceLoad: number): string => {
   );
 
   return parts.join(' ');
-};
+}
