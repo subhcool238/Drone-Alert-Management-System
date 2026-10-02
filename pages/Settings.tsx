@@ -4,10 +4,10 @@ import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { UserPermission, Integration, ThreatType } from '../types';
 
 const mockPermissions: UserPermission[] = [
-  { role: 'Administrator', canDeploy: true, canManual: true, manualLimit: 60, canApprovePatrols: true, canChangeSLA: true, canReport: true, canSettings: true, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
-  { role: 'Shift Commander', canDeploy: true, canManual: true, manualLimit: 30, canApprovePatrols: true, canChangeSLA: false, canReport: true, canSettings: false, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
-  { role: 'Field Operator', canDeploy: true, canManual: true, manualLimit: 10, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: true, canAnalytics: false },
-  { role: 'Viewer Only', canDeploy: false, canManual: false, manualLimit: 0, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: false, canAnalytics: true },
+  { role: 'Admin', description: 'System settings', canDeploy: true, canManual: true, manualLimit: 60, canApprovePatrols: true, canChangeSLA: true, canReport: true, canSettings: true, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
+  { role: 'Team Lead', description: 'All drones, full override', canDeploy: true, canManual: true, manualLimit: 30, canApprovePatrols: true, canChangeSLA: false, canReport: true, canSettings: false, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
+  { role: 'Field Operator', description: 'Assigned drones, 5m manual', canDeploy: true, canManual: true, manualLimit: 5, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: true, canAnalytics: false },
+  { role: 'Director', description: 'Escalation, authority reports', canDeploy: false, canManual: false, manualLimit: 0, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: false, canAnalytics: true },
 ];
 
 const mockIntegrations: Integration[] = [
@@ -62,7 +62,7 @@ const RolesAndPermissions = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">{p.role}</h4>
-                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight mt-0.5">Global Protocol</p>
+                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tight mt-0.5">{p.description}</p>
                     </div>
                   </div>
                 </td>
@@ -338,7 +338,7 @@ const AboutSection = () => (
   <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-[600px] flex flex-col items-center justify-center text-center">
     <div className="size-24 rounded-3xl bg-primary flex items-center justify-center text-black font-bold text-4xl mb-10 shadow-2xl shadow-primary/30">FS</div>
     <h2 className="text-4xl font-display font-bold text-white tracking-tighter mb-4">FlytBase Security Operations</h2>
-    <p className="text-lg text-gray-500 font-medium mb-12">Louvre Museum Command Center Deployment</p>
+    <p className="text-lg text-gray-500 font-medium mb-12">Musée d'Art Précieux Command Center Deployment</p>
     
     <div className="grid grid-cols-2 gap-x-20 gap-y-8 max-w-xl text-left border-t border-white/5 pt-12">
        <div>
@@ -351,7 +351,7 @@ const AboutSection = () => (
        </div>
        <div>
          <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest block mb-1">Build ID</span>
-         <span className="text-sm font-bold text-white">882-LOU-2025</span>
+         <span className="text-sm font-bold text-white">882-MAP-2025</span>
        </div>
        <div>
          <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest block mb-1">Last System Update</span>

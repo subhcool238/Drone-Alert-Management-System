@@ -42,7 +42,7 @@ export const INCIDENTS: Incident[] = [
     threat: ThreatType.SENSOR,
     severity: 'HIGH',
     status: 'Investigating',
-    location: 'Watcher-3 @ Richelieu',
+    location: 'Watcher-3 @ East Wing',
     slaLimit: 600,
     elapsed: 45,
     respondedBy: 'System',

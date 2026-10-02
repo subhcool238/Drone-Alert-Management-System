@@ -95,7 +95,7 @@ const ManualControl: React.FC = () => {
               </div>
               <h2 className="text-xl font-display font-bold text-white mb-2">Request Extension?</h2>
               <p className="text-xs text-gray-500 uppercase font-bold tracking-widest leading-relaxed">
-                Supervisor approval required for +2:00 mins override. ({extensionsUsed}/3 used)
+                Team Lead approval required for +2:00 mins override. ({extensionsUsed}/3 used)
               </p>
             </div>
             <div className="p-6 bg-background/50 grid grid-cols-2 gap-3">
@@ -193,7 +193,7 @@ const ManualControl: React.FC = () => {
                 !isManual ? 'text-emerald-500' : isCriticalZone ? 'text-danger' : 'text-warning'
               }`}>
                 {!isManual ? 'Mode: Autonomous – Flight path controlled by mission plan' : 
-                 `Mode: Manual override by Isabelle R. – ${formatTime(elapsedSeconds)} elapsed`}
+                 `Mode: Manual override by Isabelle M. – ${formatTime(elapsedSeconds)} elapsed`}
               </span>
             </div>
             {isManual && (

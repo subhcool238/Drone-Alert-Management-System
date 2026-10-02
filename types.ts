@@ -122,6 +122,7 @@ export interface Integration {
 
 export interface UserPermission {
   role: string;
+  description: string;
   canDeploy: boolean;
   canManual: boolean;
   manualLimit: number; // in minutes

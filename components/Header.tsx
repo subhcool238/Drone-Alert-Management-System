@@ -98,7 +98,7 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-3 group cursor-pointer">
           <span className="material-symbols-outlined text-primary text-2xl group-hover:rotate-180 transition-transform duration-500">hexagon</span>
           <div className="flex flex-col">
-            <span className="text-white text-base font-bold tracking-tight font-display">Louvre Museum CC</span>
+            <span className="text-white text-base font-bold tracking-tight font-display">Musée d'Art Précieux CC</span>
             <span className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] leading-none mt-1">Command Center v1.2.3</span>
           </div>
           <span className="ml-2 text-[8px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-widest uppercase">AI-Assisted</span>
@@ -183,7 +183,7 @@ const Header: React.FC = () => {
           <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700 group-hover:ring-primary transition-all" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
           <div className="flex flex-col">
             <span className="text-xs font-bold text-white group-hover:text-primary transition-colors leading-none">Isabelle M.</span>
-            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Shift Commander</span>
+            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Lead Drone Operator</span>
           </div>
           <span className="material-symbols-outlined text-gray-600 text-[18px] ml-2 group-hover:text-white">expand_more</span>
         </div>

@@ -230,13 +230,13 @@ const Dashboard: React.FC = () => {
                 {/* Detailed Hall Outlines */}
                 <g className="text-primary/10">
                   <rect x="70" y="70" width="120" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="130" y="125" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">DENON HALL</text>
+                  <text x="130" y="125" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">GRAND GALLERY</text>
                   
                   <rect x="250" y="70" width="300" height="200" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="400" y="170" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">SULLY COURTYARD</text>
+                  <text x="400" y="170" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">NORTH COURTYARD</text>
                   
                   <rect x="620" y="70" width="110" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="675" y="125" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">RICHELIEU</text>
+                  <text x="675" y="125" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">EAST WING</text>
                   
                   <rect x="70" y="320" width="300" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
                   <text x="220" y="375" textAnchor="middle" fill="currentColor" className="text-[10px] font-bold opacity-40">STORAGE WING A</text>
