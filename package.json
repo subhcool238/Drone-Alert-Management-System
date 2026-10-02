@@ -1,5 +1,6 @@
 {
   "name": "drone-alert-management-system",
+  "description": "Concept prototype of a drone alert management system for museum security operations, built for a FlytBase product design assignment.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +12,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@google/genai": "1.3.0",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.10",
     "react": "18.3.1",

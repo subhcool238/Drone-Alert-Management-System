@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
 import { countByStatus, getFleetBatteryAvg } from '../data/drones';
+import { COVERAGE_GAP, getCoverageGapCount } from '../data/patrols';
 import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
 
 const Dashboard: React.FC = () => {
@@ -384,8 +385,8 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400 font-medium leading-tight">Coverage Gaps</span>
               <div className="text-right">
-                <span className="text-lg font-display font-bold text-warning tracking-tight block">1</span>
-                <span className="text-[10px] font-bold text-warning uppercase tracking-widest">Sector B</span>
+                <span className="text-lg font-display font-bold text-warning tracking-tight block">{getCoverageGapCount()}</span>
+                <span className="text-[10px] font-bold text-warning uppercase tracking-widest">{COVERAGE_GAP.zone}</span>
               </div>
             </div>
           </div>

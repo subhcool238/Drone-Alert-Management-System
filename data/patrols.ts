@@ -1,0 +1,110 @@
+import { PatrolRoute, FleetStatus, Drone } from '../types';
+import { DRONES, STATUS_LABEL, getDroneByName } from './drones';
+
+// The one shared coverage gap record. The Dashboard tile, briefing line,
+// Header summary and Patrol Routes all read from here.
+export const COVERAGE_GAP = { zone: 'North Storage Wing', minutes: 45 };
+
+export const PATROL_ROUTES: PatrolRoute[] = [
+  {
+    id: 'PR-01',
+    name: 'Perimeter Alpha',
+    type: 'Standard',
+    duration: '18 min',
+    waypoints: 12,
+    lastRun: '14:20 today',
+    coverage: 100,
+    status: 'ACTIVE',
+    drones: [getDroneByName('Sentinel-1').name],
+    guards: ['Pierre L.'],
+    hasCoverageGap: false,
+    frequency: 'Every 2 Hours',
+    startTime: '08:00',
+    endTime: '20:00',
+    approvalStatus: 'Approved',
+    isNightMode: false
+  },
+  {
+    id: 'PR-02',
+    name: COVERAGE_GAP.zone,
+    type: 'Emergency',
+    duration: '12 min',
+    waypoints: 8,
+    lastRun: 'Yesterday',
+    coverage: 85,
+    status: 'SCHEDULED',
+    drones: [],
+    guards: ['Sarah J.'],
+    hasCoverageGap: true,
+    gapDuration: `${COVERAGE_GAP.minutes} min`,
+    frequency: 'On Demand',
+    startTime: '00:00',
+    endTime: '23:59',
+    approvalStatus: 'Pending',
+    isNightMode: true
+  },
+  {
+    id: 'PR-03',
+    name: 'Gallery Sweep',
+    type: 'Standard',
+    duration: '45 min',
+    waypoints: 24,
+    lastRun: 'Never',
+    coverage: 0,
+    status: 'DRAFT',
+    drones: [getDroneByName('Watcher-3').name],
+    guards: [],
+    hasCoverageGap: false,
+    frequency: 'Nightly',
+    startTime: '22:00',
+    endTime: '06:00',
+    approvalStatus: 'N/A',
+    isNightMode: true
+  }
+];
+
+export const getCoverageGapCount = (): number => PATROL_ROUTES.filter(r => r.hasCoverageGap).length;
+
+// Flowchart health checks for picking a drone: Idle, not in Fault, battery above 50%
+export const MIN_RECOMMEND_BATTERY = 50;
+
+export type PatrolRecommendation =
+  | { ok: true; route: PatrolRoute; drone: Drone; summary: string; reason: string }
+  | { ok: false; message: string };
+
+// First anomaly flag that is not the "nominal" line
+const firstFlag = (d: Drone): string | undefined => d.anomalies.find(a => !/nominal/i.test(a));
+
+// Rule-based: pick the route with a coverage gap, then the Idle drone with the
+// highest health score that is not in Fault and has more than 50% battery.
+export const getPatrolRecommendation = (routes: PatrolRoute[] = PATROL_ROUTES): PatrolRecommendation => {
+  const route = routes.find(r => r.hasCoverageGap);
+  if (!route) return { ok: false, message: 'No route has a coverage gap.' };
+
+  const idle = DRONES.filter(d => d.status === FleetStatus.IDLE);
+  const eligible = idle.filter(d => d.status !== FleetStatus.FAULT && d.battery > MIN_RECOMMEND_BATTERY);
+  if (eligible.length === 0) {
+    return { ok: false, message: `No Idle drone above ${MIN_RECOMMEND_BATTERY}% battery.` };
+  }
+
+  const best = [...eligible].sort((a, b) => b.health - a.health)[0];
+  const skipped = idle
+    .filter(d => d.id !== best.id)
+    .map(d => {
+      if (d.battery <= MIN_RECOMMEND_BATTERY) return `${d.name} skipped: battery ${d.battery}%`;
+      const flag = firstFlag(d);
+      return `${d.name} skipped: health ${d.health}${flag ? `, flag: ${flag}` : ''}`;
+    });
+
+  const reason =
+    `${best.name}: ${STATUS_LABEL[best.status]}, ${best.battery}% battery, health ${best.health}.` +
+    skipped.map(s => ` ${s}.`).join('');
+
+  return {
+    ok: true,
+    route,
+    drone: best,
+    summary: `Assign ${best.name} to ${route.name} (gap ${route.gapDuration}).`,
+    reason
+  };
+};

@@ -1,27 +1,27 @@
 
 import React, { useState } from 'react';
-import { getSmartSuggestion } from '../geminiService';
 import { FleetStatus } from '../types';
-import { DRONES, getFleetBatteryAvg } from '../data/drones';
+import { DRONES } from '../data/drones';
 import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla } from '../data/incidents';
+import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../data/patrols';
+import { buildSystemSummary } from '../data/summary';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showShiftBriefing, setShowShiftBriefing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
 
   const secondsSinceLoad = useSecondsSinceLoad();
+  const gapCount = getCoverageGapCount();
+  const recommendation = getPatrolRecommendation();
   const openIncidents = getOpenIncidents();
   const criticalIncidents = openIncidents.filter(i => i.severity === 'CRITICAL');
   const outOfServiceDrones = DRONES.filter(d => d.status === FleetStatus.FAULT);
 
-  const handleAiStatus = async () => {
-    setIsAiLoading(true);
-    const suggestion = await getSmartSuggestion(`Full museum status query: ${openIncidents.length} active alerts, 1 coverage gap, fleet battery avg ${getFleetBatteryAvg()}%.`);
-    setAiResponse(suggestion);
-    setIsAiLoading(false);
+  // Rule-based summary from the shared drone, incident and patrol data
+  const handleSummary = () => {
+    setSummary(buildSystemSummary(secondsSinceLoad));
   };
 
   const notifications = [
@@ -72,9 +72,11 @@ const Header: React.FC = () => {
                 <section>
                   <h4 className="text-[10px] font-bold text-warning uppercase tracking-widest mb-4">Coverage Intelligence</h4>
                   <div className="p-5 rounded-2xl bg-warning/5 border border-warning/20">
-                    <div className="text-4xl font-display font-bold text-warning mb-1">1 Zone</div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for &gt;45 min</p>
-                    <button className="mt-4 text-[9px] text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign Sentinel-2</button>
+                    <div className="text-4xl font-display font-bold text-warning mb-1">{gapCount} {gapCount === 1 ? 'Zone' : 'Zones'}</div>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for {COVERAGE_GAP.minutes} min</p>
+                    {recommendation.ok && (
+                      <button className="mt-4 text-[9px] text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign {recommendation.drone.name}</button>
+                    )}
                   </div>
                 </section>
                 <section>
@@ -101,7 +103,7 @@ const Header: React.FC = () => {
             <span className="text-white text-base font-bold tracking-tight font-display">Musée d'Art Précieux CC</span>
             <span className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] leading-none mt-1">Command Center v1.2.3</span>
           </div>
-          <span className="ml-2 text-[8px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-widest uppercase">AI-Assisted</span>
+          <span className="ml-2 text-[8px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-widest uppercase">Rule-Based</span>
         </div>
       </div>
 
@@ -115,19 +117,20 @@ const Header: React.FC = () => {
             className="w-full bg-panel border border-white/10 rounded-2xl py-2.5 pl-12 pr-12 text-white text-sm focus:border-primary/50 focus:ring-0 placeholder-gray-600 transition-all outline-none" 
             placeholder="Search Drones, Incidents, Guards, Patrols..."
           />
-          <button onClick={handleAiStatus} className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary transition-colors">
-            <span className={`material-symbols-outlined text-[20px] ${isAiLoading ? 'animate-spin' : ''}`}>psychology</span>
+          <button onClick={handleSummary} className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary transition-colors">
+            <span className="material-symbols-outlined text-[20px]">summarize</span>
           </button>
         </div>
-        
-        {aiResponse && (
+
+        {summary && (
           <div className="absolute top-full mt-3 left-0 right-0 bg-indigo-600 border border-indigo-500/30 p-4 rounded-2xl shadow-2xl z-[70] animate-in slide-in-from-top-2">
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-white text-lg mt-0.5">auto_awesome</span>
+              <span className="material-symbols-outlined text-white text-lg mt-0.5">info</span>
               <div className="flex-1">
-                <p className="text-[11px] text-white/90 font-bold leading-relaxed">{aiResponse}</p>
+                <p className="text-[9px] text-white/60 font-bold uppercase tracking-widest mb-1">Rule-based summary</p>
+                <p className="text-[11px] text-white/90 font-bold leading-relaxed">{summary}</p>
               </div>
-              <button onClick={() => setAiResponse(null)} className="text-white/40 hover:text-white"><span className="material-symbols-outlined text-sm">close</span></button>
+              <button onClick={() => setSummary(null)} className="text-white/40 hover:text-white"><span className="material-symbols-outlined text-sm">close</span></button>
             </div>
           </div>
         )}

@@ -255,7 +255,7 @@ const FleetManagement: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-[0.25em]">Predictive Diagnostics</h3>
-                  <p className="text-[11px] text-gray-500 font-medium uppercase mt-1">Autonomous Fleet Intelligence Report</p>
+                  <p className="text-[11px] text-gray-500 font-medium uppercase mt-1">Fleet Health Report</p>
                 </div>
              </div>
              <button 
@@ -324,7 +324,7 @@ const FleetManagement: React.FC = () => {
                     </div>
                     <div className="flex flex-col gap-1">
                        <p className={`text-[12px] font-bold ${selectedDrone.health < 60 ? 'text-gray-200' : 'text-gray-400'}`}>{a}</p>
-                       <p className="text-[10px] text-gray-600 font-medium">Verified by AI Inspector 2.4s ago</p>
+                       <p className="text-[10px] text-gray-600 font-medium">Checked by system diagnostics 2.4s ago</p>
                     </div>
                   </div>
                 ))}

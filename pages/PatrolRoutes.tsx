@@ -1,75 +1,15 @@
 
 import React, { useState, useMemo } from 'react';
 import { PatrolRoute } from '../types';
-import { getSmartSuggestion } from '../geminiService';
-import { getDroneByName } from '../data/drones';
-
-const mockRoutes: PatrolRoute[] = [
-  { 
-    id: 'PR-01', 
-    name: 'Perimeter Alpha', 
-    type: 'Standard', 
-    duration: '18 min', 
-    waypoints: 12, 
-    lastRun: '14:20 today', 
-    coverage: 100, 
-    status: 'ACTIVE',
-    drones: [getDroneByName('Sentinel-1').name],
-    guards: ['Pierre L.'],
-    hasCoverageGap: false,
-    frequency: 'Every 2 Hours',
-    startTime: '08:00',
-    endTime: '20:00',
-    approvalStatus: 'Approved',
-    isNightMode: false
-  },
-  { 
-    id: 'PR-02', 
-    name: 'North Storage Wing', 
-    type: 'Emergency', 
-    duration: '12 min', 
-    waypoints: 8, 
-    lastRun: 'Yesterday', 
-    coverage: 85, 
-    status: 'SCHEDULED',
-    drones: [],
-    guards: ['Sarah J.'],
-    hasCoverageGap: true,
-    gapDuration: '45 min',
-    frequency: 'On Demand',
-    startTime: '00:00',
-    endTime: '23:59',
-    approvalStatus: 'Pending',
-    isNightMode: true
-  },
-  { 
-    id: 'PR-03', 
-    name: 'Gallery Sweep', 
-    type: 'Standard', 
-    duration: '45 min', 
-    waypoints: 24, 
-    lastRun: 'Never', 
-    coverage: 0, 
-    status: 'DRAFT',
-    drones: [getDroneByName('Watcher-3').name],
-    guards: [],
-    hasCoverageGap: false,
-    frequency: 'Nightly',
-    startTime: '22:00',
-    endTime: '06:00',
-    approvalStatus: 'N/A',
-    isNightMode: true
-  }
-];
+import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, PatrolRecommendation } from '../data/patrols';
 
 const PatrolRoutes: React.FC = () => {
-  const [routes, setRoutes] = useState<PatrolRoute[]>(mockRoutes);
-  const [selectedRoute, setSelectedRoute] = useState<PatrolRoute>(mockRoutes[0]);
+  const [routes, setRoutes] = useState<PatrolRoute[]>(PATROL_ROUTES);
+  const [selectedRoute, setSelectedRoute] = useState<PatrolRoute>(PATROL_ROUTES[0]);
   const [showGapsOnly, setShowGapsOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [timeScope, setTimeScope] = useState('Last 24h');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [recommendation, setRecommendation] = useState<PatrolRecommendation | null>(null);
 
   const filteredRoutes = useMemo(() => {
     return routes.filter(r => {
@@ -84,18 +24,23 @@ const PatrolRoutes: React.FC = () => {
     });
   }, [routes, searchTerm, showGapsOnly, timeScope]);
 
-  const handleSmartSuggestion = async () => {
-    setIsAiLoading(true);
-    const context = `
-      Route: ${selectedRoute.name}
-      Type: ${selectedRoute.type}
-      Coverage: ${selectedRoute.coverage}%
-      Gaps: ${selectedRoute.hasCoverageGap ? selectedRoute.gapDuration : 'None'}
-      Assigned: ${selectedRoute.drones.join(', ')}
-    `;
-    const res = await getSmartSuggestion(context);
-    setSuggestion(res);
-    setIsAiLoading(false);
+  // Rule-based recommendation from the shared drone and patrol data
+  const handleRecommendation = () => {
+    setRecommendation(getPatrolRecommendation(routes));
+  };
+
+  // Applied when the recommended drone is already on the recommended route in page state
+  const isApplied =
+    recommendation?.ok === true &&
+    !!routes.find(r => r.id === recommendation.route.id)?.drones.includes(recommendation.drone.name);
+
+  const handleApplyRecommendation = () => {
+    if (!recommendation?.ok || isApplied) return;
+    const { route, drone } = recommendation;
+    const assign = (r: PatrolRoute): PatrolRoute =>
+      r.id === route.id ? { ...r, drones: [...r.drones, drone.name] } : r;
+    setRoutes(prev => prev.map(assign));
+    setSelectedRoute(prev => assign(prev));
   };
 
   const isRouteNightShift = (route: PatrolRoute) => {
@@ -405,35 +350,44 @@ const PatrolRoutes: React.FC = () => {
             <div className="col-span-12 lg:col-span-5 space-y-10">
                <section className="space-y-6">
                  <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em]">Intelligence Engine</h3>
-                    <button 
-                      onClick={handleSmartSuggestion}
-                      disabled={isAiLoading}
+                    <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em]">Route Recommendations</h3>
+                    <button
+                      onClick={handleRecommendation}
                       className="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-6 py-2.5 rounded-full uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <span className="material-symbols-outlined text-[16px]">{isAiLoading ? 'refresh' : 'auto_awesome'}</span>
-                      {isAiLoading ? 'Analyzing...' : 'Smart Optimization'}
+                      <span className="material-symbols-outlined text-[16px]">lightbulb</span>
+                      Get Recommendation
                     </button>
                  </div>
-                 
-                 {suggestion ? (
+
+                 {recommendation ? (
                    <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-[2rem] p-8 relative overflow-hidden group animate-in slide-in-from-bottom duration-500">
                      <div className="absolute top-0 left-0 w-1 h-full bg-indigo-600"></div>
                      <div className="flex gap-6">
                        <div className="size-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
-                         <span className="material-symbols-outlined text-indigo-400">psychology</span>
+                         <span className="material-symbols-outlined text-indigo-400">lightbulb</span>
                        </div>
                        <div>
-                         <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">AI Tactical Insight</h4>
-                         <p className="text-[13px] text-gray-300 italic leading-relaxed font-medium">"{suggestion}"</p>
-                         <button className="mt-6 text-[10px] text-white font-bold bg-indigo-600 px-6 py-2 rounded-xl uppercase tracking-widest hover:brightness-110 transition-all">Apply Recommendation</button>
+                         <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">Rule-based recommendation</h4>
+                         {recommendation.ok ? (
+                           <>
+                             <p className="text-[13px] text-gray-300 italic leading-relaxed font-medium">{recommendation.summary} {recommendation.reason}</p>
+                             {isApplied ? (
+                               <p className="mt-6 text-[10px] text-emerald-500 font-bold uppercase tracking-widest">Applied: {recommendation.drone.name} assigned to {recommendation.route.name}</p>
+                             ) : (
+                               <button onClick={handleApplyRecommendation} className="mt-6 text-[10px] text-white font-bold bg-indigo-600 px-6 py-2 rounded-xl uppercase tracking-widest hover:brightness-110 transition-all">Apply Recommendation</button>
+                             )}
+                           </>
+                         ) : (
+                           <p className="text-[13px] text-gray-300 italic leading-relaxed font-medium">{recommendation.message}</p>
+                         )}
                        </div>
                      </div>
                    </div>
                  ) : (
                    <div className="bg-panel/30 border border-dashed border-white/10 rounded-[2rem] p-12 text-center">
                      <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em] leading-relaxed">
-                       Enable Smart Optimization to analyze coverage gaps and propose mission-specific adjustments.
+                       Select Get Recommendation to check coverage gaps and idle drones.
                      </p>
                    </div>
                  )}
@@ -451,7 +405,7 @@ const PatrolRoutes: React.FC = () => {
                       </div>
                    </div>
                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
-                     Zone <span className="text-white font-bold">"North Storage"</span> is currently unpatrolled by any automated track for &gt;45 minutes. 
+                     Zone <span className="text-white font-bold">"{COVERAGE_GAP.zone}"</span> is currently unpatrolled by any automated track for {COVERAGE_GAP.minutes} minutes. 
                      Recommend adding a high-altitude waypoint at [Sector 4] or tasking a manual guard sweep.
                    </p>
                    <div className="flex gap-3 pt-2">

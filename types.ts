@@ -43,7 +43,7 @@ export interface Incident {
   respondedBy: string;
   responseTime: string;
   falseAlarmReason?: string;
-  confidence?: number; // AI confidence score 0-100
+  confidence?: number; // Sensor confidence score 0-100
   priority?: 'P1' | 'P2' | 'P3' | 'P4';
   eta?: string;
   assignmentStatus?: 'En route' | 'Queued' | 'None';

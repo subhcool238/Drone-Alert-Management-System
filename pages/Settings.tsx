@@ -165,8 +165,8 @@ const AlertRulesAndSLA = () => {
 
               <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-emerald-500">psychology</span>
-                  <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">AI Feedback Loop</h4>
+                  <span className="material-symbols-outlined text-emerald-500">tune</span>
+                  <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Threshold Suggestion (sample)</h4>
                 </div>
                 <p className="text-[11px] text-gray-400 leading-relaxed font-medium uppercase tracking-tight">
                   Auto-adjust thresholds based on false alarm patterns. 

@@ -1,20 +1,45 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# FlytBase Security Ops: Drone Alert Management System
 
-# Run and deploy your AI Studio app
+Independent concept based on FlytBase's design assignment. Not an official FlytBase product.
 
-This contains everything you need to run your app locally.
+This is a concept for a FlytBase product design assignment. It imagines a command center where security operators manage drones, alerts, patrols and incidents for a fictional museum, the Musée d'Art Précieux.
 
-View your app in AI Studio: https://ai.studio/apps/ba0a78b8-5295-4d9f-9f11-139260852c6b
+- Live demo: https://subhcool238.github.io/Drone-Alert-Management-System/
+- Case study: https://www.shubh.design/case-study/flytbase
 
-## Run Locally
+## Features
 
-**Prerequisites:**  Node.js
+- **Dashboard:** live alert cards with a ticking SLA countdown, severity and threat filters, priority badges (P1 to P4), a multi-incident banner, a pause-patrols switch while a P1 alert is open, fleet status counters, a readiness overview, a simulated 2D and 3D map view, and a shift handover briefing that must be acknowledged.
+- **Fleet Management:** searchable drone list with status and health filters, a detail view with health score, service countdown, anomaly flags and telemetry cards, and a maintenance scheduling popup.
+- **Manual Control:** drone selector, a 5-minute session timer with warnings at 2:00 and 4:00 elapsed, automatic return to autonomy at the limit, extension requests (+2 minutes, up to 3), and a session ended popup.
+- **Patrol Routes:** route library with search, scope filter and a coverage gap filter, route details with schedule and assignments, a night operation notice, and a rule-based recommendation that can be applied to assign a drone.
+- **Incidents:** incident table with filters, summary strip, a detail panel with timeline and evidence, analytics charts, and a report center.
+- **Settings:** roles and permissions table, alert rules and SLA tiers, integrations, notification channels, and language and region.
+- **Header:** a rule-based system summary built from the sample data, a notifications menu, and the shift briefing.
 
+## Tech
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+React, TypeScript, Vite, Tailwind CSS, Recharts and React Router.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:3000/Drone-Alert-Management-System/
+
+## Deploy
+
+```bash
+npm run deploy
+```
+
+This builds the app and publishes the `dist` folder to the `gh-pages` branch.
+
+## About the data
+
+All alerts, drones, confidence scores and incidents are simulated sample data. Nothing is connected to real systems.
+
+Built with AI coding tools.

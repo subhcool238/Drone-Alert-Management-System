@@ -10,6 +10,7 @@ import PatrolRoutes from './pages/PatrolRoutes';
 import Incidents from './pages/Incidents';
 import Settings from './pages/Settings';
 import { DRONES, STATUS_LABEL, STATUS_DOT } from './data/drones';
+import { COVERAGE_GAP } from './data/patrols';
 
 const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowledge }) => {
   const [checked, setChecked] = useState(false);
@@ -83,8 +84,8 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
                 <span className="text-[10px] font-bold text-emerald-500 uppercase">Staffed (Pierre L.)</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-danger uppercase tracking-tight">Storage Room 4</span>
-                <span className="text-[10px] font-bold text-danger uppercase animate-pulse">Unpatrolled for 75 min</span>
+                <span className="text-xs font-bold text-danger uppercase tracking-tight">{COVERAGE_GAP.zone}</span>
+                <span className="text-[10px] font-bold text-danger uppercase animate-pulse">Unpatrolled for {COVERAGE_GAP.minutes} min</span>
               </div>
             </div>
           </section>
