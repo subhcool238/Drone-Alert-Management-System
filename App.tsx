@@ -89,16 +89,16 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
             </div>
           </section>
 
-          {/* Supervisor Notes */}
+          {/* Director's Notes */}
           <section>
             <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">sticky_note_2</span> Director / Supervisor Notes
+              <span className="material-symbols-outlined text-lg">sticky_note_2</span> Director's Notes
             </h4>
             <div className="bg-indigo-600/10 border border-indigo-500/20 p-8 rounded-3xl">
               <p className="text-sm text-gray-300 italic leading-relaxed font-medium">
                 "Prioritize West Storage tonight – Picasso delivery; accept slightly higher false-alarm tolerance there. Keep Sentinel-1 dedicated to the roof corridor."
                 <br/>
-                <span className="text-[10px] text-indigo-400 font-black uppercase mt-4 block">— Marc, Shift Supervisor</span>
+                <span className="text-[10px] text-indigo-400 font-black uppercase mt-4 block">— Marc, Security Director</span>
               </p>
             </div>
           </section>

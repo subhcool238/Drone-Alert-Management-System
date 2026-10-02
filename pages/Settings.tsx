@@ -7,7 +7,7 @@ const mockPermissions: UserPermission[] = [
   { role: 'Admin', description: 'System settings', canDeploy: true, canManual: true, manualLimit: 60, canApprovePatrols: true, canChangeSLA: true, canReport: true, canSettings: true, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
   { role: 'Team Lead', description: 'All drones, full override', canDeploy: true, canManual: true, manualLimit: 30, canApprovePatrols: true, canChangeSLA: false, canReport: true, canSettings: false, canEmergency: true, canRequestExtensions: true, canAnalytics: true },
   { role: 'Field Operator', description: 'Assigned drones, 5m manual', canDeploy: true, canManual: true, manualLimit: 5, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: true, canAnalytics: false },
-  { role: 'Director', description: 'Escalation, authority reports', canDeploy: false, canManual: false, manualLimit: 0, canApprovePatrols: false, canChangeSLA: false, canReport: false, canSettings: false, canEmergency: false, canRequestExtensions: false, canAnalytics: true },
+  { role: 'Director', description: 'Escalation, authority reports', canDeploy: false, canManual: false, manualLimit: 0, canApprovePatrols: false, canChangeSLA: false, canReport: true, canSettings: false, canEmergency: true, canRequestExtensions: false, canAnalytics: true },
 ];
 
 const mockIntegrations: Integration[] = [

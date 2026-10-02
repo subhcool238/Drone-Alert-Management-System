@@ -469,7 +469,7 @@ const PatrolRoutes: React.FC = () => {
                    </div>
                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
                      This route includes non-critical zones during silent hours (22:00–06:00). Safety protocol requires 
-                     Director-level override for non-critical flight pathing at night.
+                     Team Lead approval for non-critical flight pathing at night.
                    </p>
                    <button className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform">
                      Request Override <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
