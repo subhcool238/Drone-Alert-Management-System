@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FleetStatus } from '../types';
+import { DRONES, getDroneById, getDroneByName } from '../data/drones';
 
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
-  
+  const [searchParams] = useSearchParams();
+
+  // Selected drone defaults to the active mission drone, or the one chosen in Fleet Management
+  const [selectedDroneId, setSelectedDroneId] = useState<string>(
+    getDroneById(searchParams.get('id') || '')?.id || getDroneByName('Sentinel-1').id
+  );
+  const selectedDrone = getDroneById(selectedDroneId) || DRONES[0];
+
   // State for Control Logic
   const [isManual, setIsManual] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -16,8 +25,8 @@ const ManualControl: React.FC = () => {
   const [speed, setSpeed] = useState(8.2);
   const [proximity, setProximity] = useState(18.5);
 
-  // Added missing variable for the active drone battery status
-  const selectedDroneBattery = 78;
+  // Battery of the currently selected drone
+  const selectedDroneBattery = selectedDrone.battery;
   
   // HUD Timer Effect
   useEffect(() => {
@@ -123,13 +132,17 @@ const ManualControl: React.FC = () => {
         <div className="p-6 flex flex-col h-full">
           <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6">Mission Assets</h2>
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
-            {[
-              { id: 'D-01', name: 'Sentinel-1', battery: 78, signal: 'Strong', active: true },
-              { id: 'D-02', name: 'Watcher-3', battery: 100, signal: 'Good', active: false },
-              { id: 'D-03', name: 'Surveyor-X', battery: 12, signal: 'Weak', active: false },
-            ].map(drone => (
-              <div 
+            {DRONES.map(d => ({
+              id: d.id,
+              name: d.name,
+              battery: d.battery,
+              signal: d.link,
+              active: d.id === selectedDroneId,
+              onPatrol: d.status === FleetStatus.ACTIVE
+            })).map(drone => (
+              <div
                 key={drone.id}
+                onClick={() => setSelectedDroneId(drone.id)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer group relative overflow-hidden ${
                   drone.active ? 'bg-primary/5 border-primary/40 shadow-lg shadow-primary/5' : 'bg-background border-white/5 hover:border-white/20'
                 }`}
@@ -139,7 +152,7 @@ const ManualControl: React.FC = () => {
                   <div className="flex-1">
                     <h3 className="text-white font-bold text-sm tracking-tight">{drone.name}</h3>
                     <p className={`text-[9px] font-bold uppercase tracking-[0.1em] mt-1 ${drone.active ? 'text-primary' : 'text-gray-600'}`}>
-                      {drone.active ? (isManual ? 'Manual Control' : 'Autonomous Patrol') : 'Docked / Ready'}
+                      {drone.active && isManual ? 'Manual Control' : drone.onPatrol ? 'Autonomous Patrol' : 'Docked / Ready'}
                     </p>
                   </div>
                   <div className={`size-1.5 rounded-full ${drone.active ? 'bg-primary animate-pulse' : 'bg-gray-700'}`}></div>
@@ -223,7 +236,7 @@ const ManualControl: React.FC = () => {
 
             {/* Overlays */}
             <div className="absolute top-8 left-8 flex flex-col gap-1 z-20">
-              <div className="text-[12px] font-display font-bold text-white uppercase tracking-widest drop-shadow-lg">Sentinel-1 // CAM-01</div>
+              <div className="text-[12px] font-display font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
               <div className="flex gap-3 text-[9px] font-mono text-white/60 font-bold uppercase tracking-widest">
                 <span>4K @ 60FPS</span>
                 <span>ISO 400</span>
@@ -234,7 +247,7 @@ const ManualControl: React.FC = () => {
             <div className="absolute top-8 right-8 flex flex-col items-end gap-3 z-20">
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                  <span className={`material-symbols-outlined text-[16px] ${selectedDroneBattery < 20 ? 'text-danger' : 'text-primary'}`}>battery_very_low</span>
-                 <span className="text-[11px] font-mono font-bold text-white">78%</span>
+                 <span className="text-[11px] font-mono font-bold text-white">{selectedDrone.battery}%</span>
               </div>
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                  <span className="material-symbols-outlined text-emerald-500 text-[16px]">signal_cellular_alt</span>
@@ -348,7 +361,7 @@ const ManualControl: React.FC = () => {
                </div>
                <div className="flex flex-col gap-1">
                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Link Quality</span>
-                 <span className="text-emerald-500 font-display font-bold text-lg">98%</span>
+                 <span className="text-emerald-500 font-display font-bold text-lg">{selectedDrone.linkStrength}%</span>
                </div>
             </div>
           </div>

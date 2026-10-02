@@ -2,78 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
-
-// Using a consistent high-quality drone image that matches the requested aesthetic
-const UNIFIED_DRONE_IMAGE = 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&q=80&w=800';
-
-const mockDrones: Drone[] = [
-  {
-    id: 'D-001',
-    name: 'Sentinel-1',
-    status: FleetStatus.ACTIVE,
-    risk: RiskLevel.LOW,
-    battery: 48,
-    batteryTimeRemaining: '22m',
-    health: 98,
-    nominalCapacity: 100,
-    link: 'Strong',
-    linkStrength: 98,
-    cycles: 132,
-    cyclesRemaining: 1868,
-    lastSync: '2s ago',
-    image: UNIFIED_DRONE_IMAGE,
-    type: 'Indoor Guardian Pro',
-    fwVersion: 'v2.4.1',
-    flightTimeToday: '4h 12m',
-    avgSpeed: 4.2,
-    anomalies: ['All systems nominal', 'Vibration within threshold'],
-    nextServiceHours: 124
-  },
-  {
-    id: 'D-002',
-    name: 'Watcher-3',
-    status: FleetStatus.IDLE,
-    risk: RiskLevel.MEDIUM,
-    battery: 100,
-    batteryTimeRemaining: '45m',
-    health: 75,
-    nominalCapacity: 92,
-    link: 'Good',
-    linkStrength: 82,
-    cycles: 450,
-    cyclesRemaining: 1550,
-    lastSync: '10m ago',
-    image: UNIFIED_DRONE_IMAGE,
-    type: 'Thermal Scout',
-    fwVersion: 'v2.3.0',
-    flightTimeToday: '2h 05m',
-    avgSpeed: 3.8,
-    anomalies: ['Lens calibration requested', 'Minor GPS drift detected'],
-    nextServiceHours: 12
-  },
-  {
-    id: 'D-003',
-    name: 'Surveyor-X',
-    status: FleetStatus.FAULT,
-    risk: RiskLevel.HIGH,
-    battery: 12,
-    batteryTimeRemaining: '0m',
-    health: 45,
-    nominalCapacity: 68,
-    link: 'Weak',
-    linkStrength: 15,
-    cycles: 1205,
-    cyclesRemaining: 795,
-    lastSync: '1h ago',
-    image: UNIFIED_DRONE_IMAGE,
-    type: 'High-Altitude Recon',
-    fwVersion: 'v1.9.8',
-    flightTimeToday: '8h 44m',
-    avgSpeed: 12.5,
-    anomalies: ['Battery cell degradation', 'Telemetry link failure'],
-    nextServiceHours: 0
-  }
-];
+import { DRONES as mockDrones, getOnlineCount } from '../data/drones';
 
 const FleetManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -171,7 +100,7 @@ const FleetManagement: React.FC = () => {
       <section className="w-[400px] flex flex-col gap-5 shrink-0 h-full overflow-hidden">
         <div className="flex justify-between items-end px-2">
           <h2 className="text-2xl font-display font-bold text-white tracking-tight">Fleet Operations</h2>
-          <span className="text-[10px] text-primary font-bold mb-1 uppercase tracking-[0.2em]">{filteredDrones.length} Units Online</span>
+          <span className="text-[10px] text-primary font-bold mb-1 uppercase tracking-[0.2em]">{getOnlineCount()} / {mockDrones.length} Units Online</span>
         </div>
         
         <div className="flex flex-col gap-3 px-1">
@@ -307,7 +236,7 @@ const FleetManagement: React.FC = () => {
             </div>
 
             <div className="flex gap-4 mt-auto">
-              <button onClick={() => navigate('/manual')} className="flex-1 bg-primary hover:bg-primary/90 transition-all text-black font-bold text-xs py-5 rounded-2xl flex items-center justify-center gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
+              <button onClick={() => navigate(`/manual?id=${selectedDrone.id}`)} className="flex-1 bg-primary hover:bg-primary/90 transition-all text-black font-bold text-xs py-5 rounded-2xl flex items-center justify-center gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
                 <span className="material-symbols-outlined text-[20px]">rocket_launch</span> Deploy Manual Mission
               </button>
               <button className="bg-background border border-white/10 text-white hover:bg-white/5 transition-all font-bold text-xs px-12 py-5 rounded-2xl flex items-center gap-3 uppercase tracking-widest">

@@ -1,6 +1,9 @@
 
 import React, { useState } from 'react';
 import { getSmartSuggestion } from '../geminiService';
+import { FleetStatus } from '../types';
+import { DRONES, getFleetBatteryAvg } from '../data/drones';
+import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla } from '../data/incidents';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -9,9 +12,14 @@ const Header: React.FC = () => {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
 
+  const secondsSinceLoad = useSecondsSinceLoad();
+  const openIncidents = getOpenIncidents();
+  const criticalIncidents = openIncidents.filter(i => i.severity === 'CRITICAL');
+  const outOfServiceDrones = DRONES.filter(d => d.status === FleetStatus.FAULT);
+
   const handleAiStatus = async () => {
     setIsAiLoading(true);
-    const suggestion = await getSmartSuggestion("Full museum status query: 2 active alerts, 1 coverage gap, fleet battery avg 84%.");
+    const suggestion = await getSmartSuggestion(`Full museum status query: ${openIncidents.length} active alerts, 1 coverage gap, fleet battery avg ${getFleetBatteryAvg()}%.`);
     setAiResponse(suggestion);
     setIsAiLoading(false);
   };
@@ -38,23 +46,25 @@ const Header: React.FC = () => {
             <div className="p-10 grid grid-cols-2 gap-10 bg-background/20">
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-[10px] font-bold text-danger uppercase tracking-widest mb-4">Critical Incidents (2)</h4>
+                  <h4 className="text-[10px] font-bold text-danger uppercase tracking-widest mb-4">Critical Incidents ({criticalIncidents.length})</h4>
                   <div className="space-y-3">
-                    <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
-                      <p className="text-xs text-white font-bold">Motion: Storage Area B</p>
-                      <p className="text-[10px] text-danger/70 font-bold uppercase mt-1">SLA Breach: -2m 14s</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <p className="text-xs text-white font-bold">Sensor: Perimeter North</p>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">Status: Investigating</p>
-                    </div>
+                    {criticalIncidents.map(inc => (
+                      <div key={inc.id} className="p-3 rounded-xl bg-danger/10 border border-danger/20">
+                        <p className="text-xs text-white font-bold">{inc.title}: {inc.location}</p>
+                        <p className="text-[10px] text-danger/70 font-bold uppercase mt-1">SLA: {formatSla({ ...inc, elapsed: getElapsed(inc, secondsSinceLoad) })}</p>
+                      </div>
+                    ))}
                   </div>
                 </section>
                 <section>
                    <h4 className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">Fleet & Maintenance</h4>
                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                       <span className="material-symbols-outlined text-primary">engineering</span>
-                      <p className="text-xs text-gray-400 leading-tight">Sentinel-4 lens recalibration in progress. Return to service: 18:00.</p>
+                      <p className="text-xs text-gray-400 leading-tight">
+                        {outOfServiceDrones.length > 0
+                          ? outOfServiceDrones.map(d => `${d.name} out of service: ${d.anomalies.join(', ')}.`).join(' ')
+                          : 'All drones in service.'}
+                      </p>
                    </div>
                 </section>
               </div>

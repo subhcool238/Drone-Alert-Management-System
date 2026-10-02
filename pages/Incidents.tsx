@@ -5,70 +5,7 @@ import {
   Cell, PieChart, Pie, LineChart, Line, Legend 
 } from 'recharts';
 import { Incident, ThreatType, TimelineEvent } from '../types';
-
-const mockIncidents: Incident[] = [
-  { 
-    id: 'INC-2025-082', 
-    timestamp: '2025-10-24 22:14', 
-    title: 'Motion Detected - Storage B', 
-    threat: ThreatType.HUMAN, 
-    severity: 'CRITICAL', 
-    status: 'Investigating', 
-    location: 'North Storage B',
-    slaLimit: 300,
-    elapsed: 420,
-    slaBreach: '-2m 00s',
-    respondedBy: 'Isabelle M.',
-    responseTime: '7m 00s',
-    assignedTo: 'Sentinel-1',
-    isCarriedOver: true,
-    previousOwner: 'Marc (Day Shift)',
-    handoverNote: 'Sensor flickering noticed, check power stability.',
-    timeline: [
-      { time: '22:14:00', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
-      { time: '22:14:30', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' },
-      { time: '22:16:10', event: 'Escalated to Team Lead', details: 'Visual confirmation required', type: 'escalation' }
-    ],
-    evidence: [
-      { type: 'video', url: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=400', caption: 'FPV Sector B' },
-      { type: 'image', url: 'https://images.unsplash.com/photo-1551817958-c5b5d1b74a33?auto=format&fit=crop&q=80&w=400', caption: 'Snapshot 22:15' }
-    ]
-  },
-  { 
-    id: 'INC-2025-081', 
-    timestamp: '2025-10-24 18:30', 
-    title: 'HVAC Unit Vibration', 
-    threat: ThreatType.ENVIRONMENTAL, 
-    severity: 'MEDIUM', 
-    status: 'Resolved',
-    location: 'Sector 4',
-    slaLimit: 600,
-    elapsed: 300,
-    respondedBy: 'Auto-dispatch',
-    responseTime: '5m 00s',
-    assignedTo: 'Watcher-3',
-    falseAlarmReason: 'HVAC resonance anomaly',
-    timeline: [
-      { time: '18:30:00', event: 'Alert Triggered', type: 'alert' },
-      { time: '18:35:00', event: 'Resolved', details: 'Marked as false alarm', type: 'resolution' }
-    ]
-  },
-  { 
-    id: 'INC-2025-080', 
-    timestamp: '2025-10-23 09:15', 
-    title: 'Signal Degradation', 
-    threat: ThreatType.SENSOR, 
-    severity: 'LOW', 
-    status: 'Closed',
-    location: 'Main Gate',
-    slaLimit: 1200,
-    elapsed: 1100,
-    respondedBy: 'System Admin',
-    responseTime: '18m 20s',
-    assignedTo: 'None',
-    timeline: []
-  }
-];
+import { INCIDENTS as mockIncidents, isOpen, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency, getAvgResponse } from '../data/incidents';
 
 const analyticData = [
   { name: 'Mon', time: 180, target: 180 },
@@ -103,6 +40,9 @@ const Incidents: React.FC = () => {
   const [threatFilter, setThreatFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [timeScope, setTimeScope] = useState('Last 24h');
+  const secondsSinceLoad = useSecondsSinceLoad();
+  // Live SLA clock for open incidents (same clock as the Dashboard alert cards)
+  const withLiveElapsed = (inc: Incident): Incident => ({ ...inc, elapsed: getElapsed(inc, secondsSinceLoad) });
 
   const filteredIncidents = useMemo(() => {
     return mockIncidents.filter(inc => {
@@ -125,11 +65,11 @@ const Incidents: React.FC = () => {
       {/* Summary Strip */}
       <div className="grid grid-cols-5 gap-4">
         {[
-          { label: 'Total (30d)', value: '24', icon: 'list_alt' },
-          { label: 'Investigating', value: '3', icon: 'visibility', color: 'text-warning' },
-          { label: 'Escalated', value: '1', icon: 'priority_high', color: 'text-danger' },
-          { label: 'False Alarms', value: '8', icon: 'cancel', color: 'text-gray-400' },
-          { label: 'Avg Response', value: '02:14', icon: 'timer', color: 'text-primary' }
+          { label: 'Total (24H)', value: String(mockIncidents.length), icon: 'list_alt' },
+          { label: 'Investigating', value: String(mockIncidents.filter(i => i.status === 'Investigating').length), icon: 'visibility', color: 'text-warning' },
+          { label: 'Escalated', value: String(mockIncidents.filter(i => i.status === 'Escalated').length), icon: 'priority_high', color: 'text-danger' },
+          { label: 'False Alarms', value: String(mockIncidents.filter(i => i.falseAlarmReason).length), icon: 'cancel', color: 'text-gray-400' },
+          { label: 'Avg Response', value: getAvgResponse(), icon: 'timer', color: 'text-primary' }
         ].map((stat, i) => (
           <div key={i} className="bg-panel border border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
             <div className="size-10 rounded-xl bg-background border border-white/5 flex items-center justify-center">
@@ -234,7 +174,16 @@ const Incidents: React.FC = () => {
                   </td>
                   <td className="px-6 py-5 text-gray-400 font-medium">{inc.respondedBy}</td>
                   <td className="px-6 py-5">
-                    {inc.slaBreach ? (
+                    {isOpen(inc) ? (
+                      inc.slaLimit ? (
+                        <div className="flex flex-col gap-1">
+                          <span className={`font-bold uppercase font-mono ${getSlaUrgency(withLiveElapsed(inc))}`}>{formatSla(withLiveElapsed(inc))}</span>
+                          <span className="text-gray-600 font-mono text-[9px]">Remaining</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-600 font-mono">-</span>
+                      )
+                    ) : inc.slaBreach ? (
                       <div className="flex flex-col gap-1">
                         <span className="text-danger font-bold uppercase">Breached</span>
                         <span className="text-danger/60 font-mono text-[9px]">{inc.slaBreach}</span>
@@ -263,6 +212,7 @@ const Incidents: React.FC = () => {
 
   const renderAnalytics = () => (
     <div className="h-full overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-10">
+      <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">30-day sample data</p>
       <div className="grid grid-cols-4 gap-6">
         {[
           { l: 'SLA Breach Rate', v: '4.2%', s: 'Last 30 days', c: 'text-danger' },
@@ -533,8 +483,10 @@ const Incidents: React.FC = () => {
                   <div className="space-y-6">
                      <div className="flex flex-col gap-1">
                        <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">SLA Response Performance</span>
-                       <span className={`text-sm font-bold ${selectedIncident.slaBreach ? 'text-danger' : 'text-emerald-500'}`}>
-                         {selectedIncident.slaBreach ? `Breached (${selectedIncident.slaBreach})` : 'Compliant (On-time)'}
+                       <span className={`text-sm font-bold ${isOpen(selectedIncident) ? 'text-gray-300' : selectedIncident.slaBreach ? 'text-danger' : 'text-emerald-500'}`}>
+                         {isOpen(selectedIncident)
+                           ? (selectedIncident.slaLimit ? `Live: ${formatSla(withLiveElapsed(selectedIncident))} remaining` : '-')
+                           : selectedIncident.slaBreach ? `Breached (${selectedIncident.slaBreach})` : 'Compliant (On-time)'}
                        </span>
                      </div>
                      <div className="flex flex-col gap-1">

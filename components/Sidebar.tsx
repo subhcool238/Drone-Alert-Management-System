@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { getOpenCount } from '../data/incidents';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: 'dashboard' },
   { path: '/fleet', label: 'Fleet Management', icon: 'flight_takeoff' },
   { path: '/manual', label: 'Manual Control', icon: 'gamepad' },
   { path: '/patrols', label: 'Patrol Routes', icon: 'alt_route' },
-  { path: '/incidents', label: 'Incidents', icon: 'warning', badge: 2 },
+  { path: '/incidents', label: 'Incidents', icon: 'warning', badge: getOpenCount() },
   { path: '/settings', label: 'System Settings', icon: 'settings' },
 ];
 

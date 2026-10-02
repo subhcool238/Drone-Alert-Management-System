@@ -9,6 +9,7 @@ import ManualControl from './pages/ManualControl';
 import PatrolRoutes from './pages/PatrolRoutes';
 import Incidents from './pages/Incidents';
 import Settings from './pages/Settings';
+import { DRONES, STATUS_LABEL, STATUS_DOT } from './data/drones';
 
 const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowledge }) => {
   const [checked, setChecked] = useState(false);
@@ -52,13 +53,13 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
             <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">flight_takeoff</span> Fleet Snapshot
             </h4>
-            <div className="grid grid-cols-4 gap-4">
-              {[
-                { name: 'Sentinel-1', battery: 78, status: 'Active', color: 'bg-emerald-500' },
-                { name: 'Sentinel-2', battery: 100, status: 'Idle', color: 'bg-primary' },
-                { name: 'Sentinel-3', battery: 12, status: 'Charging', color: 'bg-warning' },
-                { name: 'Sentinel-4', battery: 0, status: 'Fault', color: 'bg-danger' }
-              ].map((d, i) => (
+            <div className="grid grid-cols-3 gap-4">
+              {DRONES.map(drone => ({
+                name: drone.name,
+                battery: drone.battery,
+                status: STATUS_LABEL[drone.status],
+                color: STATUS_DOT[drone.status]
+              })).map((d, i) => (
                 <div key={i} className="bg-background border border-white/5 p-5 rounded-2xl text-center space-y-3">
                   <p className="text-[10px] font-black text-white uppercase tracking-widest">{d.name}</p>
                   <div className="text-2xl font-display font-bold text-white">{d.battery}%</div>

@@ -29,6 +29,7 @@ export interface TimelineEvent {
 export interface Incident {
   id: string;
   timestamp: string;
+  relativeTime?: string; // e.g. "2m ago", shown on live alert cards
   title: string;
   threat: ThreatType;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';

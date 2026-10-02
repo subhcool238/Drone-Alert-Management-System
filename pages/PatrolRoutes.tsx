@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { PatrolRoute } from '../types';
 import { getSmartSuggestion } from '../geminiService';
+import { getDroneByName } from '../data/drones';
 
 const mockRoutes: PatrolRoute[] = [
   { 
@@ -13,7 +14,7 @@ const mockRoutes: PatrolRoute[] = [
     lastRun: '14:20 today', 
     coverage: 100, 
     status: 'ACTIVE',
-    drones: ['Sentinel-1'],
+    drones: [getDroneByName('Sentinel-1').name],
     guards: ['Pierre L.'],
     hasCoverageGap: false,
     frequency: 'Every 2 Hours',
@@ -50,7 +51,7 @@ const mockRoutes: PatrolRoute[] = [
     lastRun: 'Never', 
     coverage: 0, 
     status: 'DRAFT',
-    drones: ['Watcher-3'],
+    drones: [getDroneByName('Watcher-3').name],
     guards: [],
     hasCoverageGap: false,
     frequency: 'Nightly',

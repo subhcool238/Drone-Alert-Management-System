@@ -1,14 +1,16 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ThreatType, Incident, Guard } from '../types';
+import { Guard, FleetStatus } from '../types';
+import { countByStatus, getFleetBatteryAvg } from '../data/drones';
+import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'feed' | 'status' | 'patrols' | 'guards'>('feed');
   const [mapMode, setMapMode] = useState<'2D' | '3D'>('2D');
   const [viewMode, setViewMode] = useState<'default' | 'thermal'>('default');
-  const [selectedAlertId, setSelectedAlertId] = useState<string | null>('ALT-01');
+  const [selectedAlertId, setSelectedAlertId] = useState<string | null>('INC-2025-082');
   const [showShiftHandover, setShowShiftHandover] = useState(false);
   const [patrolsPaused, setPatrolsPaused] = useState(false);
   
@@ -17,78 +19,17 @@ const Dashboard: React.FC = () => {
   const [threatFilter, setThreatFilter] = useState('All');
   const [mapLayers, setMapLayers] = useState({ drones: true, guards: true, blindSpots: true });
 
-  const [alerts, setAlerts] = useState<Incident[]>([
-    {
-      id: 'ALT-01',
-      severity: 'CRITICAL',
-      threat: ThreatType.HUMAN,
-      title: 'Motion Detected',
-      location: 'Storage Area B (North)',
-      slaLimit: 300,
-      elapsed: 6,
-      status: 'Investigating',
-      assignedTo: 'Sentinel-1',
-      assignmentStatus: 'En route',
-      eta: '01:30',
-      timestamp: '2m ago',
-      confidence: 92,
-      priority: 'P1',
-      respondedBy: 'Isabelle M.',
-      responseTime: 'N/A',
-      timeline: []
-    },
-    {
-      id: 'ALT-02',
-      severity: 'HIGH',
-      threat: ThreatType.SENSOR,
-      title: 'Signal Degradation',
-      location: 'Watcher-3 @ Richelieu',
-      slaLimit: 600,
-      elapsed: 45,
-      status: 'Investigating',
-      assignedTo: 'None',
-      assignmentStatus: 'Queued',
-      eta: '03:00',
-      timestamp: '12m ago',
-      confidence: 41,
-      priority: 'P2',
-      isLikelyFalseAlarm: true,
-      respondedBy: 'System',
-      responseTime: 'N/A',
-      timeline: []
-    },
-    {
-      id: 'ALT-03',
-      severity: 'MEDIUM',
-      threat: ThreatType.ENVIRONMENTAL,
-      title: 'Temp Spike',
-      location: 'Server Room 4',
-      slaLimit: 300,
-      elapsed: 180,
-      status: 'Investigating',
-      assignedTo: 'None',
-      assignmentStatus: 'Queued',
-      eta: '04:15',
-      timestamp: '15m ago',
-      confidence: 68,
-      priority: 'P3',
-      respondedBy: 'System',
-      responseTime: 'N/A',
-      timeline: []
-    }
-  ]);
+  // Live alerts are the open incidents from the shared list, with live SLA clocks
+  const secondsSinceLoad = useSecondsSinceLoad();
+  const alerts = useMemo(
+    () => getOpenIncidents().map(i => ({ ...i, elapsed: getElapsed(i, secondsSinceLoad) })),
+    [secondsSinceLoad]
+  );
 
   const guards: Guard[] = [
     { id: 'G-01', name: 'Pierre L.', location: 'Sector 4', status: 'Patrolling', assignment: 'Perimeter B' },
     { id: 'G-02', name: 'Sarah J.', location: 'Main Gate', status: 'Stationary', assignment: 'Check-in' }
   ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setAlerts(prev => prev.map(a => ({ ...a, elapsed: a.elapsed + 1 })));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const filteredAlerts = useMemo(() => {
     const filtered = alerts.filter(a => {
@@ -113,22 +54,6 @@ const Dashboard: React.FC = () => {
   const hasP1Active = useMemo(() => {
     return alerts.some(a => a.priority === 'P1');
   }, [alerts]);
-
-  const getSlaUrgency = (a: Incident) => {
-    const remaining = a.slaLimit - a.elapsed;
-    const ratio = remaining / a.slaLimit;
-    if (ratio < 0) return 'text-danger animate-pulse font-black';
-    if (ratio < 0.2) return 'text-danger animate-pulse';
-    if (ratio < 0.5) return 'text-warning';
-    return 'text-success';
-  };
-
-  const formatSla = (a: Incident) => {
-    const remaining = Math.max(0, a.slaLimit - a.elapsed);
-    const m = Math.floor(remaining / 60);
-    const s = remaining % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
 
   const getPriorityBadgeStyles = (priority?: string) => {
     switch(priority) {
@@ -206,10 +131,10 @@ const Dashboard: React.FC = () => {
 
           <div className="grid grid-cols-4 gap-1 py-4 bg-background/50 rounded-2xl border border-white/5">
             {[
-              { label: 'ACTIVE', count: 3, color: 'text-primary' },
-              { label: 'IDLE', count: 2, color: 'text-gray-400' },
-              { label: 'CHRG', count: 1, color: 'text-warning' },
-              { label: 'FAULT', count: 0, color: 'text-danger' }
+              { label: 'ACTIVE', count: countByStatus(FleetStatus.ACTIVE), color: 'text-primary' },
+              { label: 'IDLE', count: countByStatus(FleetStatus.IDLE), color: 'text-gray-400' },
+              { label: 'CHRG', count: countByStatus(FleetStatus.CHARGING), color: 'text-warning' },
+              { label: 'FAULT', count: countByStatus(FleetStatus.FAULT), color: 'text-danger' }
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center">
                 <span className="text-2xl font-display font-bold text-white leading-none">{stat.count}</span>
@@ -279,7 +204,7 @@ const Dashboard: React.FC = () => {
                         <span className="material-symbols-outlined text-[16px]">reply</span>
                         {alert.assignedTo || 'Unassigned'}
                       </span>
-                      <span className="text-gray-600 font-medium">{alert.timestamp}</span>
+                      <span className="text-gray-600 font-medium">{alert.relativeTime ?? alert.timestamp}</span>
                     </div>
                   </div>
                 );
@@ -454,7 +379,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400 font-medium">Fleet Battery Avg</span>
-              <span className="text-lg font-display font-bold text-white tracking-tight">84%</span>
+              <span className="text-lg font-display font-bold text-white tracking-tight">{getFleetBatteryAvg()}%</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400 font-medium leading-tight">Coverage Gaps</span>
