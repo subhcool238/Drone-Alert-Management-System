@@ -70,7 +70,7 @@ const Header: React.FC = () => {
               </div>
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-[10px] font-bold text-warning uppercase tracking-widest mb-4">Coverage Intelligence</h4>
+                  <h4 className="text-[10px] font-bold text-warning uppercase tracking-widest mb-4">Coverage Gap</h4>
                   <div className="p-5 rounded-2xl bg-warning/5 border border-warning/20">
                     <div className="text-4xl font-display font-bold text-warning mb-1">{gapCount} {gapCount === 1 ? 'Zone' : 'Zones'}</div>
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for {COVERAGE_GAP.minutes} min</p>

@@ -254,7 +254,7 @@ const FleetManagement: React.FC = () => {
                   <span className="material-symbols-outlined text-primary text-[28px]">analytics</span>
                 </div>
                 <div>
-                  <h3 className="text-[13px] font-bold text-white uppercase tracking-[0.25em]">Predictive Diagnostics</h3>
+                  <h3 className="text-[13px] font-bold text-white uppercase tracking-[0.25em]">Maintenance Diagnostics</h3>
                   <p className="text-[11px] text-gray-500 font-medium uppercase mt-1">Fleet Health Report</p>
                 </div>
              </div>

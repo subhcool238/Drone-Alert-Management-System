@@ -169,10 +169,9 @@ const AlertRulesAndSLA = () => {
                   <h4 className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Threshold Suggestion (sample)</h4>
                 </div>
                 <p className="text-[11px] text-gray-400 leading-relaxed font-medium uppercase tracking-tight">
-                  Auto-adjust thresholds based on false alarm patterns. 
-                  (Detected 12 HVAC vibrations in Sector B, suggesting 5% threshold raise).
+                  Suggested threshold change from logged false alarms (sample data): 12 HVAC vibrations in Sector B, raise 5%.
                 </p>
-                <button className="w-full py-3 bg-emerald-500 text-black text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all hover:brightness-110">Enable Auto-Calibration</button>
+                <button className="w-full py-3 bg-emerald-500 text-black text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all hover:brightness-110">Review Suggestion</button>
               </div>
             </div>
           </div>

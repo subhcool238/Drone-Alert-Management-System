@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
 import { countByStatus, getFleetBatteryAvg } from '../data/drones';
 import { COVERAGE_GAP, getCoverageGapCount } from '../data/patrols';
+import { formatScenarioTime } from '../data/clock';
 import { getOpenIncidents, getElapsed, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
 
 const Dashboard: React.FC = () => {
@@ -22,6 +23,7 @@ const Dashboard: React.FC = () => {
 
   // Live alerts are the open incidents from the shared list, with live SLA clocks
   const secondsSinceLoad = useSecondsSinceLoad();
+  const scenarioClock = formatScenarioTime(secondsSinceLoad);
   const alerts = useMemo(
     () => getOpenIncidents().map(i => ({ ...i, elapsed: getElapsed(i, secondsSinceLoad) })),
     [secondsSinceLoad]
@@ -359,7 +361,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="flex-1 bg-[#0b0e14]/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
             <div className="flex gap-4 text-[10px] items-start">
-              <span className="text-gray-600 font-mono pt-0.5">14:22:01</span>
+              <span className="text-gray-600 font-mono pt-0.5">{scenarioClock}</span>
               <div className="flex flex-col gap-1">
                 <span className="text-primary font-bold uppercase tracking-widest">[SENTINEL-1]</span>
                 <span className="text-gray-400">Lock established at Waypoint 4. Perimeter scan engaged.</span>

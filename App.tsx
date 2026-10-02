@@ -33,7 +33,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
               {[
                 { time: '22:14', type: 'Motion', zone: 'Storage B', sev: 'CRITICAL', status: 'False alarm – HVAC' },
                 { time: '18:30', type: 'Vibration', zone: 'Sector 4', sev: 'MEDIUM', status: 'Resolved in 2:14 by Pierre' },
-                { time: '14:02', type: 'Intruder', zone: 'Perimeter Alpha', sev: 'HIGH', status: 'Resolved by Drone Dispatch' }
+                { time: '15:02', type: 'Intruder', zone: 'Perimeter Alpha', sev: 'HIGH', status: 'Resolved by Drone Dispatch' }
               ].map((inc, i) => (
                 <div key={i} className="bg-background border border-white/5 p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
                   <div className="flex items-center gap-6">
