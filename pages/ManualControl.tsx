@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Button from '../components/Button';
 import { clickableProps } from '../components/a11y';
 import ModalOverlay from '../components/ModalOverlay';
+import { announce } from '../components/LiveAnnouncer';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
@@ -24,6 +25,9 @@ const NOT_ACTIVE_BANNER: Record<Exclude<FleetStatus, FleetStatus.ACTIVE>, { text
 // Link quality colour by number: 80 and above green, 50 to 79 amber, below 50 red
 const linkQualityColor = (n: number): string =>
   n >= 80 ? 'text-emerald-500' : n >= 50 ? 'text-amber-500' : 'text-danger-light';
+
+// Spoken form of the link quality colour
+const linkQualityWord = (n: number): string => (n >= 80 ? 'good' : n >= 50 ? 'fair' : 'poor');
 
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
@@ -119,6 +123,20 @@ const ManualControl: React.FC = () => {
   const secondsLeft = currentLimit - elapsedSeconds;
   const isWarningZone = isManual && secondsLeft <= 180; // 3 mins left
   const isCriticalZone = isManual && secondsLeft <= 60; // 1 min left
+
+  // Announce state changes only (never the ticking timer)
+  const lastMode = useRef(isManual);
+  useEffect(() => {
+    if (lastMode.current === isManual) return;
+    lastMode.current = isManual;
+    announce(isManual ? 'Manual control started' : 'Returned to autonomous mode', 'polite');
+  }, [isManual]);
+  useEffect(() => {
+    if (isWarningZone && !isCriticalZone) announce('Manual control: 3 minutes left', 'polite');
+  }, [isWarningZone]);
+  useEffect(() => {
+    if (isCriticalZone) announce('Auto-return in 60 seconds', 'assertive');
+  }, [isCriticalZone]);
 
   return (
     <div className="flex gap-6 h-full overflow-hidden p-1 bg-background relative">
@@ -237,8 +255,8 @@ const ManualControl: React.FC = () => {
             </div>
             {isManual && (
               <div className="flex items-center gap-4">
-                 <div className="text-white font-mono font-bold text-sm bg-black/40 px-3 py-1 rounded-lg border border-white/10">
-                   {formatTime(secondsLeft)}
+                 <div role="timer" className="text-white font-mono font-bold text-sm bg-black/40 px-3 py-1 rounded-lg border border-white/10">
+                   <span className="sr-only">Time remaining </span>{formatTime(secondsLeft)}
                  </div>
               </div>
             )}
@@ -401,7 +419,7 @@ const ManualControl: React.FC = () => {
                </div>
                <div className="flex flex-col gap-1">
                  <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Link Quality</span>
-                 <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-mono font-bold text-lg`}>{selectedDrone.linkStrength}%</span>
+                 <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-mono font-bold text-lg`}>{selectedDrone.linkStrength}%<span className="sr-only"> ({linkQualityWord(selectedDrone.linkStrength)})</span></span>
                </div>
             </div>
           </div>

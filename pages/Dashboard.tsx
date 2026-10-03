@@ -10,6 +10,10 @@ import { COLORS } from '../data/theme';
 import { formatScenarioTime, formatAgo } from '../data/clock';
 import { getOpenIncidents, getElapsed, getSlaState, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
 
+// Spoken form of the SLA colour, so the urgency is not carried by colour alone
+const slaUrgencyWord = (cls: string): string =>
+  cls.includes('danger') ? ' remaining, critical' : cls.includes('warning') ? ' remaining, warning' : ' remaining';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'feed' | 'status' | 'patrols' | 'guards'>('feed');
@@ -184,7 +188,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-1 shrink-0 px-1">
               <div className="flex items-center gap-3">
                 <h2 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Live Alerts</h2>
-                <span className="size-1.5 rounded-full bg-danger animate-pulse"></span>
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-danger animate-pulse"></span>
               </div>
               <span className="text-xs font-bold text-text-muted uppercase tracking-wider">{filteredAlerts.length} Units</span>
             </div>
@@ -225,7 +229,7 @@ const Dashboard: React.FC = () => {
                         ) : alert.sla.kind === 'breached' ? (
                           <div className="text-danger-light font-bold">Breached</div>
                         ) : (
-                          <div className={getSlaUrgency(alert)}>SLA: {formatSla(alert)}</div>
+                          <div className={getSlaUrgency(alert)}>SLA: {formatSla(alert)}<span className="sr-only">{slaUrgencyWord(getSlaUrgency(alert))}</span></div>
                         )}
                         <div className="mt-1">{renderConfidence(alert.confidence)}</div>
                       </div>
@@ -388,7 +392,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div tabIndex={0} role="region" aria-label="Live feed log" className="flex-1 bg-background/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
             <div className="flex gap-4 text-xs items-start">
-              <span className="text-text-muted font-mono pt-0.5">{scenarioClock}</span>
+              <span className="text-text-muted font-mono pt-0.5"><span className="sr-only">Scenario time </span>{scenarioClock}</span>
               <div className="flex flex-col gap-1">
                 <span className="text-primary font-bold uppercase tracking-widest">[SENTINEL-1]</span>
                 <span className="text-gray-400">Lock established at Waypoint 4. Perimeter scan engaged.</span>

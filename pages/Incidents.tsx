@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Button from '../components/Button';
-import { activateOnKey } from '../components/a11y';
+import { activateOnKey, prefersReducedMotion } from '../components/a11y';
 import ModalOverlay from '../components/ModalOverlay';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -10,6 +10,8 @@ import {
 import { Incident, ThreatType, TimelineEvent } from '../types';
 import { COLORS } from '../data/theme';
 import { INCIDENTS as mockIncidents, getElapsed, getSlaState, useSecondsSinceLoad, getSlaUrgency, getAvgResponse } from '../data/incidents';
+
+const REDUCE_MOTION = prefersReducedMotion();
 
 const analyticData = [
   { name: 'Mon', time: 180, target: 180 },
@@ -242,7 +244,7 @@ const Incidents: React.FC = () => {
                     {renderSlaCell(inc)}
                   </td>
                   <td className="px-6 py-5 text-right">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 focus-within:opacity-100 transition-opacity">
                       <Button variant="icon" aria-label="View incident report" className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">description</span></Button>
                       <Button variant="icon" aria-label="Flag incident" className="text-text-muted hover:text-danger-light"><span className="material-symbols-outlined" aria-hidden="true">flag</span></Button>
                     </div>
@@ -257,7 +259,7 @@ const Incidents: React.FC = () => {
   );
 
   const renderAnalytics = () => (
-    <div className="h-full overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-10">
+    <div tabIndex={0} role="region" aria-label="Tactical analytics" className="h-full overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-10">
       <p className="text-xs font-bold text-text-muted uppercase tracking-wider">30-day sample data</p>
       <div className="grid grid-cols-4 gap-6">
         {[
@@ -280,7 +282,7 @@ const Incidents: React.FC = () => {
             <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Response Time Trend vs SLA Target</h2>
             <div className="flex items-center gap-6">
                <div className="flex items-center gap-2">
-                 <div className="size-2 rounded-full bg-primary"></div>
+                 <div aria-hidden="true" className="size-2 rounded-full bg-primary"></div>
                  <span className="text-xs font-bold text-text-muted uppercase">Avg Response</span>
                </div>
                <div className="flex items-center gap-2">
@@ -289,7 +291,15 @@ const Incidents: React.FC = () => {
                </div>
             </div>
           </div>
-          <div className="h-[400px] w-full">
+          <div className="sr-only">
+            <p>Line chart: average response time per weekday in seconds, against the SLA target of {analyticData[0].target} seconds. Above target on {analyticData.filter(d => d.time > d.target).map(d => d.name).join(' and ')}; fastest on {[...analyticData].sort((a, b) => a.time - b.time)[0].name} at {[...analyticData].sort((a, b) => a.time - b.time)[0].time} seconds.</p>
+            <table>
+              <caption>Average response time by weekday, in seconds</caption>
+              <thead><tr><th scope="col">Day</th><th scope="col">Average response</th><th scope="col">SLA target</th></tr></thead>
+              <tbody>{analyticData.map(d => <tr key={d.name}><th scope="row">{d.name}</th><td>{d.time}</td><td>{d.target}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className="h-[400px] w-full" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analyticData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
@@ -299,8 +309,8 @@ const Incidents: React.FC = () => {
                   contentStyle={{backgroundColor: COLORS.panel, border: '1px solid #ffffff10', borderRadius: '12px'}}
                   itemStyle={{color: COLORS.primary, fontSize: '12px', fontWeight: 'bold'}}
                 />
-                <Line type="monotone" dataKey="time" stroke={COLORS.primary} strokeWidth={4} dot={{ r: 4, fill: COLORS.primary }} activeDot={{ r: 8 }} />
-                <Line type="stepAfter" dataKey="target" stroke={COLORS.danger} strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                <Line type="monotone" dataKey="time" stroke={COLORS.primary} strokeWidth={4} dot={{ r: 4, fill: COLORS.primary }} activeDot={{ r: 8 }} isAnimationActive={!REDUCE_MOTION} />
+                <Line type="stepAfter" dataKey="target" stroke={COLORS.danger} strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={!REDUCE_MOTION} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -308,7 +318,15 @@ const Incidents: React.FC = () => {
 
         <div className="col-span-12 lg:col-span-4 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-10 shadow-2xl">
           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Threat Type Distribution</h2>
-          <div className="h-[250px] w-full relative">
+          <div className="sr-only">
+            <p>Doughnut chart of 24 total cases by threat type: {threatDistribution.map(t => `${t.name} ${t.value}%`).join(', ')}.</p>
+            <table>
+              <caption>Cases by threat type, in percent</caption>
+              <thead><tr><th scope="col">Threat type</th><th scope="col">Share of cases</th></tr></thead>
+              <tbody>{threatDistribution.map(t => <tr key={t.name}><th scope="row">{t.name}</th><td>{t.value}%</td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className="h-[250px] w-full relative" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie 
@@ -317,6 +335,8 @@ const Incidents: React.FC = () => {
                   outerRadius={100} 
                   paddingAngle={8} 
                   dataKey="value"
+                  isAnimationActive={!REDUCE_MOTION}
+                  rootTabIndex={-1}
                 >
                   {threatDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -334,7 +354,7 @@ const Incidents: React.FC = () => {
              {threatDistribution.map(item => (
                <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="size-2 rounded-full" style={{backgroundColor: item.color}}></div>
+                    <div aria-hidden="true" className="size-2 rounded-full" style={{backgroundColor: item.color}}></div>
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.name}</span>
                   </div>
                   <span className="text-xs font-mono font-bold text-white">{item.value}%</span>
@@ -466,7 +486,7 @@ const Incidents: React.FC = () => {
                   </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-xs text-text-muted font-bold uppercase tracking-wider">{selectedIncident.location}</span>
-                    <span className="size-1 rounded-full bg-gray-800"></span>
+                    <span aria-hidden="true" className="size-1 rounded-full bg-gray-800"></span>
                     <span className="text-xs text-primary font-bold uppercase tracking-wider">{selectedIncident.threat} Threat</span>
                   </div>
                </div>
@@ -487,7 +507,7 @@ const Incidents: React.FC = () => {
                          }`}></div>
                          <div className="flex flex-col gap-1.5 ml-6">
                             <span className="text-xs font-mono text-text-muted font-bold">{item.time}</span>
-                            <span className={`text-sm font-bold ${item.type === 'escalation' ? 'text-danger-light' : 'text-white'}`}>{item.event}</span>
+                            <span className={`text-sm font-bold ${item.type === 'escalation' ? 'text-danger-light' : 'text-white'}`}><span className="sr-only">{item.type}: </span>{item.event}</span>
                             {item.details && <p className="text-xs text-text-muted font-medium">{item.details}</p>}
                          </div>
                       </div>

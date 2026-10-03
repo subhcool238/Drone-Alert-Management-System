@@ -63,6 +63,12 @@
         /* Keyboard focus ring for everything that is not already a Button (Buttons carry their own ring) */
         :where(a, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid #06b6d4 !important; outline-offset: 2px !important; }
         [role="button"]:focus-visible, .custom-scrollbar:focus-visible, tr:focus-visible { outline-offset: -2px !important; }
+        /* Reduced motion: stop the pulsing, pinging and scanning animations. The static state stays visible (dots, rings, borders); the decorative scan sweep is hidden. */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-pulse, .animate-ping, .animate-spin, .animate-bounce { animation: none !important; }
+            .animate-scan { animation: none !important; display: none !important; }
+            * { scroll-behavior: auto !important; }
+        }
         .custom-scrollbar::-webkit-scrollbar { width: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
     </style>

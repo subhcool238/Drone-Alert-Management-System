@@ -212,11 +212,11 @@ const PatrolRoutes: React.FC = () => {
                 <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Tactical Overlays</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs text-white">
-                    <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-primary"></span> Waypoints</span>
+                    <span className="flex items-center gap-2"><span aria-hidden="true" className="size-2 rounded-full bg-primary"></span> Waypoints</span>
                     <span className="font-bold text-text-muted">{selectedRoute.waypoints}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs text-white">
-                    <span className="flex items-center gap-2"><span className="size-2 rounded-full border-2 border-dashed border-danger"></span> Blind Spots</span>
+                    <span className="flex items-center gap-2"><span aria-hidden="true" className="size-2 rounded-full border-2 border-dashed border-danger"></span> Blind Spots</span>
                     <span className="font-bold text-text-muted">2 Zones</span>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ const PatrolRoutes: React.FC = () => {
                     <div className="flex flex-wrap gap-3">
                       {selectedRoute.drones.length > 0 ? selectedRoute.drones.map(d => (
                         <div key={d} className="bg-background border border-primary/20 rounded-2xl p-4 flex items-center gap-4 flex-1 min-w-[150px] group hover:border-primary transition-all">
-                           <div className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                           <div aria-hidden="true" className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                            <span className="text-xs font-bold text-white uppercase tracking-widest">{d}</span>
                            <span aria-hidden="true" className="material-symbols-outlined text-text-muted ml-auto group-hover:text-danger-light cursor-pointer text-lg">cancel</span>
                         </div>
@@ -334,7 +334,7 @@ const PatrolRoutes: React.FC = () => {
                     </div>
                     <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
                        <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-2">
-                         <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Next Run: {getNextRun(selectedRoute)}
+                         <span aria-hidden="true" className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Next Run: {getNextRun(selectedRoute)}
                        </span>
                        <span className="text-xs text-text-muted font-mono">UTC+1</span>
                     </div>

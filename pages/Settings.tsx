@@ -437,7 +437,7 @@ const Settings: React.FC = () => {
       {/* GLOBAL HEALTH WIDGET */}
       <div className="fixed bottom-6 left-80 z-[60] flex items-center gap-4 bg-panel/80 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl shadow-2xl group transition-all hover:border-primary/30">
         <div className="flex items-center gap-2 pr-4 border-r border-white/5">
-          <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse"></span>
+          <span aria-hidden="true" className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse"></span>
           <span className="text-xs font-bold text-white uppercase tracking-wider">System Online</span>
         </div>
         <div className="flex gap-4">

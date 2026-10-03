@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Button from './components/Button';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ModalOverlay from './components/ModalOverlay';
+import LiveAnnouncer from './components/LiveAnnouncer';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
@@ -185,6 +186,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       >
         Skip to main content
       </a>
+      <LiveAnnouncer />
       {showBriefingModal && <ShiftHandoverModal onAcknowledge={handleAcknowledge} />}
       
       <Sidebar />

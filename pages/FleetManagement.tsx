@@ -373,7 +373,7 @@ const FleetManagement: React.FC = () => {
                    <div className="size-12 rounded-2xl bg-panel border border-white/10 flex items-center justify-center text-text-muted group-hover:text-primary group-hover:border-primary/30 transition-all">
                      <span aria-hidden="true" className="material-symbols-outlined text-[24px]">{stat.icon}</span>
                    </div>
-                   <div className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
+                   <div aria-hidden="true" className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">{stat.label}</span>

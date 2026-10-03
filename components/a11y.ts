@@ -17,3 +17,7 @@ export const clickableProps = (handler: () => void) => ({
   onClick: handler,
   onKeyDown: activateOnKey(handler)
 });
+
+// True when the user asked the system for reduced motion
+export const prefersReducedMotion = (): boolean =>
+  typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

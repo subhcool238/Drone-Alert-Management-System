@@ -10,6 +10,7 @@ import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../d
 import { buildSystemSummary } from '../data/summary';
 import { clickableProps } from './a11y';
 import ModalOverlay from './ModalOverlay';
+import { announce } from './LiveAnnouncer';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -56,7 +57,9 @@ const Header: React.FC = () => {
 
   // Rule-based summary from the shared drone, incident and patrol data
   const handleSummary = () => {
-    setSummary(buildSystemSummary(secondsSinceLoad));
+    const text = buildSystemSummary(secondsSinceLoad);
+    setSummary(text);
+    announce(text, 'polite');
   };
 
   // Notification 1 age is live: how long ago INC-2025-083 was detected, counting up
@@ -71,6 +74,13 @@ const Header: React.FC = () => {
     { id: 2, type: 'Escalation', msg: 'Team Lead approval required: North Storage Wing', time: '1m ago', color: 'text-warning', icon: 'priority_high' },
     { id: 3, type: 'Maintenance', msg: 'Watcher-3 lens calibration requested', time: '2m ago', color: 'text-primary', icon: 'settings_backup_restore' },
   ];
+
+  // Opening the panel moves focus into it and announces it once
+  useEffect(() => {
+    if (!showNotifications) return;
+    notificationsRef.current?.querySelector<HTMLElement>('[role="dialog"] button')?.focus();
+    announce(`Notifications panel open, ${notifications.length} notifications`, 'polite');
+  }, [showNotifications]);
 
   return (
     <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 shrink-0 z-[60] bg-background">
@@ -129,8 +139,8 @@ const Header: React.FC = () => {
                 <section>
                    <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Outstanding Tasks</h3>
                    <div className="space-y-2">
-                     <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-indigo-500"></span> 2 Police Reports Pending</div>
-                     <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-gray-600"></span> Night Mode Audit Due</div>
+                     <div className="flex items-center gap-2 text-xs text-gray-400"><span aria-hidden="true" className="size-1.5 rounded-full bg-indigo-500"></span> 2 Police Reports Pending</div>
+                     <div className="flex items-center gap-2 text-xs text-gray-400"><span aria-hidden="true" className="size-1.5 rounded-full bg-gray-600"></span> Night Mode Audit Due</div>
                    </div>
                 </section>
               </div>
@@ -189,6 +199,8 @@ const Header: React.FC = () => {
           <Button variant="icon"
  ref={bellRef}
  aria-expanded={showNotifications}
+ aria-controls="notifications-panel"
+ aria-haspopup="dialog"
  aria-label="Notifications"
  onClick={() => setShowNotifications(!showNotifications)}
  className={`size-10 border relative ${ showNotifications ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-panel border-white/10 text-gray-400 hover:text-white' }`}>
@@ -197,7 +209,7 @@ const Header: React.FC = () => {
           </Button>
 
           {showNotifications && (
-            <div className="absolute top-full mt-4 right-0 w-[320px] bg-panel border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
+            <div id="notifications-panel" role="dialog" aria-label="Notifications" className="absolute top-full mt-4 right-0 w-[320px] bg-panel border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
               <div className="p-5 border-b border-white/5 flex justify-between items-center bg-background/50">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">Active Notifications</h3>
                 <Button variant="text" className="text-xs text-primary font-bold uppercase hover:underline">Clear All</Button>
@@ -232,7 +244,7 @@ const Header: React.FC = () => {
           aria-haspopup="dialog"
           className="flex items-center gap-3 bg-panel border border-white/5 rounded-2xl px-4 py-2 hover:bg-white/5 transition-all cursor-pointer group"
         >
-          <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700 group-hover:ring-primary transition-all" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
+          <div aria-hidden="true" className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700 group-hover:ring-primary transition-all" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
           <div className="flex flex-col">
             <span className="text-xs font-bold text-white group-hover:text-primary transition-colors leading-none">Isabelle M.</span>
             <span className="text-xs text-text-muted font-bold uppercase tracking-wider mt-1">Lead Drone Operator</span>
