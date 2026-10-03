@@ -9,7 +9,7 @@ This is a concept for a FlytBase product design assignment. It imagines a comman
 
 ## Features
 
-- **Dashboard:** live alert cards with a ticking SLA countdown, severity and threat filters, priority badges (P1 to P4), a multi-incident banner, a pause-patrols switch while a P1 alert is open, fleet status counters, a readiness overview, a simulated 2D and 3D map view, and a shift handover briefing that must be acknowledged.
+- **Dashboard:** live alert cards with a ticking SLA countdown, severity and threat filters, priority badges (P1 to P4), a multi-incident banner, a pause-patrols switch while a P1 alert is open, fleet status counters, a readiness overview, a floor plan map in 2D and a rotatable 3D view, and a shift handover briefing that must be acknowledged.
 - **Fleet Management:** searchable drone list with status and health filters, a detail view with health score, service countdown, anomaly flags and telemetry cards, and a maintenance scheduling popup.
 - **Manual Control:** drone selector, a 5-minute session timer with warnings at 2:00 and 4:00 elapsed, automatic return to autonomy at the limit, extension requests (+2 minutes, up to 3), and a session ended popup.
 - **Patrol Routes:** route library with search, scope filter and a coverage gap filter, route details with schedule and assignments, a night operation notice, and a rule-based recommendation that can be applied to assign a drone.
@@ -51,7 +51,7 @@ Known limits:
 npm run deploy
 ```
 
-This builds the app and publishes the `dist` folder to the `gh-pages` branch.
+This builds the app and publishes the `dist` folder to the `gh-pages` branch. The app is hosted for free on GitHub Pages at the live demo link above. It has no backend and needs no API key or environment file.
 
 ## Museum floor plan
 
