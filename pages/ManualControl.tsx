@@ -164,8 +164,8 @@ const ManualControl: React.FC = () => {
       )}
 
       {/* LEFT SIDEBAR: Fleet Selector */}
-      <aside className="w-80 flex-none flex flex-col bg-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-        <div className="p-6 flex flex-col h-full">
+      <aside className="w-80 max-[1439px]:w-60 flex-none flex flex-col bg-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+        <div className="p-6 max-[1439px]:p-4 flex flex-col h-full">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6">Mission Assets</h2>
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
             {DRONES.map(d => ({
@@ -212,7 +212,7 @@ const ManualControl: React.FC = () => {
       {/* CENTER COLUMN: FPV & Joysticks */}
       <main className="flex-1 flex flex-col gap-6 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
         {/* Top HUD Feed */}
-        <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[260px]">
+        <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[260px] max-[1439px]:min-h-[430px]">
           {/* Mode Banner */}
           <div className={`flex-none px-6 py-3 border-b flex items-center justify-between z-10 transition-colors duration-500 ${
             !isManual ? (statusBanner ? statusBanner.box : 'bg-emerald-500/10 border-emerald-500/20') :
@@ -259,7 +259,7 @@ const ManualControl: React.FC = () => {
                  </div>
                  
                  {/* Altimeter Ladder Simulation */}
-                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4">
+                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4 max-[1439px]:hidden">
                     {[20, 15, 10, 5, 0].map(h => (
                       <div key={h} className="flex items-center gap-2">
                         <span className="text-xs font-mono text-white">{h}</span>
@@ -273,7 +273,7 @@ const ManualControl: React.FC = () => {
             {/* Overlays */}
             <div className="absolute top-8 left-8 flex flex-col gap-1 z-20">
               <div className="text-[12px] font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
-              <div className="flex gap-3 text-xs font-mono text-text-secondary font-bold uppercase tracking-wider">
+              <div className="flex gap-3 text-xs font-mono text-text-secondary font-bold uppercase tracking-wider max-[1439px]:hidden">
                 <span>4K @ 60FPS</span>
                 <span>ISO 400</span>
                 <span>ENC: H.265</span>
@@ -299,15 +299,15 @@ const ManualControl: React.FC = () => {
             )}
 
             {/* FPV Controls Bar */}
-            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20">
-               <div className="flex flex-col gap-2">
+            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20 max-[1439px]:flex-col max-[1439px]:items-center max-[1439px]:gap-3">
+               <div className="flex flex-col gap-2 max-[1439px]:items-center">
                  <span className="text-xs font-mono text-primary font-bold tracking-[0.12em] uppercase">Telemetry Sync</span>
                  <div className="text-[32px] font-mono font-bold text-white leading-none">
                     {shownAltitude.toFixed(1)} <span className="text-sm text-text-secondary">m AGL</span>
                  </div>
                </div>
                
-               <div className="flex flex-wrap justify-end gap-3">
+               <div className="flex flex-wrap justify-end max-[1439px]:justify-center gap-3">
                  {isManual && secondsLeft < 120 && extensionsUsed < 3 && (
                    <Button variant="primary" 
  onClick={requestExtension}
@@ -369,7 +369,7 @@ const ManualControl: React.FC = () => {
       </main>
 
       {/* RIGHT SIDEBAR: Detailed Stats & Safety */}
-      <aside className="w-80 flex-none flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
+      <aside className="w-80 max-[1439px]:w-72 flex-none flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
         <div className="bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl shrink-0">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
             <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
