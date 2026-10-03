@@ -26,6 +26,16 @@ const StatusToggle = ({ active, onChange }: { active: boolean; onChange?: () => 
   </Button>
 );
 
+// Edge shadows that appear only on the side where the table is scrolled out of view.
+const SCROLL_SHADOW: React.CSSProperties = {
+  backgroundImage:
+    'linear-gradient(to right, #151a23, #151a23), linear-gradient(to left, #151a23, #151a23), linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0)), linear-gradient(to left, rgba(0,0,0,0.6), rgba(0,0,0,0))',
+  backgroundPosition: 'left center, right center, left center, right center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '24px 100%, 24px 100%, 16px 100%, 16px 100%',
+  backgroundAttachment: 'local, local, scroll, scroll'
+};
+
 const RolesAndPermissions = () => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -39,25 +49,25 @@ const RolesAndPermissions = () => {
         </Button>
       </div>
 
-      <div className="bg-panel border border-white/5 rounded-[2.5rem] overflow-x-auto shadow-2xl">
+      <div className="bg-panel border border-white/5 rounded-[2.5rem] overflow-x-auto shadow-2xl" style={SCROLL_SHADOW}>
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-background/30 text-xs uppercase tracking-wider text-text-muted font-bold border-b border-white/5">
-              <th className="px-4 py-6">Role Profile</th>
-              <th className="px-2 py-6 text-center">Deploy</th>
-              <th className="px-2 py-6 text-center">Manual</th>
-              <th className="px-2 py-6 text-center">Approve</th>
-              <th className="px-2 py-6 text-center">Emergency</th>
-              <th className="px-2 py-6 text-center">Reports</th>
-              <th className="px-2 py-6 text-center">Analytics</th>
-              <th className="px-4 py-6 text-right">Overrides</th>
+              <th className="px-3 py-6">Role Profile</th>
+              <th className="px-1 py-6 text-center">Deploy</th>
+              <th className="px-1 py-6 text-center">Manual</th>
+              <th className="px-1 py-6 text-center">Approve</th>
+              <th className="px-1 py-6 text-center">Emergency</th>
+              <th className="px-1 py-6 text-center">Reports</th>
+              <th className="px-1 py-6 text-center">Analytics</th>
+              <th className="px-3 py-6 text-right">Overrides</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {mockPermissions.map(p => (
               <tr key={p.role} className="hover:bg-white/5 transition-colors group">
-                <td className="px-4 py-7">
-                  <div className="flex items-center gap-4">
+                <td className="px-3 py-7">
+                  <div className="flex items-center gap-3">
                     <div className="size-10 rounded-2xl bg-background border border-white/5 flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
                       <span aria-hidden="true" className="material-symbols-outlined text-lg">shield_person</span>
                     </div>
@@ -67,18 +77,18 @@ const RolesAndPermissions = () => {
                     </div>
                   </div>
                 </td>
-                <td className="px-2 py-7 text-center"><StatusToggle active={p.canDeploy} /></td>
-                <td className="px-2 py-7 text-center">
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canDeploy} /></td>
+                <td className="px-1 py-7 text-center">
                   <div className="flex flex-col items-center gap-1.5">
                     <StatusToggle active={p.canManual} />
                     {p.canManual && <span className="text-xs font-mono text-primary font-bold">{p.manualLimit}m limit</span>}
                   </div>
                 </td>
-                <td className="px-2 py-7 text-center"><StatusToggle active={p.canApprovePatrols} /></td>
-                <td className="px-2 py-7 text-center"><StatusToggle active={p.canEmergency} /></td>
-                <td className="px-2 py-7 text-center"><StatusToggle active={p.canReport} /></td>
-                <td className="px-2 py-7 text-center"><StatusToggle active={p.canAnalytics} /></td>
-                <td className="px-4 py-7 text-right">
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canApprovePatrols} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canEmergency} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canReport} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canAnalytics} /></td>
+                <td className="px-3 py-7 text-right">
                   <Button variant="text" className="text-xs font-bold text-text-muted hover:text-white uppercase tracking-wider">Edit Matrix</Button>
                 </td>
               </tr>

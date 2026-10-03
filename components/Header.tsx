@@ -152,7 +152,7 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 max-w-2xl mx-12 relative">
+      <div className="flex-1 max-w-2xl mx-6 relative">
         <div className="relative group">
           <span aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
           <input 

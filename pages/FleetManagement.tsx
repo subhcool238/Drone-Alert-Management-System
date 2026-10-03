@@ -209,8 +209,8 @@ const FleetManagement: React.FC = () => {
 
       {/* RIGHT DETAILS: Predictive Maintenance & Telemetry */}
       <section className="flex-1 bg-panel rounded-[2rem] border border-white/5 p-10 overflow-y-auto flex flex-col gap-12 custom-scrollbar shadow-2xl">
-        <div className="flex flex-col xl:flex-row gap-12 pb-12 border-b border-white/5">
-          <div className="w-full xl:w-[480px] h-72 bg-background rounded-[2rem] overflow-hidden relative group">
+        <div className="flex flex-col min-[1440px]:flex-row gap-12 pb-12 border-b border-white/5">
+          <div className="w-full h-[220px] min-[1440px]:h-72 min-[1440px]:w-[480px] min-[1440px]:min-w-[280px] min-[1440px]:shrink bg-background rounded-[2rem] overflow-hidden relative group">
             <img className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src={selectedDrone.image} alt={selectedDrone.name}/>
             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
             <div className="absolute bottom-6 left-6 flex items-center gap-3">
@@ -223,14 +223,14 @@ const FleetManagement: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex-1 flex flex-col">
-            <div className="flex justify-between items-start mb-10">
+          <div className="flex-1 min-w-0 min-[1440px]:min-w-[280px] flex flex-col">
+            <div className="flex flex-wrap justify-between items-start gap-x-6 gap-y-6 mb-10">
               <div>
-                <div className="flex items-center gap-4 mb-4">
-                  <h1 className="text-6xl font-display font-bold text-white tracking-tighter">{selectedDrone.name}</h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
+                  <h1 className="whitespace-nowrap text-6xl font-display font-bold text-white tracking-tighter">{selectedDrone.name}</h1>
                   <span className="text-2xl font-mono text-text-muted font-bold">[{selectedDrone.id}]</span>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <span className={`${STATUS_DOT[selectedDrone.status]} ${selectedDrone.status === FleetStatus.FAULT ? 'text-white' : 'text-black'} text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider`}>{STATUS_LABEL[selectedDrone.status]}</span>
                   <span className="bg-background text-gray-400 border border-white/10 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">{selectedDrone.type}</span>
                   <div className={`px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wider ${getRiskColor(selectedDrone.risk)}`}>
@@ -244,11 +244,11 @@ const FleetManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-4 mt-auto">
-              <Button variant="primary" onClick={() => navigate(`/manual?id=${selectedDrone.id}`)} className="flex-1 font-bold text-xs py-5 gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
+            <div className="flex flex-wrap gap-4 mt-auto">
+              <Button variant="primary" onClick={() => navigate(`/manual?id=${selectedDrone.id}`)} className="flex-1 whitespace-nowrap font-bold text-xs py-5 gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px]">rocket_launch</span> Deploy Manual Mission
               </Button>
-              <Button variant="secondary" className="bg-background text-white font-bold text-xs px-12 py-5 gap-3 uppercase tracking-widest">
+              <Button variant="secondary" className="bg-background text-white whitespace-nowrap font-bold text-xs px-12 py-5 gap-3 uppercase tracking-widest">
                 <span aria-hidden="true" className="material-symbols-outlined text-[20px]">settings</span> Advanced Config
               </Button>
             </div>

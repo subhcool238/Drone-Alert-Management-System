@@ -210,9 +210,9 @@ const ManualControl: React.FC = () => {
       </aside>
 
       {/* CENTER COLUMN: FPV & Joysticks */}
-      <main className="flex-1 flex flex-col gap-6 min-w-0">
+      <main className="flex-1 flex flex-col gap-6 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
         {/* Top HUD Feed */}
-        <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[450px]">
+        <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[260px]">
           {/* Mode Banner */}
           <div className={`flex-none px-6 py-3 border-b flex items-center justify-between z-10 transition-colors duration-500 ${
             !isManual ? (statusBanner ? statusBanner.box : 'bg-emerald-500/10 border-emerald-500/20') :
@@ -331,20 +331,20 @@ const ManualControl: React.FC = () => {
         </div>
 
         {/* Joysticks Area */}
-        <div className="h-64 bg-panel rounded-3xl border border-white/5 p-8 flex shadow-2xl relative overflow-hidden shrink-0">
-          <div className="flex-1 flex items-center justify-around">
+        <div className="min-h-[256px] bg-panel rounded-3xl border border-white/5 p-4 min-[1536px]:p-8 flex shadow-2xl relative overflow-hidden shrink-0">
+          <div className="flex-1 flex flex-wrap items-center justify-around gap-x-4 gap-y-4">
             {/* Left Joystick: Throttle/Yaw */}
             <div className="flex flex-col items-center gap-4">
-              <div className="size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
+              <div className="size-28 min-[1536px]:size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-white/5"></div>
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
                  <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transform translate-y-4 group-active:-translate-y-10 transition-transform duration-300"></div>
               </div>
-              <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Throttle / Yaw</span>
+              <span className="whitespace-nowrap text-xs font-bold text-text-muted uppercase tracking-wider">Throttle / Yaw</span>
             </div>
 
             {/* Center Switch */}
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-6 max-[1535px]:order-3 max-[1535px]:basis-full">
                <div className="flex flex-col gap-1 items-center">
                  <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Control Mode</span>
                  <div className="bg-background/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
@@ -357,24 +357,24 @@ const ManualControl: React.FC = () => {
 
             {/* Right Joystick: Pitch/Roll */}
             <div className="flex flex-col items-center gap-4">
-              <div className="size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
+              <div className="size-28 min-[1536px]:size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-white/5"></div>
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
                  <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transition-transform group-active:translate-x-4"></div>
               </div>
-              <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Pitch / Roll</span>
+              <span className="whitespace-nowrap text-xs font-bold text-text-muted uppercase tracking-wider">Pitch / Roll</span>
             </div>
           </div>
         </div>
       </main>
 
       {/* RIGHT SIDEBAR: Detailed Stats & Safety */}
-      <aside className="w-80 flex-none flex flex-col gap-6">
-        <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
-          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
+      <aside className="w-80 flex-none flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
+        <div className="bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl shrink-0">
+          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
             <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
           </h2>
-          <div className="space-y-6">
+          <div className="space-y-3">
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Altitude (AGL)</span>
               <div className="font-mono text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-xs text-text-muted uppercase">m</span></div>
@@ -391,7 +391,7 @@ const ManualControl: React.FC = () => {
               <div className="bg-amber-500 h-full shadow-[0_0_10px_rgba(245,158,11,0.4)] transition-all duration-300" style={{ width: `${(shownSpeed/20)*100}%` }}></div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+            <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/5">
                <div className="flex flex-col gap-1">
                  <span className="text-xs text-text-muted font-bold uppercase tracking-wider">GPS Locked</span>
                  <span className="text-white font-mono font-bold text-lg">18 Sats</span>
@@ -404,19 +404,19 @@ const ManualControl: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
-          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-4 flex items-center gap-2">
+        <div className="bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl shrink-0">
+          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
             <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">security</span> Safety Systems
           </h2>
-          <div className="space-y-3">
-            <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isAirborne && proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
+          <div className="space-y-2">
+            <div className={`p-3 rounded-xl border flex items-center gap-4 transition-all ${isAirborne && proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
               <span aria-hidden="true" className={`material-symbols-outlined ${!isAirborne ? 'text-text-muted' : proximity < 5 ? 'text-danger-light' : 'text-emerald-500'}`}>sensors</span>
               <div className="flex-1">
                  <p className="text-xs font-bold text-white uppercase tracking-wider">Proximity</p>
                  <p className="text-xs text-text-muted font-medium mt-0.5">{!isAirborne ? 'Not in flight' : proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-background border border-white/5 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-background border border-white/5 flex items-center gap-4">
               <span aria-hidden="true" className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-text-muted'}`}>public</span>
               <div className="flex-1">
                  <p className="text-xs font-bold text-white uppercase tracking-wider">Geofence Status</p>
@@ -426,22 +426,22 @@ const ManualControl: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-end bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl relative overflow-hidden">
+        <div className="flex-auto shrink-0 flex flex-col justify-end bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-danger/5 pointer-events-none"></div>
-          <div className="flex items-start gap-3 mb-6 bg-background/60 p-3 rounded-xl border border-white/10">
+          <div className="flex items-start gap-3 mb-3 bg-background/60 p-3 rounded-xl border border-white/10">
              <span aria-hidden="true" className="material-symbols-outlined text-danger-light text-[18px]">warning</span>
              <p className="text-xs text-gray-400 font-bold uppercase leading-relaxed tracking-tight">
                Emergency actions immediately override all mission logic and safety buffers.
              </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <Button variant="secondary" className="bg-background text-white font-bold py-3.5 text-xs uppercase tracking-wider">Return Home</Button>
-            <Button variant="secondary" className="bg-background text-white font-bold py-3.5 text-xs uppercase tracking-wider">Hover Lock</Button>
+          <div className="grid grid-cols-2 gap-3 mb-2">
+            <Button variant="secondary" className="bg-background text-white font-bold py-2.5 text-xs uppercase tracking-wider">Return Home</Button>
+            <Button variant="secondary" className="bg-background text-white font-bold py-2.5 text-xs uppercase tracking-wider">Hover Lock</Button>
           </div>
-          <Button variant="danger" className="w-full font-bold py-4 text-xs uppercase tracking-[0.12em] shadow-xl shadow-danger/20">
+          <Button variant="danger" className="w-full font-bold py-3 text-xs uppercase tracking-[0.12em] shadow-xl shadow-danger/20">
             EMERGENCY STOP
           </Button>
-          <Button variant="danger-outline" className="w-full mt-3 bg-background font-bold py-3.5 text-xs uppercase tracking-wider">
+          <Button variant="danger-outline" className="w-full mt-2 bg-background font-bold py-2.5 text-xs uppercase tracking-wider">
             Declare Emergency
           </Button>
         </div>

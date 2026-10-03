@@ -130,20 +130,20 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
 const ShiftContextBar: React.FC<{ onOpenBriefing: () => void }> = ({ onOpenBriefing }) => {
   return (
-    <div className="mb-6 flex items-center justify-between bg-panel/50 border border-white/5 rounded-2xl px-6 py-1.5 shrink-0 animate-in slide-in-from-top duration-500">
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-3">
+    <div className="mb-6 flex items-center justify-between gap-4 bg-panel/50 border border-white/5 rounded-2xl px-6 py-1.5 shrink-0 animate-in slide-in-from-top duration-500">
+      <div className="flex items-center gap-6 min-w-0">
+        <div className="flex items-center gap-3 shrink-0 whitespace-nowrap">
           <span aria-hidden="true" className="material-symbols-outlined text-primary text-[20px]">dark_mode</span>
           <span className="text-xs font-bold text-white uppercase tracking-wider">Night Shift 22:00–06:00</span>
           <span className="text-xs text-text-muted font-bold uppercase">— Isabelle</span>
         </div>
-        <div className="h-4 w-px bg-white/5"></div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-indigo-400 font-black uppercase tracking-wider">Priority:</span>
-          <span className="text-xs font-bold text-gray-300 uppercase tracking-tight">West Storage (Picasso delivery)</span>
+        <div className="h-4 w-px bg-white/5 shrink-0"></div>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-xs text-indigo-400 font-black uppercase tracking-wider shrink-0">Priority:</span>
+          <span className="text-xs font-bold text-gray-300 uppercase tracking-tight truncate">West Storage (Picasso delivery)</span>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shrink-0 whitespace-nowrap">
         <Button variant="text" onClick={onOpenBriefing} className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white">[View briefing]</Button>
         <Button variant="text" className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white">[Message previous shift]</Button>
       </div>
