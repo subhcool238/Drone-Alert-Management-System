@@ -1,0 +1,30 @@
+/* Material Symbols Outlined, self-hosted from @fontsource-variable/material-symbols-outlined.
+   Full axes (opsz, wght, FILL, GRAD) like the Google file the app used before, so icons render pixel-identical.
+   (The 1.1 MB fill-only file leaves a few stray anti-aliasing pixels on some icons.)
+   font-display: block keeps the icon names (ligature text) invisible until the font is ready,
+   so they never flash as plain words. The base rule uses :where() so it has no specificity and
+   Tailwind size classes (text-[20px] and so on) still win, as they did with the Google stylesheet. */
+@font-face {
+  font-family: 'Material Symbols Outlined Variable';
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 700;
+  src: url(./node_modules/@fontsource-variable/material-symbols-outlined/files/material-symbols-outlined-latin-full-normal.woff2) format('woff2-variations');
+}
+
+:where(.material-symbols-outlined) {
+  font-family: 'Material Symbols Outlined Variable';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

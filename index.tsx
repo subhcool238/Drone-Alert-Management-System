@@ -4,6 +4,7 @@ import App from './App';
 import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/space-grotesk/wght.css';
 import '@fontsource-variable/jetbrains-mono/wght.css';
+import './icon-font.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
