@@ -60,29 +60,29 @@ const Dashboard: React.FC = () => {
 
   const getPriorityBadgeStyles = (priority?: string) => {
     switch(priority) {
-      case 'P1': return 'bg-[#FF4B4B] text-white';
-      case 'P2': return 'bg-[#FF9F43] text-black';
-      case 'P3': return 'bg-[#FFC857] text-black';
-      case 'P4': return 'bg-[#2ECC71]/20 text-[#2ECC71]';
+      case 'P1': return 'bg-danger text-white';
+      case 'P2': return 'bg-warning text-black';
+      case 'P3': return 'bg-caution text-black';
+      case 'P4': return 'bg-success/20 text-success';
       default: return 'bg-gray-700 text-gray-300';
     }
   };
 
   const getSeverityColors = (sev: string) => {
     switch(sev) {
-      case 'CRITICAL': return { text: 'text-[#FF4B4B]', border: 'border-[#FF4B4B]' };
-      case 'HIGH': return { text: 'text-[#FF9F43]', border: 'border-[#FF9F43]' };
-      case 'MEDIUM': return { text: 'text-[#FFC857]', border: 'border-[#FFC857]' };
-      case 'LOW': return { text: 'text-[#2ECC71]', border: 'border-[#2ECC71]' };
+      case 'CRITICAL': return { text: 'text-danger', border: 'border-danger' };
+      case 'HIGH': return { text: 'text-warning', border: 'border-warning' };
+      case 'MEDIUM': return { text: 'text-caution', border: 'border-caution' };
+      case 'LOW': return { text: 'text-success', border: 'border-success' };
       default: return { text: 'text-gray-400', border: 'border-white/10' };
     }
   };
 
   const renderConfidence = (conf?: number) => {
     if (conf === undefined) return null;
-    let color = 'text-[#FF4B4B]';
-    if (conf >= 80) color = 'text-[#2ECC71]';
-    else if (conf >= 50) color = 'text-[#FFC857]';
+    let color = 'text-danger';
+    if (conf >= 80) color = 'text-success';
+    else if (conf >= 50) color = 'text-caution';
     
     return (
       <span className={`${color} flex items-center gap-1 justify-end`}>
@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
               <select 
                 value={severityFilter} 
                 onChange={e => setSeverityFilter(e.target.value)}
-                className="w-full appearance-none bg-[#0b0e14] text-[11px] text-gray-300 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all cursor-pointer"
+                className="w-full appearance-none bg-background text-[11px] text-gray-300 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all cursor-pointer"
               >
                 <option>Severity: All</option>
                 <option>Critical</option>
@@ -121,7 +121,7 @@ const Dashboard: React.FC = () => {
               <select 
                 value={threatFilter}
                 onChange={e => setThreatFilter(e.target.value)}
-                className="w-full appearance-none bg-[#0b0e14] text-[11px] text-gray-300 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all cursor-pointer"
+                className="w-full appearance-none bg-background text-[11px] text-gray-300 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-primary/50 transition-all cursor-pointer"
               >
                 <option>Threat: All</option>
                 <option>Human</option>
@@ -149,8 +149,8 @@ const Dashboard: React.FC = () => {
 
         <div className="bg-panel border border-white/5 rounded-2xl flex-1 p-5 flex flex-col gap-4 min-h-0 shadow-sm overflow-hidden relative">
           {isMultiIncidentMode && (
-            <div className="absolute top-0 left-0 right-0 z-20 bg-[#FF4B4B]/10 border-b border-[#FF4B4B]/20 p-2 text-center animate-in slide-in-from-top duration-300">
-              <p className="text-[9px] font-bold text-[#FF4B4B] uppercase tracking-widest flex items-center justify-center gap-2">
+            <div className="absolute top-0 left-0 right-0 z-20 bg-danger/10 border-b border-danger/20 p-2 text-center animate-in slide-in-from-top duration-300">
+              <p className="text-[9px] font-bold text-danger uppercase tracking-widest flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-[14px]">priority_high</span>
                 Multi-incident mode active
               </p>
@@ -183,7 +183,7 @@ const Dashboard: React.FC = () => {
                   <div 
                     key={alert.id}
                     onClick={() => setSelectedAlertId(alert.id)}
-                    className={`bg-[#0b0e14] border-l-[3px] rounded-xl p-4 transition-all cursor-pointer relative overflow-hidden shrink-0 ${
+                    className={`bg-background border-l-[3px] rounded-xl p-4 transition-all cursor-pointer relative overflow-hidden shrink-0 ${
                       selectedAlertId === alert.id ? `ring-1 ring-primary/30 bg-primary/5 ${sevBorder}/60` : `hover:bg-white/5 ${sevBorder}/30`
                     } ${sevBorder}`}
                   >
@@ -229,7 +229,7 @@ const Dashboard: React.FC = () => {
           
           {/* Dynamic Map Background */}
           {mapMode === '2D' ? (
-            <div className="absolute inset-0 bg-[#0b0e14] flex items-center justify-center p-8 overflow-hidden">
+            <div className="absolute inset-0 bg-background flex items-center justify-center p-8 overflow-hidden">
               {/* Technical Grid Blueprint */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
               <svg className="w-full h-full text-primary/30" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -305,18 +305,18 @@ const Dashboard: React.FC = () => {
           )}
 
           {/* Toggle Controls */}
-          <div className="absolute top-5 left-5 flex gap-0.5 bg-[#0b0e14]/90 backdrop-blur-md border border-white/10 p-1 rounded-xl z-30 shadow-2xl">
+          <div className="absolute top-5 left-5 flex gap-0.5 bg-background/90 backdrop-blur-md border border-white/10 p-1 rounded-xl z-30 shadow-2xl">
             <button onClick={() => setMapMode('2D')} className={`px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest ${mapMode === '2D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>2D</button>
             <button onClick={() => setMapMode('3D')} className={`px-4 py-1.5 text-[10px] font-bold rounded-lg transition-all uppercase tracking-widest ${mapMode === '3D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>3D</button>
           </div>
 
           <div className="absolute top-5 right-5 flex flex-col gap-2 z-30">
-             <button className="size-10 rounded-xl flex items-center justify-center bg-[#0b0e14]/90 backdrop-blur-md border border-white/10 text-gray-400 hover:text-white transition-all shadow-xl">
+             <button className="size-10 rounded-xl flex items-center justify-center bg-background/90 backdrop-blur-md border border-white/10 text-gray-400 hover:text-white transition-all shadow-xl">
                <span className="material-symbols-outlined text-[20px]">layers</span>
              </button>
              <button 
               onClick={() => setViewMode(viewMode === 'thermal' ? 'default' : 'thermal')}
-              className={`size-10 rounded-xl flex items-center justify-center bg-[#0b0e14]/90 backdrop-blur-md border transition-all shadow-xl ${
+              className={`size-10 rounded-xl flex items-center justify-center bg-background/90 backdrop-blur-md border transition-all shadow-xl ${
                 viewMode === 'thermal' ? 'border-orange-500/50 text-orange-400' : 'border-white/10 text-gray-400'
               }`}
             >
@@ -328,7 +328,7 @@ const Dashboard: React.FC = () => {
           {mapLayers.drones && (
              <div className="absolute top-[35%] left-[40%] z-20 flex flex-col items-center group cursor-pointer transition-transform hover:scale-110">
                 <span className="material-symbols-outlined text-primary text-2xl rotate-45 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">flight</span>
-                <div className="bg-[#0b0e14]/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 transition-transform origin-top min-w-[120px]">
+                <div className="bg-background/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 transition-transform origin-top min-w-[120px]">
                    <p className="text-[9px] font-black text-white uppercase truncate tracking-widest">Sentinel-1</p>
                    <p className="text-[8px] text-primary font-bold mt-0.5 uppercase tracking-tighter">Status: MISSION_ACTIVE</p>
                 </div>
@@ -340,9 +340,9 @@ const Dashboard: React.FC = () => {
              const coords = [{ t: '25%', l: '65%' }, { t: '15%', l: '25%' }, { t: '65%', l: '75%' }][i] || { t: '50%', l: '50%' };
              return (
                <div key={alert.id} className="absolute z-20 group transition-all" style={{ top: coords.t, left: coords.l }}>
-                 <div className={`size-4 rounded-full border-2 bg-black animate-ping absolute -top-2 -left-2 ${alert.priority === 'P1' ? 'border-[#FF4B4B]' : 'border-primary'}`}></div>
-                 <span className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-[#FF4B4B]' : 'text-primary'}`}>location_on</span>
-                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#0b0e14]/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 transition-opacity">
+                 <div className={`size-4 rounded-full border-2 bg-black animate-ping absolute -top-2 -left-2 ${alert.priority === 'P1' ? 'border-danger' : 'border-primary'}`}></div>
+                 <span className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-danger' : 'text-primary'}`}>location_on</span>
+                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-[8px] font-black text-white uppercase bg-danger/10 px-2 py-0.5 rounded w-fit mb-1">{alert.priority}</p>
                     <p className="text-[10px] font-bold text-gray-200">{alert.title}</p>
                  </div>
@@ -365,7 +365,7 @@ const Dashboard: React.FC = () => {
               </button>
             ))}
           </div>
-          <div className="flex-1 bg-[#0b0e14]/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
+          <div className="flex-1 bg-background/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
             <div className="flex gap-4 text-[10px] items-start">
               <span className="text-gray-600 font-mono pt-0.5">{scenarioClock}</span>
               <div className="flex flex-col gap-1">
@@ -409,7 +409,7 @@ const Dashboard: React.FC = () => {
                 { icon: 'sensors', name: 'Motion Sensors', desc: 'Zone B Triggered', status: 'warn' },
                 { icon: 'lock', name: 'Access Control', desc: 'All Gates Secure', status: 'ok' }
               ].map((sys, i) => (
-                <div key={i} className="bg-[#0b0e14] border border-white/5 rounded-xl p-4 flex items-center gap-4 transition-all hover:border-white/10 group">
+                <div key={i} className="bg-background border border-white/5 rounded-xl p-4 flex items-center gap-4 transition-all hover:border-white/10 group">
                   <div className={`size-10 rounded-xl flex items-center justify-center bg-background border border-white/5 ${sys.status === 'warn' ? 'text-warning' : 'text-gray-500 group-hover:text-primary'}`}>
                     <span className="material-symbols-outlined text-[20px]">{sys.icon}</span>
                   </div>
@@ -426,7 +426,7 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col gap-3 shrink-0 pt-2 pb-1">
           <button onClick={() => navigate('/fleet')} className="w-full bg-primary hover:bg-primary/90 transition-all text-black font-bold py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-primary/10">Deploy Drone</button>
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => navigate('/patrols')} className="bg-[#1e293b] text-white font-bold py-3 rounded-xl border border-white/10 text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Patrols</button>
+            <button onClick={() => navigate('/patrols')} className="bg-slate-800 text-white font-bold py-3 rounded-xl border border-white/10 text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Patrols</button>
             <button onClick={() => setShowShiftHandover(true)} className="bg-indigo-600/90 text-white font-bold py-3 rounded-xl border border-white/10 text-[10px] uppercase tracking-widest hover:bg-indigo-600 transition-all">Handover</button>
           </div>
         </div>

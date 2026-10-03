@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { PatrolRoute } from '../types';
+import { COLORS } from '../data/theme';
 import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
 
 const PatrolRoutes: React.FC = () => {
@@ -223,7 +224,7 @@ const PatrolRoutes: React.FC = () => {
               <polyline 
                 points="200,400 400,300 800,350 1000,100 600,150 200,400" 
                 fill="none" 
-                stroke="#06b6d4" 
+                stroke={COLORS.primary} 
                 strokeWidth="3" 
                 strokeDasharray="10 6" 
                 strokeLinecap="round" 
@@ -232,7 +233,7 @@ const PatrolRoutes: React.FC = () => {
               
               {/* Blind Spot Region */}
               <rect x="700" y="250" width="120" height="120" fill="rgba(239, 68, 68, 0.05)" stroke="rgba(239, 68, 68, 0.2)" strokeDasharray="5 5" strokeWidth="2" className="animate-pulse" />
-              <text x="760" y="320" textAnchor="middle" fill="#ef4444" fontSize="10" fontWeight="bold" className="uppercase tracking-widest opacity-60">Gap &gt;30m</text>
+              <text x="760" y="320" textAnchor="middle" fill={COLORS.danger} fontSize="10" fontWeight="bold" className="uppercase tracking-widest opacity-60">Gap &gt;30m</text>
 
               {/* Numbered Waypoints */}
               {[
@@ -242,13 +243,13 @@ const PatrolRoutes: React.FC = () => {
                 { x: 600, y: 150, n: 4 }
               ].map(p => (
                 <g key={p.n} transform={`translate(${p.x}, ${p.y})`}>
-                  <circle r="14" fill="#151a23" stroke="#06b6d4" strokeWidth="2" />
+                  <circle r="14" fill={COLORS.panel} stroke={COLORS.primary} strokeWidth="2" />
                   <text y="4" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{p.n}</text>
                 </g>
               ))}
 
               {/* Drone Position */}
-              <circle cx="900" cy="225" r="18" fill="#06b6d4" className="animate-pulse shadow-xl" />
+              <circle cx="900" cy="225" r="18" fill={COLORS.primary} className="animate-pulse shadow-xl" />
               <path d="M895 220 L905 230 M905 220 L895 230" stroke="white" strokeWidth="2" />
             </svg>
 

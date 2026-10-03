@@ -5,6 +5,7 @@ import {
   Cell, PieChart, Pie, LineChart, Line, Legend 
 } from 'recharts';
 import { Incident, ThreatType, TimelineEvent } from '../types';
+import { COLORS } from '../data/theme';
 import { INCIDENTS as mockIncidents, getElapsed, getSlaState, useSecondsSinceLoad, getSlaUrgency, getAvgResponse } from '../data/incidents';
 
 const analyticData = [
@@ -18,10 +19,10 @@ const analyticData = [
 ];
 
 const threatDistribution = [
-  { name: 'Human', value: 45, color: '#ef4444' },
-  { name: 'Environmental', value: 25, color: '#10b981' },
-  { name: 'Sensor', value: 20, color: '#f97316' },
-  { name: 'Other', value: 10, color: '#334155' },
+  { name: 'Human', value: 45, color: COLORS.danger },
+  { name: 'Environmental', value: 25, color: COLORS.success },
+  { name: 'Sensor', value: 20, color: COLORS.warning },
+  { name: 'Other', value: 10, color: COLORS.border },
 ];
 
 const reportData = [
@@ -284,14 +285,14 @@ const Incidents: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analyticData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={15} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: COLORS.textMuted, fontSize: 10}} dy={15} />
                 <YAxis hide />
                 <Tooltip 
-                  contentStyle={{backgroundColor: '#151a23', border: '1px solid #ffffff10', borderRadius: '12px'}}
-                  itemStyle={{color: '#06b6d4', fontSize: '11px', fontWeight: 'bold'}}
+                  contentStyle={{backgroundColor: COLORS.panel, border: '1px solid #ffffff10', borderRadius: '12px'}}
+                  itemStyle={{color: COLORS.primary, fontSize: '11px', fontWeight: 'bold'}}
                 />
-                <Line type="monotone" dataKey="time" stroke="#06b6d4" strokeWidth={4} dot={{ r: 4, fill: '#06b6d4' }} activeDot={{ r: 8 }} />
-                <Line type="stepAfter" dataKey="target" stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                <Line type="monotone" dataKey="time" stroke={COLORS.primary} strokeWidth={4} dot={{ r: 4, fill: COLORS.primary }} activeDot={{ r: 8 }} />
+                <Line type="stepAfter" dataKey="target" stroke={COLORS.danger} strokeWidth={2} strokeDasharray="5 5" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
