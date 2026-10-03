@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { FleetStatus } from '../types';
 import { DRONES } from '../data/drones';
-import { getOpenIncidents, getSlaState, useSecondsSinceLoad } from '../data/incidents';
+import { INCIDENTS, getOpenIncidents, getSlaState, useSecondsSinceLoad } from '../data/incidents';
+import { formatAgo } from '../data/clock';
 import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../data/patrols';
 import { buildSystemSummary } from '../data/summary';
 
@@ -24,10 +25,17 @@ const Header: React.FC = () => {
     setSummary(buildSystemSummary(secondsSinceLoad));
   };
 
+  // Notification 1 age is live: how long ago INC-2025-083 was detected, counting up
+  const awaiting = INCIDENTS.find(i => i.id === 'INC-2025-083');
+  const awaitingAge =
+    awaiting?.detectedSecondsBeforeLoad !== undefined
+      ? formatAgo(awaiting.detectedSecondsBeforeLoad + secondsSinceLoad)
+      : 'now';
+
   const notifications = [
-    { id: 1, type: 'SLA Breach', msg: 'INC-2025-083 awaiting response (High, potential false alarm)', time: '2m ago', color: 'text-danger', icon: 'timer_off' },
-    { id: 2, type: 'Escalation', msg: 'Team Lead approval required: Perimeter Alpha', time: '12m ago', color: 'text-warning', icon: 'priority_high' },
-    { id: 3, type: 'Maintenance', msg: 'Watcher-3 lens calibration requested', time: '1h ago', color: 'text-primary', icon: 'settings_backup_restore' },
+    { id: 1, type: 'Awaiting Response', msg: 'INC-2025-083 awaiting response (High, potential false alarm)', time: awaitingAge, color: 'text-danger', icon: 'timer_off' },
+    { id: 2, type: 'Escalation', msg: 'Team Lead approval required: North Storage Wing', time: '1m ago', color: 'text-warning', icon: 'priority_high' },
+    { id: 3, type: 'Maintenance', msg: 'Watcher-3 lens calibration requested', time: '2m ago', color: 'text-primary', icon: 'settings_backup_restore' },
   ];
 
   return (

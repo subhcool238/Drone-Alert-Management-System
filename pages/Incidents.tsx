@@ -110,8 +110,7 @@ const Incidents: React.FC = () => {
       
       // Basic time scope filter logic (mocked)
       let timeMatch = true;
-      if (timeScope === 'Current shift') timeMatch = inc.id === 'INC-2025-082';
-      if (timeScope === 'Previous shift') timeMatch = inc.id === 'INC-2025-081';
+      if (timeScope === 'Current shift' || timeScope === 'Previous shift') timeMatch = inc.shift === timeScope;
 
       return searchMatch && severityMatch && threatMatch && statusMatch && timeMatch;
     });

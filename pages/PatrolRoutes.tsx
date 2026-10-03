@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { PatrolRoute } from '../types';
-import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, PatrolRecommendation } from '../data/patrols';
+import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
 
 const PatrolRoutes: React.FC = () => {
   const [routes, setRoutes] = useState<PatrolRoute[]>(PATROL_ROUTES);
@@ -329,7 +329,7 @@ const PatrolRoutes: React.FC = () => {
                     </div>
                     <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
                        <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2">
-                         <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Next Run: 04:00
+                         <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Next Run: {getNextRun(selectedRoute)}
                        </span>
                        <span className="text-[10px] text-gray-600 font-mono">UTC+1</span>
                     </div>

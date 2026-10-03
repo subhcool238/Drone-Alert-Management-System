@@ -19,10 +19,10 @@ export const PATROL_ROUTES: PatrolRoute[] = [
     guards: ['Pierre L.'],
     hasCoverageGap: false,
     frequency: 'Every 2 Hours',
-    startTime: '08:00',
-    endTime: '20:00',
+    startTime: '00:00',
+    endTime: '23:59',
     approvalStatus: 'Approved',
-    isNightMode: false
+    isNightMode: true
   },
   {
     id: 'PR-02',
@@ -107,4 +107,20 @@ export const getPatrolRecommendation = (routes: PatrolRoute[] = PATROL_ROUTES): 
     summary: `Assign ${best.name} to ${route.name} (gap ${route.gapDuration}).`,
     reason
   };
+};
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+// "Next Run" text per route, from its status and schedule:
+// Draft: not scheduled. On demand: no time. Active "Every N Hours": last run plus N hours.
+// Scheduled: the start of its window.
+export const getNextRun = (route: PatrolRoute): string => {
+  if (route.status === 'DRAFT') return 'Not scheduled';
+  if (/on demand/i.test(route.frequency)) return 'On demand';
+  if (route.status === 'ACTIVE') {
+    const every = route.frequency.match(/Every (\d+) Hours?/i);
+    const last = route.lastRun.match(/^(\d{1,2}):(\d{2})/);
+    if (every && last) return `${pad2((Number(last[1]) + Number(every[1])) % 24)}:${last[2]}`;
+  }
+  return route.startTime;
 };

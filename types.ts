@@ -29,6 +29,7 @@ export interface TimelineEvent {
 export interface Incident {
   id: string;
   timestamp: string;
+  shift?: 'Current shift' | 'Previous shift'; // which shift the incident belongs to, used by the Time scope filter
   detectedSecondsBeforeLoad?: number; // scenario: seconds before app load that the alert was detected
   respondedInSeconds?: number; // scenario: set once an operator has responded
   title: string;

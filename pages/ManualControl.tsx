@@ -3,6 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
 
+// Drone card subtitle follows the drone's real status
+const CARD_STATUS_TEXT: Record<FleetStatus, string> = {
+  [FleetStatus.ACTIVE]: 'Autonomous Patrol',
+  [FleetStatus.IDLE]: 'Docked / Ready',
+  [FleetStatus.CHARGING]: 'Charging',
+  [FleetStatus.FAULT]: 'Fault'
+};
+
+// Link quality colour by number: 80 and above green, 50 to 79 amber, below 50 red
+const linkQualityColor = (n: number): string =>
+  n >= 80 ? 'text-emerald-500' : n >= 50 ? 'text-amber-500' : 'text-danger';
+
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -29,6 +41,11 @@ const ManualControl: React.FC = () => {
   // Simulated Telemetry
   const [altitude, setAltitude] = useState(12.4);
   const [speed, setSpeed] = useState(8.2);
+
+  // Only an Active drone is in the air; any other status shows 0 m and 0 m/s with empty bars
+  const isAirborne = selectedDrone.status === FleetStatus.ACTIVE;
+  const shownAltitude = isAirborne ? altitude : 0;
+  const shownSpeed = isAirborne ? speed : 0;
   const [proximity, setProximity] = useState(18.5);
 
   // Battery of the currently selected drone
@@ -144,7 +161,7 @@ const ManualControl: React.FC = () => {
               battery: d.battery,
               signal: d.link,
               active: d.id === selectedDroneId,
-              onPatrol: d.status === FleetStatus.ACTIVE
+              status: d.status
             })).map(drone => (
               <div
                 key={drone.id}
@@ -158,7 +175,7 @@ const ManualControl: React.FC = () => {
                   <div className="flex-1">
                     <h3 className="text-white font-bold text-sm tracking-tight">{drone.name}</h3>
                     <p className={`text-[9px] font-bold uppercase tracking-[0.1em] mt-1 ${drone.active ? 'text-primary' : 'text-gray-600'}`}>
-                      {drone.active && isManual ? 'Manual Control' : drone.onPatrol ? 'Autonomous Patrol' : 'Docked / Ready'}
+                      {drone.active && isManual ? 'Manual Control' : CARD_STATUS_TEXT[drone.status]}
                     </p>
                   </div>
                   <div className={`size-1.5 rounded-full ${drone.active ? 'bg-primary animate-pulse' : 'bg-gray-700'}`}></div>
@@ -233,7 +250,7 @@ const ManualControl: React.FC = () => {
                     {[20, 15, 10, 5, 0].map(h => (
                       <div key={h} className="flex items-center gap-2">
                         <span className="text-[10px] font-mono text-white">{h}</span>
-                        <div className={`h-px w-3 bg-white ${altitude > h - 2 && altitude < h + 2 ? 'w-6 bg-primary' : ''}`}></div>
+                        <div className={`h-px w-3 bg-white ${shownAltitude > h - 2 && shownAltitude < h + 2 ? 'w-6 bg-primary' : ''}`}></div>
                       </div>
                     ))}
                  </div>
@@ -273,7 +290,7 @@ const ManualControl: React.FC = () => {
                <div className="flex flex-col gap-2">
                  <span className="text-[10px] font-mono text-primary font-bold tracking-[0.2em] uppercase">Telemetry Sync</span>
                  <div className="text-[32px] font-display font-bold text-white leading-none">
-                    {altitude.toFixed(1)} <span className="text-sm text-gray-400">m AGL</span>
+                    {shownAltitude.toFixed(1)} <span className="text-sm text-gray-400">m AGL</span>
                  </div>
                </div>
                
@@ -351,18 +368,18 @@ const ManualControl: React.FC = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Altitude (AGL)</span>
-              <div className="font-display text-white text-xl font-bold tracking-tight">{altitude.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m</span></div>
+              <div className="font-display text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
-              <div className="bg-primary h-full shadow-[0_0_10px_rgba(6,182,212,0.4)] transition-all duration-300" style={{ width: `${(altitude/50)*100}%` }}></div>
+              <div className="bg-primary h-full shadow-[0_0_10px_rgba(6,182,212,0.4)] transition-all duration-300" style={{ width: `${(shownAltitude/50)*100}%` }}></div>
             </div>
             
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Ground Speed</span>
-              <div className="font-display text-amber-500 text-xl font-bold tracking-tight">{speed.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m/s</span></div>
+              <div className="font-display text-amber-500 text-xl font-bold tracking-tight">{shownSpeed.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m/s</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
-              <div className="bg-amber-500 h-full shadow-[0_0_10px_rgba(245,158,11,0.4)] transition-all duration-300" style={{ width: `${(speed/20)*100}%` }}></div>
+              <div className="bg-amber-500 h-full shadow-[0_0_10px_rgba(245,158,11,0.4)] transition-all duration-300" style={{ width: `${(shownSpeed/20)*100}%` }}></div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
@@ -372,7 +389,7 @@ const ManualControl: React.FC = () => {
                </div>
                <div className="flex flex-col gap-1">
                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Link Quality</span>
-                 <span className="text-emerald-500 font-display font-bold text-lg">{selectedDrone.linkStrength}%</span>
+                 <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-display font-bold text-lg`}>{selectedDrone.linkStrength}%</span>
                </div>
             </div>
           </div>

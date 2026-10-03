@@ -12,6 +12,7 @@ export const INCIDENTS: Incident[] = [
   {
     id: 'INC-2025-082',
     timestamp: 'Today 02:36:48',
+    shift: 'Current shift',
     detectedSecondsBeforeLoad: 12,
     respondedInSeconds: 12,
     title: 'Motion Detected',
@@ -28,9 +29,6 @@ export const INCIDENTS: Incident[] = [
     eta: '01:30',
     confidence: 92,
     priority: 'P1',
-    isCarriedOver: true,
-    previousOwner: 'Marc (Day Shift)',
-    handoverNote: 'Sensor flickering noticed, check power stability.',
     timeline: [
       { time: '02:36:48', event: 'Alert Triggered', details: 'Motion sensor B-12 active', type: 'alert' },
       { time: '02:37:00', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' }
@@ -43,6 +41,7 @@ export const INCIDENTS: Incident[] = [
   {
     id: 'INC-2025-083',
     timestamp: 'Today 02:36:35',
+    shift: 'Current shift',
     detectedSecondsBeforeLoad: 25,
     title: 'Signal Degradation',
     threat: ThreatType.SENSOR,
@@ -64,6 +63,7 @@ export const INCIDENTS: Incident[] = [
   {
     id: 'INC-2025-084',
     timestamp: 'Today 02:36:10',
+    shift: 'Current shift',
     detectedSecondsBeforeLoad: 50,
     title: 'Temp Spike',
     threat: ThreatType.ENVIRONMENTAL,
@@ -84,6 +84,7 @@ export const INCIDENTS: Incident[] = [
   {
     id: 'INC-2025-081',
     timestamp: 'Yesterday 18:30',
+    shift: 'Previous shift',
     title: 'HVAC Unit Vibration',
     threat: ThreatType.ENVIRONMENTAL,
     severity: 'MEDIUM',
