@@ -203,7 +203,7 @@ function measureInPage(withLayout) {
     return item;
   };
 
-  const skipSel = 'script,style,noscript,option,optgroup,title,.material-symbols-outlined,[aria-hidden="true"]';
+  const skipSel = 'script,style,noscript,option,optgroup,title,.material-symbols-outlined,.sr-only,[aria-hidden="true"]';
 
   // 1) text nodes
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -271,7 +271,7 @@ function layoutInPage() {
   style.setAttribute('data-contrast-check', '1');
   style.textContent = '* { pointer-events: auto !important; }';
   document.head.appendChild(style);
-  const skipSel = 'script,style,noscript,option,optgroup,title,.material-symbols-outlined,[aria-hidden="true"]';
+  const skipSel = 'script,style,noscript,option,optgroup,title,.material-symbols-outlined,.sr-only,[aria-hidden="true"]';
   const hiddenEl = el => {
     for (let a = el; a; a = a.parentElement) {
       const c = getComputedStyle(a);
@@ -288,7 +288,9 @@ function layoutInPage() {
     const el = node.parentElement;
     if (!text || !el || el.closest(skipSel) || el instanceof SVGElement || hiddenEl(el) || el.closest('select')) continue;
     if (seen.has(el)) continue;
-    const rg = document.createRange(); rg.selectNodeContents(el);
+    const rg = document.createRange();
+    // Visually hidden (sr-only) children are not part of what is on screen
+    if (el.querySelector('.sr-only')) rg.selectNodeContents(node); else rg.selectNodeContents(el);
     const r = rg.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) continue;
     if (r.top < 0 || r.left < 0 || r.bottom > innerHeight + 0.5 || r.right > innerWidth + 0.5) {
