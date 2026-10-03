@@ -8,6 +8,7 @@ import { INCIDENTS, getOpenIncidents, getSlaState, useSecondsSinceLoad } from '.
 import { formatAgo } from '../data/clock';
 import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../data/patrols';
 import { buildSystemSummary } from '../data/summary';
+import { clickableProps } from './a11y';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -225,7 +226,8 @@ const Header: React.FC = () => {
         </div>
         
         <div 
-          onClick={() => setShowShiftBriefing(true)}
+          {...clickableProps(() => setShowShiftBriefing(true))}
+          aria-haspopup="dialog"
           className="flex items-center gap-3 bg-panel border border-white/5 rounded-2xl px-4 py-2 hover:bg-white/5 transition-all cursor-pointer group"
         >
           <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700 group-hover:ring-primary transition-all" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>

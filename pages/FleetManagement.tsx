@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Button from '../components/Button';
+import { clickableProps } from '../components/a11y';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
 import { DRONES as mockDrones, getOnlineCount, STATUS_DOT, STATUS_LABEL } from '../data/drones';
@@ -149,7 +150,8 @@ const FleetManagement: React.FC = () => {
           {filteredDrones.map(drone => (
             <div 
               key={drone.id}
-              onClick={() => setSelectedDrone(drone)}
+              {...clickableProps(() => setSelectedDrone(drone))}
+              aria-pressed={selectedDrone.id === drone.id}
               className={`flex flex-col gap-4 rounded-[1.5rem] p-5 border transition-all cursor-pointer group relative overflow-hidden shrink-0 ${
                 selectedDrone.id === drone.id ? 'bg-primary/5 border-primary shadow-[0_0_20px_-10px_rgba(6,182,212,0.3)]' : 'bg-panel border-white/5 hover:border-white/20'
               }`}

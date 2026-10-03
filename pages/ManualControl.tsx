@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../components/Button';
+import { clickableProps } from '../components/a11y';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
@@ -178,7 +179,8 @@ const ManualControl: React.FC = () => {
             })).map(drone => (
               <div
                 key={drone.id}
-                onClick={() => setSelectedDroneId(drone.id)}
+                {...clickableProps(() => setSelectedDroneId(drone.id))}
+                aria-pressed={drone.active}
                 className={`p-4 rounded-xl border transition-all cursor-pointer group relative overflow-hidden ${
                   drone.active ? 'bg-primary/5 border-primary/40 shadow-lg shadow-primary/5' : 'bg-background border-white/5 hover:border-white/20'
                 }`}

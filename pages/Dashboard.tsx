@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Button from '../components/Button';
+import { clickableProps } from '../components/a11y';
 import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
 import { countByStatus, getFleetBatteryAvg } from '../data/drones';
@@ -202,7 +203,8 @@ const Dashboard: React.FC = () => {
                 return (
                   <div 
                     key={alert.id}
-                    onClick={() => setSelectedAlertId(alert.id)}
+                    {...clickableProps(() => setSelectedAlertId(alert.id))}
+                    aria-pressed={selectedAlertId === alert.id}
                     className={`bg-background border-l-[3px] rounded-xl p-4 transition-all cursor-pointer relative overflow-hidden shrink-0 ${
                       selectedAlertId === alert.id ? `ring-1 ring-primary/30 bg-primary/5 ${sevBorder}/60` : `hover:bg-white/5 ${sevBorder}/30`
                     } ${sevBorder}`}
@@ -343,9 +345,9 @@ const Dashboard: React.FC = () => {
 
           {/* Markers */}
           {mapLayers.drones && (
-             <div className="absolute top-[35%] left-[40%] z-20 flex flex-col items-center group cursor-pointer transition-transform hover:scale-110">
+             <div tabIndex={0} role="img" aria-label="Sentinel-1, status: mission active" className="absolute top-[35%] left-[40%] z-20 flex flex-col items-center group cursor-pointer transition-transform hover:scale-110 focus-visible:scale-110">
                 <span aria-hidden="true" className="material-symbols-outlined text-primary text-2xl rotate-45 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">flight</span>
-                <div className="bg-background/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 transition-transform origin-top min-w-[120px]">
+                <div className="bg-background/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 group-focus-visible:scale-100 transition-transform origin-top min-w-[120px]">
                    <p className="text-xs font-black text-white uppercase truncate tracking-wider">Sentinel-1</p>
                    <p className="text-xs text-primary font-bold mt-0.5 uppercase tracking-tighter">Status: MISSION_ACTIVE</p>
                 </div>
@@ -356,10 +358,10 @@ const Dashboard: React.FC = () => {
           {filteredAlerts.map((alert, i) => {
              const coords = [{ t: '25%', l: '65%' }, { t: '15%', l: '25%' }, { t: '65%', l: '75%' }][i] || { t: '50%', l: '50%' };
              return (
-               <div key={alert.id} className="absolute z-20 group transition-all" style={{ top: coords.t, left: coords.l }}>
+               <div key={alert.id} tabIndex={0} role="img" aria-label={`${alert.priority} ${alert.title}, ${alert.location}`} className="absolute z-20 group transition-all" style={{ top: coords.t, left: coords.l }}>
                  <div className={`size-4 rounded-full border-2 bg-black animate-ping absolute -top-2 -left-2 ${alert.priority === 'P1' ? 'border-danger' : 'border-primary'}`}></div>
                  <span aria-hidden="true" className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-danger-light' : 'text-primary'}`}>location_on</span>
-                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 transition-opacity">
+                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
                     <p className="text-xs font-black text-white uppercase bg-danger/10 px-2 py-0.5 rounded w-fit mb-1">{alert.priority}</p>
                     <p className="text-xs font-bold text-gray-200">{alert.title}</p>
                  </div>

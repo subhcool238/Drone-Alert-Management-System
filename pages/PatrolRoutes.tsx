@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Button from '../components/Button';
+import { clickableProps } from '../components/a11y';
 import { PatrolRoute } from '../types';
 import { COLORS } from '../data/theme';
 import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
@@ -98,7 +99,8 @@ const PatrolRoutes: React.FC = () => {
           {filteredRoutes.map(route => (
             <div 
               key={route.id} 
-              onClick={() => setSelectedRoute(route)}
+              {...clickableProps(() => setSelectedRoute(route))}
+              aria-pressed={selectedRoute.id === route.id}
               className={`p-5 rounded-[1.5rem] border transition-all cursor-pointer relative group ${
                 selectedRoute.id === route.id 
                   ? 'bg-primary/5 border-primary shadow-[0_4px_20px_-10px_rgba(6,182,212,0.3)]' 

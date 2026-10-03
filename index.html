@@ -60,6 +60,9 @@
         .fill-1 { font-variation-settings: 'FILL' 1; }
         /* Digits keep a fixed width so ticking values do not jump */
         .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Keyboard focus ring for everything that is not already a Button (Buttons carry their own ring) */
+        :where(a, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid #06b6d4 !important; outline-offset: 2px !important; }
+        [role="button"]:focus-visible, .custom-scrollbar:focus-visible, tr:focus-visible { outline-offset: -2px !important; }
         .custom-scrollbar::-webkit-scrollbar { width: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
     </style>

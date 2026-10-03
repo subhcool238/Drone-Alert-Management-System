@@ -166,7 +166,7 @@ const AlertRulesAndSLA = () => {
                   <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Motion Trigger Confidence</span>
                   <span className="text-2xl font-display font-bold text-white">{confidence}%</span>
                 </div>
-                <div className="relative h-1.5 w-full bg-background rounded-full p-0.5">
+                <div role="meter" aria-label="Motion trigger confidence" aria-valuemin={0} aria-valuemax={100} aria-valuenow={confidence} className="relative h-1.5 w-full bg-background rounded-full p-0.5">
                    <div className="absolute inset-0 bg-primary/20 rounded-full"></div>
                    <div className="h-full bg-primary rounded-full relative" style={{width: `${confidence}%`}}>
                      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-4 bg-white rounded-full shadow-xl shadow-primary/40 cursor-pointer"></div>

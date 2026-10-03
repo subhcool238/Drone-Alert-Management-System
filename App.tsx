@@ -162,12 +162,19 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="flex h-screen w-screen bg-background overflow-hidden text-gray-100">
+      <a
+        href="#main-content"
+        onClick={(e) => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[300] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-black"
+      >
+        Skip to main content
+      </a>
       {showBriefingModal && <ShiftHandoverModal onAcknowledge={handleAcknowledge} />}
       
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 h-full">
         <Header />
-        <main className="flex-1 overflow-hidden relative p-6 flex flex-col">
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden relative p-6 flex flex-col focus:outline-none">
           {hasAcknowledgedBriefing && <ShiftContextBar onOpenBriefing={() => setShowBriefingModal(true)} />}
           <div className="flex-1 w-full min-h-0">
             {children}

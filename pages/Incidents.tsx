@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Button from '../components/Button';
+import { activateOnKey } from '../components/a11y';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, PieChart, Pie, LineChart, Line, Legend 
@@ -197,6 +198,9 @@ const Incidents: React.FC = () => {
                 <tr 
                   key={inc.id} 
                   onClick={() => setSelectedIncident(inc)}
+                  tabIndex={0}
+                  onKeyDown={activateOnKey(() => setSelectedIncident(inc))}
+                  aria-haspopup="dialog"
                   className="hover:bg-white/5 transition-colors cursor-pointer group"
                 >
                   <td className="px-6 py-5">
