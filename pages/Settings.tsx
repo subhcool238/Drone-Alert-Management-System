@@ -39,7 +39,7 @@ const RolesAndPermissions = () => {
         </Button>
       </div>
 
-      <div className="bg-panel border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+      <div className="bg-panel border border-white/5 rounded-[2.5rem] overflow-x-auto shadow-2xl">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-background/30 text-xs uppercase tracking-wider text-text-muted font-bold border-b border-white/5">
@@ -401,7 +401,7 @@ const Settings: React.FC = () => {
         </nav>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+      <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
         <Routes>
           <Route index element={<Navigate to="roles" replace />} />
           <Route path="roles" element={<RolesAndPermissions />} />

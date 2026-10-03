@@ -302,8 +302,8 @@ const Dashboard: React.FC = () => {
                        <div className="absolute inset-0 border border-primary/10 rounded-full animate-pulse"></div>
                        <div className="w-24 h-px bg-primary/40"></div>
                        <div className="h-24 w-px bg-primary/40 absolute"></div>
-                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 text-xs font-mono text-primary/60">0°</div>
-                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 text-xs font-mono text-primary/60">180°</div>
+                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 text-xs font-mono text-primary">0°</div>
+                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 text-xs font-mono text-primary">180°</div>
                     </div>
                   </div>
                   

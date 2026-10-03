@@ -307,7 +307,7 @@ const ManualControl: React.FC = () => {
                  </div>
                </div>
                
-               <div className="flex gap-3">
+               <div className="flex flex-wrap justify-end gap-3">
                  {isManual && secondsLeft < 120 && extensionsUsed < 3 && (
                    <Button variant="primary" 
  onClick={requestExtension}

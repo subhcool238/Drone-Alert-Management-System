@@ -150,7 +150,7 @@ const FleetManagement: React.FC = () => {
             <div 
               key={drone.id}
               onClick={() => setSelectedDrone(drone)}
-              className={`flex flex-col gap-4 rounded-[1.5rem] p-5 border transition-all cursor-pointer group relative overflow-hidden ${
+              className={`flex flex-col gap-4 rounded-[1.5rem] p-5 border transition-all cursor-pointer group relative overflow-hidden shrink-0 ${
                 selectedDrone.id === drone.id ? 'bg-primary/5 border-primary shadow-[0_0_20px_-10px_rgba(6,182,212,0.3)]' : 'bg-panel border-white/5 hover:border-white/20'
               }`}
             >
