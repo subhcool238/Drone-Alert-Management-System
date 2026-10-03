@@ -53,39 +53,39 @@ const Incidents: React.FC = () => {
         return (
           <div className="flex flex-col gap-1">
             <span className="text-success font-bold uppercase">Responded in {sla.text}</span>
-            <span className="text-gray-600 font-mono text-[9px]">Limit {sla.tier}</span>
+            <span className="text-text-muted font-mono text-xs">Limit {sla.tier}</span>
           </div>
         );
       case 'ticking':
         return (
           <div className="flex flex-col gap-1">
             <span className={`font-bold uppercase font-mono ${getSlaUrgency(withLiveElapsed(inc))}`}>{sla.text}</span>
-            <span className="text-gray-600 font-mono text-[9px]">Remaining</span>
+            <span className="text-text-muted font-mono text-xs">Remaining</span>
           </div>
         );
       case 'breached':
         return (
           <div className="flex flex-col gap-1">
-            <span className="text-danger font-bold uppercase">Breached</span>
-            <span className="text-danger/60 font-mono text-[9px]">Limit {sla.tier}</span>
+            <span className="text-danger-light font-bold uppercase">Breached</span>
+            <span className="text-danger-light font-mono text-xs">Limit {sla.tier}</span>
           </div>
         );
       case 'closed-breached':
         return (
           <div className="flex flex-col gap-1">
-            <span className="text-danger font-bold uppercase">Breached</span>
-            <span className="text-danger/60 font-mono text-[9px]">{sla.response}</span>
+            <span className="text-danger-light font-bold uppercase">Breached</span>
+            <span className="text-danger-light font-mono text-xs">{sla.response}</span>
           </div>
         );
       case 'closed-ok':
         return (
           <div className="flex flex-col gap-1">
             <span className="text-success font-bold uppercase">On-Time</span>
-            <span className="text-gray-600 font-mono text-[9px]">{sla.response}</span>
+            <span className="text-text-muted font-mono text-xs">{sla.response}</span>
           </div>
         );
       default:
-        return <span className="text-gray-600 font-mono">-</span>;
+        return <span className="text-text-muted font-mono">-</span>;
     }
   };
 
@@ -95,8 +95,8 @@ const Incidents: React.FC = () => {
     switch (sla.kind) {
       case 'responded': return { text: `Responded in ${sla.text} (limit ${sla.tier})`, className: 'text-emerald-500' };
       case 'ticking': return { text: `Live: ${sla.text} remaining`, className: 'text-gray-300' };
-      case 'breached': return { text: `Breached (limit ${sla.tier})`, className: 'text-danger' };
-      case 'closed-breached': return { text: `Breached (${sla.response} vs ${sla.tier} limit)`, className: 'text-danger' };
+      case 'breached': return { text: `Breached (limit ${sla.tier})`, className: 'text-danger-light' };
+      case 'closed-breached': return { text: `Breached (${sla.response} vs ${sla.tier} limit)`, className: 'text-danger-light' };
       case 'closed-ok': return { text: 'Compliant (On-time)', className: 'text-emerald-500' };
       default: return { text: '-', className: 'text-gray-300' };
     }
@@ -124,16 +124,16 @@ const Incidents: React.FC = () => {
         {[
           { label: 'Total (24H)', value: String(mockIncidents.length), icon: 'list_alt' },
           { label: 'Investigating', value: String(mockIncidents.filter(i => i.status === 'Investigating').length), icon: 'visibility', color: 'text-warning' },
-          { label: 'Escalated', value: String(mockIncidents.filter(i => i.status === 'Escalated').length), icon: 'priority_high', color: 'text-danger' },
+          { label: 'Escalated', value: String(mockIncidents.filter(i => i.status === 'Escalated').length), icon: 'priority_high', color: 'text-danger-light' },
           { label: 'False Alarms', value: String(mockIncidents.filter(i => i.falseAlarmReason).length), icon: 'cancel', color: 'text-gray-400' },
           { label: 'Avg Response', value: getAvgResponse(), icon: 'timer', color: 'text-primary' }
         ].map((stat, i) => (
           <div key={i} className="bg-panel border border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
             <div className="size-10 rounded-xl bg-background border border-white/5 flex items-center justify-center">
-              <span className={`material-symbols-outlined text-gray-500 ${stat.color}`}>{stat.icon}</span>
+              <span className={`material-symbols-outlined text-text-muted ${stat.color}`}>{stat.icon}</span>
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{stat.label}</p>
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">{stat.label}</p>
               <p className={`text-xl font-display font-bold text-white ${stat.color}`}>{stat.value}</p>
             </div>
           </div>
@@ -143,11 +143,11 @@ const Incidents: React.FC = () => {
       {/* Filter Bar */}
       <div className="bg-panel border border-white/5 p-4 rounded-2xl flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[300px]">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-lg">search</span>
           <input 
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full bg-background border border-white/5 text-white text-[11px] rounded-xl pl-12 pr-4 py-3 outline-none focus:border-primary/50 transition-all font-bold uppercase tracking-widest placeholder-gray-700" 
+            className="w-full bg-background border border-white/5 text-white text-xs rounded-xl pl-12 pr-4 py-3 outline-none focus:border-primary/50 transition-all font-bold uppercase tracking-wider placeholder-text-muted" 
             placeholder="Search incident database..."
           />
         </div>
@@ -162,7 +162,7 @@ const Incidents: React.FC = () => {
                   if (f === 'Threat') setThreatFilter(e.target.value);
                   if (f === 'Status') setStatusFilter(e.target.value);
                 }}
-                className="appearance-none bg-background border border-white/5 text-white text-[10px] font-bold rounded-xl pl-4 pr-10 py-3 uppercase tracking-widest outline-none cursor-pointer"
+                className="appearance-none bg-background border border-white/5 text-white text-xs font-bold rounded-xl pl-4 pr-10 py-3 uppercase tracking-wider outline-none cursor-pointer"
               >
                 <option value="All">{f}: All</option>
                 {f === 'Time scope' && ['Current shift', 'Previous shift', 'Last 24h'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -170,7 +170,7 @@ const Incidents: React.FC = () => {
                 {f === 'Threat' && ['Human', 'Environmental', 'Sensor'].map(o => <option key={o}>{o}</option>)}
                 {f === 'Status' && ['Investigating', 'Responding', 'Resolved', 'Escalated'].map(o => <option key={o}>{o}</option>)}
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none text-lg">expand_more</span>
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-lg">expand_more</span>
             </div>
           ))}
         </div>
@@ -179,9 +179,9 @@ const Incidents: React.FC = () => {
       {/* Table Content */}
       <div className="bg-panel border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex-1 min-h-0">
         <div className="h-full overflow-y-auto custom-scrollbar">
-          <table className="w-full text-left text-[11px] border-collapse">
+          <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-background/50 sticky top-0 z-10 backdrop-blur-md">
-              <tr className="border-b border-white/5 text-[9px] uppercase text-gray-500 font-bold tracking-[0.2em]">
+              <tr className="border-b border-white/5 text-xs uppercase text-text-muted font-bold tracking-[0.12em]">
                 <th className="px-6 py-5">Timestamp & ID</th>
                 <th className="px-6 py-5">Incident & Threat</th>
                 <th className="px-6 py-5">Severity</th>
@@ -200,7 +200,7 @@ const Incidents: React.FC = () => {
                 >
                   <td className="px-6 py-5">
                     <div className="font-bold font-mono text-white mb-1">{inc.id}</div>
-                    <div className="text-gray-600 font-mono text-[10px]">{inc.timestamp}</div>
+                    <div className="text-text-muted font-mono text-xs">{inc.timestamp}</div>
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3 mb-2">
@@ -210,12 +210,12 @@ const Incidents: React.FC = () => {
                        )}
                     </div>
                     <div className="flex gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[8px] font-bold text-gray-500 uppercase tracking-widest">{inc.threat}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-bold text-text-muted uppercase tracking-wider">{inc.threat}</span>
                     </div>
                   </td>
                   <td className="px-6 py-5">
                     <span className={`font-bold tracking-widest ${
-                      inc.severity === 'CRITICAL' ? 'text-danger' : 
+                      inc.severity === 'CRITICAL' ? 'text-danger-light' : 
                       inc.severity === 'HIGH' ? 'text-warning' : 'text-primary'
                     }`}>{inc.severity}</span>
                   </td>
@@ -235,8 +235,8 @@ const Incidents: React.FC = () => {
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="material-symbols-outlined text-gray-500 hover:text-white transition-colors">description</button>
-                      <button className="material-symbols-outlined text-gray-500 hover:text-danger transition-colors">flag</button>
+                      <button className="material-symbols-outlined text-text-muted hover:text-white transition-colors">description</button>
+                      <button className="material-symbols-outlined text-text-muted hover:text-danger-light transition-colors">flag</button>
                     </div>
                   </td>
                 </tr>
@@ -250,18 +250,18 @@ const Incidents: React.FC = () => {
 
   const renderAnalytics = () => (
     <div className="h-full overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-10">
-      <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">30-day sample data</p>
+      <p className="text-xs font-bold text-text-muted uppercase tracking-wider">30-day sample data</p>
       <div className="grid grid-cols-4 gap-6">
         {[
-          { l: 'SLA Breach Rate', v: '4.2%', s: 'Last 30 days', c: 'text-danger' },
+          { l: 'SLA Breach Rate', v: '4.2%', s: 'Last 30 days', c: 'text-danger-light' },
           { l: 'False Alarm Rate', v: '33%', s: '12% decrease', c: 'text-gray-400' },
           { l: 'Avg Response', v: '2m 14s', s: 'Target: 3m', c: 'text-primary' },
           { l: 'Common Threat', v: 'Human Intruder', s: '45% total', c: 'text-white' }
         ].map((m, i) => (
           <div key={i} className="bg-panel border border-white/5 p-8 rounded-3xl shadow-xl">
-             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest block mb-2">{m.l}</span>
+             <span className="text-xs font-bold text-text-muted uppercase tracking-wider block mb-2">{m.l}</span>
              <div className={`text-4xl font-display font-bold ${m.c} tracking-tighter`}>{m.v}</div>
-             <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest block mt-3">{m.s}</span>
+             <span className="text-xs font-medium text-text-muted uppercase tracking-wider block mt-3">{m.s}</span>
           </div>
         ))}
       </div>
@@ -269,15 +269,15 @@ const Incidents: React.FC = () => {
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-12 lg:col-span-8 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-8 shadow-2xl">
           <div className="flex justify-between items-center">
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Response Time Trend vs SLA Target</h3>
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Response Time Trend vs SLA Target</h3>
             <div className="flex items-center gap-6">
                <div className="flex items-center gap-2">
                  <div className="size-2 rounded-full bg-primary"></div>
-                 <span className="text-[9px] font-bold text-gray-500 uppercase">Avg Response</span>
+                 <span className="text-xs font-bold text-text-muted uppercase">Avg Response</span>
                </div>
                <div className="flex items-center gap-2">
                  <div className="w-4 h-0.5 border-t border-dashed border-danger"></div>
-                 <span className="text-[9px] font-bold text-danger uppercase tracking-widest">SLA Limit</span>
+                 <span className="text-xs font-bold text-danger-light uppercase tracking-wider">SLA Limit</span>
                </div>
             </div>
           </div>
@@ -285,11 +285,11 @@ const Incidents: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analyticData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff05" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: COLORS.textMuted, fontSize: 10}} dy={15} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: COLORS.textMuted, fontSize: 13}} dy={15} />
                 <YAxis hide />
                 <Tooltip 
                   contentStyle={{backgroundColor: COLORS.panel, border: '1px solid #ffffff10', borderRadius: '12px'}}
-                  itemStyle={{color: COLORS.primary, fontSize: '11px', fontWeight: 'bold'}}
+                  itemStyle={{color: COLORS.primary, fontSize: '12px', fontWeight: 'bold'}}
                 />
                 <Line type="monotone" dataKey="time" stroke={COLORS.primary} strokeWidth={4} dot={{ r: 4, fill: COLORS.primary }} activeDot={{ r: 8 }} />
                 <Line type="stepAfter" dataKey="target" stroke={COLORS.danger} strokeWidth={2} strokeDasharray="5 5" dot={false} />
@@ -299,7 +299,7 @@ const Incidents: React.FC = () => {
         </div>
 
         <div className="col-span-12 lg:col-span-4 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-10 shadow-2xl">
-          <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">Threat Type Distribution</h3>
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Threat Type Distribution</h3>
           <div className="h-[250px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -319,7 +319,7 @@ const Incidents: React.FC = () => {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                <span className="text-3xl font-display font-bold text-white leading-none">24</span>
-               <span className="text-[9px] text-gray-600 font-bold uppercase mt-1">Total Cases</span>
+               <span className="text-xs text-text-muted font-bold uppercase mt-1">Total Cases</span>
             </div>
           </div>
           <div className="space-y-4">
@@ -329,7 +329,7 @@ const Incidents: React.FC = () => {
                     <div className="size-2 rounded-full" style={{backgroundColor: item.color}}></div>
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.name}</span>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-white">{item.value}%</span>
+                  <span className="text-xs font-mono font-bold text-white">{item.value}%</span>
                </div>
              ))}
           </div>
@@ -346,7 +346,7 @@ const Incidents: React.FC = () => {
          </div>
          <div className="text-center">
            <h4 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-1">New Incident Report</h4>
-           <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Select Incident to Start</p>
+           <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Select Incident to Start</p>
          </div>
       </button>
 
@@ -356,12 +356,12 @@ const Incidents: React.FC = () => {
           <div key={rep.id} className="bg-panel border border-white/5 rounded-[2.5rem] p-8 flex flex-col justify-between shadow-2xl group hover:border-white/10 transition-all">
             <div className="flex justify-between items-start">
                <div className="flex flex-col gap-1">
-                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">{rep.id}</span>
+                 <span className="text-xs text-text-muted font-bold uppercase tracking-[0.12em]">{rep.id}</span>
                  <h4 className="text-xl font-display font-bold text-white tracking-tight">{rep.type}</h4>
                </div>
-               <span className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+               <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
                  rep.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500' : 
-                 rep.status === 'Pending' ? 'bg-warning/10 text-warning' : 'bg-white/5 text-gray-500'
+                 rep.status === 'Pending' ? 'bg-warning/10 text-warning' : 'bg-white/5 text-text-muted'
                }`}>
                  {rep.status}
                </span>
@@ -369,26 +369,26 @@ const Incidents: React.FC = () => {
 
             {rep.deadlineMins > 0 && (
               <div className={`mt-8 p-4 rounded-2xl flex items-center justify-between border ${
-                isUrgent ? 'bg-danger/10 border-danger/30 animate-pulse' : 'bg-background/80 border-white/5'
+                isUrgent ? 'bg-danger/10 border-danger/30' : 'bg-background/80 border-white/5'
               }`}>
                 <div className="flex items-center gap-3">
-                  <span className={`material-symbols-outlined text-[18px] ${isUrgent ? 'text-danger' : 'text-gray-500'}`}>timer</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${isUrgent ? 'text-danger' : 'text-gray-500'}`}>Report Deadline</span>
+                  <span className={`material-symbols-outlined text-[18px] ${isUrgent ? 'text-danger-light' : 'text-text-muted'}`}>timer</span>
+                  <span className={`text-xs font-bold uppercase tracking-wider ${isUrgent ? 'text-danger-light' : 'text-text-muted'}`}>Report Deadline</span>
                 </div>
-                <span className={`text-[12px] font-mono font-bold ${isUrgent ? 'text-danger' : 'text-white'}`}>{rep.deadlineMins}m remaining</span>
+                <span className={`text-[12px] font-mono font-bold ${isUrgent ? 'text-danger-light' : 'text-white'}`}>{rep.deadlineMins}m remaining</span>
               </div>
             )}
 
             <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Source Incident</span>
+                 <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Source Incident</span>
                  <span className="text-xs font-bold text-gray-400">{rep.incId}</span>
               </div>
               <div className="flex gap-2">
-                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-text-muted hover:text-white transition-all">
                    <span className="material-symbols-outlined text-lg">download</span>
                  </button>
-                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-gray-500 hover:text-white transition-all">
+                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-text-muted hover:text-white transition-all">
                    <span className="material-symbols-outlined text-lg">share</span>
                  </button>
               </div>
@@ -412,8 +412,8 @@ const Incidents: React.FC = () => {
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative ${
-                activeTab === tab.id ? 'text-primary' : 'text-gray-600 hover:text-white'
+              className={`pb-4 text-xs font-bold uppercase tracking-[0.12em] transition-all relative ${
+                activeTab === tab.id ? 'text-primary' : 'text-text-muted hover:text-white'
               }`}
             >
               {tab.label}
@@ -440,38 +440,38 @@ const Incidents: React.FC = () => {
                <div className="flex-1 pr-10">
                   <div className="flex items-center gap-4 mb-4">
                     <h2 className="text-4xl font-mono font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
-                    <span className={`px-4 py-1 rounded-full text-[10px] font-bold border ${
-                      selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger' : 'bg-primary/10 border-primary/30 text-primary'
+                    <span className={`px-4 py-1 rounded-full text-xs font-bold border ${
+                      selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger-light' : 'bg-primary/10 border-primary/30 text-primary'
                     }`}>{selectedIncident.severity}</span>
                   </div>
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-bold text-gray-400">{selectedIncident.title}</h3>
                     {selectedIncident.isCarriedOver && (
                       <div className="group relative flex items-center">
-                        <span className="bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-widest flex items-center gap-2 cursor-help">
+                        <span className="bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider flex items-center gap-2 cursor-help">
                           <span className="material-symbols-outlined text-[14px]">sync_alt</span> Carried over from previous shift
                         </span>
                         <div className="absolute top-full left-0 mt-2 p-3 bg-panel border border-white/10 rounded-xl shadow-2xl z-50 w-64 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                          <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Assigned to: {selectedIncident.previousOwner}</p>
+                          <p className="text-xs text-text-muted font-bold uppercase mb-1">Assigned to: {selectedIncident.previousOwner}</p>
                           <p className="text-xs text-gray-300 italic">"{selectedIncident.handoverNote}"</p>
                         </div>
                       </div>
                     )}
                   </div>
                   <div className="flex gap-4 items-center">
-                    <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">{selectedIncident.location}</span>
+                    <span className="text-xs text-text-muted font-bold uppercase tracking-wider">{selectedIncident.location}</span>
                     <span className="size-1 rounded-full bg-gray-800"></span>
-                    <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{selectedIncident.threat} Threat</span>
+                    <span className="text-xs text-primary font-bold uppercase tracking-wider">{selectedIncident.threat} Threat</span>
                   </div>
                </div>
-               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-gray-600 hover:text-white transition-all text-3xl shrink-0">close</button>
+               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-text-muted hover:text-white transition-all text-3xl shrink-0">close</button>
             </div>
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-12">
                {/* Timeline Section */}
                <section>
-                 <h4 className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-10">Mission Timeline & Escalations</h4>
+                 <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-10">Mission Timeline & Escalations</h4>
                  <div className="space-y-0 pl-4 border-l border-white/5 relative">
                     {selectedIncident.timeline.map((item, idx) => (
                       <div key={idx} className="relative pb-10 group last:pb-0">
@@ -480,9 +480,9 @@ const Incidents: React.FC = () => {
                            item.type === 'alert' ? 'border-warning' : 'border-primary'
                          }`}></div>
                          <div className="flex flex-col gap-1.5 ml-6">
-                            <span className="text-[10px] font-mono text-gray-600 font-bold">{item.time}</span>
-                            <span className={`text-sm font-bold ${item.type === 'escalation' ? 'text-danger' : 'text-white'}`}>{item.event}</span>
-                            {item.details && <p className="text-xs text-gray-500 font-medium">{item.details}</p>}
+                            <span className="text-xs font-mono text-text-muted font-bold">{item.time}</span>
+                            <span className={`text-sm font-bold ${item.type === 'escalation' ? 'text-danger-light' : 'text-white'}`}>{item.event}</span>
+                            {item.details && <p className="text-xs text-text-muted font-medium">{item.details}</p>}
                          </div>
                       </div>
                     ))}
@@ -491,14 +491,14 @@ const Incidents: React.FC = () => {
 
                {/* Evidence Section */}
                <section>
-                 <h4 className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-6">Tactical Evidence</h4>
+                 <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6">Tactical Evidence</h4>
                  <div className="grid grid-cols-2 gap-6">
                     {selectedIncident.evidence?.map((ev, i) => (
                       <div key={i} className="group relative rounded-3xl overflow-hidden aspect-video bg-background border border-white/5 shadow-inner">
                          <img src={ev.url} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" alt={ev.caption}/>
                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-widest">{ev.caption}</span>
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">{ev.caption}</span>
                             <span className="material-symbols-outlined text-white text-lg">fullscreen</span>
                          </div>
                       </div>
@@ -510,23 +510,23 @@ const Incidents: React.FC = () => {
                <section className="bg-background/40 border border-white/5 rounded-[2.5rem] p-10 grid grid-cols-2 gap-10">
                   <div className="space-y-6">
                      <div className="flex flex-col gap-1">
-                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Assigned Operator</span>
+                       <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Assigned Operator</span>
                        <span className="text-sm font-bold text-white">{selectedIncident.respondedBy}</span>
                      </div>
                      <div className="flex flex-col gap-1">
-                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Primary Mission Asset</span>
+                       <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Primary Mission Asset</span>
                        <span className="text-sm font-bold text-primary">{selectedIncident.assignedTo}</span>
                      </div>
                   </div>
                   <div className="space-y-6">
                      <div className="flex flex-col gap-1">
-                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">SLA Response Performance</span>
+                       <span className="text-xs text-text-muted font-bold uppercase tracking-wider">SLA Response Performance</span>
                        <span className={`text-sm font-bold ${slaPerformance(selectedIncident).className}`}>
                          {slaPerformance(selectedIncident).text}
                        </span>
                      </div>
                      <div className="flex flex-col gap-1">
-                       <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Status Code</span>
+                       <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Status Code</span>
                        <span className="text-sm font-bold text-gray-300">{selectedIncident.status}</span>
                      </div>
                   </div>
@@ -535,10 +535,10 @@ const Incidents: React.FC = () => {
 
             {/* Modal Footer */}
             <div className="p-10 border-t border-white/5 bg-background/20 flex gap-4 shrink-0">
-              <button className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 transition-all">
+              <button className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl text-xs uppercase tracking-[0.12em] shadow-2xl shadow-primary/20 transition-all">
                 Export Detailed PDF
               </button>
-              <button className="px-10 bg-background border border-white/10 text-white hover:bg-white/5 font-bold py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] transition-all">
+              <button className="px-10 bg-background border border-white/10 text-white hover:bg-white/5 font-bold py-4 rounded-2xl text-xs uppercase tracking-[0.12em] transition-all">
                 Share Externally
               </button>
             </div>
@@ -550,7 +550,7 @@ const Incidents: React.FC = () => {
       <div className="fixed bottom-10 right-10 z-[60]">
          <button className="bg-primary hover:bg-primary/90 text-black px-10 py-4 rounded-full shadow-2xl flex items-center gap-4 transition-all transform active:scale-95 group overflow-hidden">
            <span className="material-symbols-outlined text-2xl">add</span>
-           <span className="text-[11px] font-bold uppercase tracking-[0.2em]">Manual Entry</span>
+           <span className="text-xs font-bold uppercase tracking-[0.12em]">Manual Entry</span>
          </button>
       </div>
     </div>

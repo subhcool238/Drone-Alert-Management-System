@@ -3,6 +3,8 @@
 export const COLORS = {
   primary: '#06b6d4',
   danger: '#ef4444',
+  dangerLight: '#f87171',
+  dangerStrong: '#dc2626',
   warning: '#f97316',
   success: '#10b981',
   caution: '#fbbf24',

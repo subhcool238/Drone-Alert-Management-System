@@ -64,7 +64,7 @@ const Header: React.FC = () => {
       : 'now';
 
   const notifications = [
-    { id: 1, type: 'Awaiting Response', msg: 'INC-2025-083 awaiting response (High, potential false alarm)', time: awaitingAge, color: 'text-danger', icon: 'timer_off' },
+    { id: 1, type: 'Awaiting Response', msg: 'INC-2025-083 awaiting response (High, potential false alarm)', time: awaitingAge, color: 'text-danger-light', icon: 'timer_off' },
     { id: 2, type: 'Escalation', msg: 'Team Lead approval required: North Storage Wing', time: '1m ago', color: 'text-warning', icon: 'priority_high' },
     { id: 3, type: 'Maintenance', msg: 'Watcher-3 lens calibration requested', time: '2m ago', color: 'text-primary', icon: 'settings_backup_restore' },
   ];
@@ -78,19 +78,19 @@ const Header: React.FC = () => {
             <div className="p-10 border-b border-white/5 flex justify-between items-start">
                <div>
                   <h2 className="text-3xl font-display font-bold text-white tracking-tight">Shift Handover Briefing</h2>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Operator: Isabelle M. • 22:00 - 06:00</p>
+                  <p className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] mt-2">Operator: Isabelle M. <span aria-hidden="true">•</span> 22:00 - 06:00</p>
                </div>
-               <button onClick={() => setShowShiftBriefing(false)} className="material-symbols-outlined text-gray-500 hover:text-white transition-colors">close</button>
+               <button onClick={() => setShowShiftBriefing(false)} className="material-symbols-outlined text-text-muted hover:text-white transition-colors">close</button>
             </div>
             <div className="p-10 grid grid-cols-2 gap-10 bg-background/20">
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-[10px] font-bold text-danger uppercase tracking-widest mb-4">Critical Incidents ({criticalIncidents.length})</h4>
+                  <h4 className="text-xs font-bold text-danger-light uppercase tracking-wider mb-4">Critical Incidents ({criticalIncidents.length})</h4>
                   <div className="space-y-3">
                     {criticalIncidents.map(inc => (
                       <div key={inc.id} className="p-3 rounded-xl bg-danger/10 border border-danger/20">
                         <p className="text-xs text-white font-bold">{inc.title}: {inc.location}</p>
-                        <p className="text-[10px] text-danger/70 font-bold uppercase mt-1">{(() => {
+                        <p className="text-xs text-danger-light font-bold uppercase mt-1">{(() => {
                           const sla = getSlaState(inc, secondsSinceLoad);
                           if (sla.kind === 'responded') return `Responded in ${sla.text}`;
                           if (sla.kind === 'breached') return 'SLA breached';
@@ -101,7 +101,7 @@ const Header: React.FC = () => {
                   </div>
                 </section>
                 <section>
-                   <h4 className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">Fleet & Maintenance</h4>
+                   <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-4">Fleet & Maintenance</h4>
                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                       <span className="material-symbols-outlined text-primary">engineering</span>
                       <p className="text-xs text-gray-400 leading-tight">
@@ -114,17 +114,17 @@ const Header: React.FC = () => {
               </div>
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-[10px] font-bold text-warning uppercase tracking-widest mb-4">Coverage Gap</h4>
+                  <h4 className="text-xs font-bold text-warning uppercase tracking-wider mb-4">Coverage Gap</h4>
                   <div className="p-5 rounded-2xl bg-warning/5 border border-warning/20">
                     <div className="text-4xl font-display font-bold text-warning mb-1">{gapCount} {gapCount === 1 ? 'Zone' : 'Zones'}</div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Unpatrolled for {COVERAGE_GAP.minutes} min</p>
+                    <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Unpatrolled for {COVERAGE_GAP.minutes} min</p>
                     {recommendation.ok && (
-                      <button className="mt-4 text-[9px] text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign {recommendation.drone.name}</button>
+                      <button className="mt-4 text-xs text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign {recommendation.drone.name}</button>
                     )}
                   </div>
                 </section>
                 <section>
-                   <h4 className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">Outstanding Tasks</h4>
+                   <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Outstanding Tasks</h4>
                    <div className="space-y-2">
                      <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-indigo-500"></span> 2 Police Reports Pending</div>
                      <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-gray-600"></span> Night Mode Audit Due</div>
@@ -133,8 +133,8 @@ const Header: React.FC = () => {
               </div>
             </div>
             <div className="p-10 flex justify-end gap-4 bg-background/50 border-t border-white/5">
-              <button onClick={() => setShowShiftBriefing(false)} className="px-8 py-3 rounded-xl border border-white/10 text-[10px] font-bold uppercase tracking-widest text-gray-400">Back to Ops</button>
-              <button onClick={() => setShowShiftBriefing(false)} className="px-10 py-3 rounded-xl bg-primary text-black text-[10px] font-bold uppercase tracking-widest shadow-xl shadow-primary/20">Acknowledge & Sign</button>
+              <button onClick={() => setShowShiftBriefing(false)} className="px-8 py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">Back to Ops</button>
+              <button onClick={() => setShowShiftBriefing(false)} className="px-10 py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary/20">Acknowledge & Sign</button>
             </div>
           </div>
         </div>
@@ -145,20 +145,20 @@ const Header: React.FC = () => {
           <span className="material-symbols-outlined text-primary text-2xl group-hover:rotate-180 transition-transform duration-500">hexagon</span>
           <div className="flex flex-col">
             <span className="text-white text-lg font-bold tracking-tight font-display">Musée d'Art Précieux CC</span>
-            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] leading-none mt-1">Command Center v1.2.3</span>
+            <span className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] leading-none mt-1">Command Center v1.2.3</span>
           </div>
-          <span className="ml-2 text-[8px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-widest uppercase">Rule-Based</span>
+          <span className="ml-2 text-xs font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-wider uppercase">Rule-Based</span>
         </div>
       </div>
 
       <div className="flex-1 max-w-2xl mx-12 relative">
         <div className="relative group">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
           <input 
             value={searchQuery}
             // DO: Fixed typo - changed setSearchTerm to setSearchQuery to match declared state
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-panel border border-white/10 rounded-2xl py-2.5 pl-12 pr-12 text-white text-sm focus:border-primary/50 focus:ring-0 placeholder-gray-600 transition-all outline-none" 
+            className="w-full bg-panel border border-white/10 rounded-2xl py-2.5 pl-12 pr-12 text-white text-sm focus:border-primary/50 focus:ring-0 placeholder-text-muted transition-all outline-none" 
             placeholder="Search Drones, Incidents, Guards, Patrols..."
           />
           <button onClick={handleSummary} className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary transition-colors">
@@ -171,8 +171,8 @@ const Header: React.FC = () => {
             <div className="flex items-start gap-3">
               <span className="material-symbols-outlined text-white text-lg mt-0.5">info</span>
               <div className="flex-1">
-                <p className="text-[9px] text-white/60 font-bold uppercase tracking-widest mb-1">Rule-based summary</p>
-                <p className="text-[11px] text-white/90 font-bold leading-relaxed">{summary}</p>
+                <p className="text-xs text-white/60 font-bold uppercase tracking-wider mb-1">Rule-based summary</p>
+                <p className="text-xs text-white/90 font-bold leading-relaxed">{summary}</p>
               </div>
               <button onClick={() => setSummary(null)} className="text-white/40 hover:text-white"><span className="material-symbols-outlined text-sm">close</span></button>
             </div>
@@ -198,8 +198,8 @@ const Header: React.FC = () => {
           {showNotifications && (
             <div className="absolute top-full mt-4 right-0 w-[320px] bg-panel border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
               <div className="p-5 border-b border-white/5 flex justify-between items-center bg-background/50">
-                <h4 className="text-[10px] font-bold text-white uppercase tracking-widest">Active Notifications</h4>
-                <button className="text-[9px] text-primary font-bold uppercase hover:underline">Clear All</button>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Active Notifications</h4>
+                <button className="text-xs text-primary font-bold uppercase hover:underline">Clear All</button>
               </div>
               <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                 {notifications.map(n => (
@@ -210,8 +210,8 @@ const Header: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-baseline mb-1">
-                          <span className={`text-[9px] font-bold uppercase tracking-widest ${n.color}`}>{n.type}</span>
-                          <span className="text-[8px] text-gray-600 font-bold font-mono">{n.time}</span>
+                          <span className={`text-xs font-bold uppercase tracking-wider ${n.color}`}>{n.type}</span>
+                          <span className="text-xs text-text-muted font-bold font-mono">{n.time}</span>
                         </div>
                         <p className="text-xs text-gray-300 font-medium leading-relaxed group-hover:text-white">{n.msg}</p>
                       </div>
@@ -220,7 +220,7 @@ const Header: React.FC = () => {
                 ))}
               </div>
               <div className="p-4 text-center bg-background/50">
-                <button className="text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:text-white transition-colors">View All Activities</button>
+                <button className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">View All Activities</button>
               </div>
             </div>
           )}
@@ -233,9 +233,9 @@ const Header: React.FC = () => {
           <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700 group-hover:ring-primary transition-all" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
           <div className="flex flex-col">
             <span className="text-xs font-bold text-white group-hover:text-primary transition-colors leading-none">Isabelle M.</span>
-            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Lead Drone Operator</span>
+            <span className="text-xs text-text-muted font-bold uppercase tracking-wider mt-1">Lead Drone Operator</span>
           </div>
-          <span className="material-symbols-outlined text-gray-600 text-[18px] ml-2 group-hover:text-white">expand_more</span>
+          <span className="material-symbols-outlined text-text-muted text-[18px] ml-2 group-hover:text-white">expand_more</span>
         </div>
       </div>
     </header>

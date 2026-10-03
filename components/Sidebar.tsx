@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
         </div>
         <div className="flex flex-col">
           <h1 className="text-white text-sm font-bold leading-none tracking-wide">FlytBase</h1>
-          <span className="text-[10px] text-primary font-bold tracking-wider mt-0.5">SECURITY OPS</span>
+          <span className="text-xs text-primary font-bold tracking-wide mt-0.5">SECURITY OPS</span>
         </div>
       </div>
       
@@ -45,7 +45,7 @@ const Sidebar: React.FC = () => {
               </span>
               <span className="text-sm font-medium">{item.label}</span>
               {item.badge && (
-                <span className="ml-auto bg-danger/20 text-danger text-[10px] font-bold px-1.5 py-0.5 rounded border border-danger/30">
+                <span className="ml-auto bg-danger/20 text-danger-light text-xs font-bold px-1.5 py-0.5 rounded border border-danger/30">
                   {item.badge}
                 </span>
               )}
@@ -59,9 +59,9 @@ const Sidebar: React.FC = () => {
           <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
           <div className="flex flex-col flex-1 min-w-0">
             <span className="text-sm font-medium text-white truncate">Isabelle M.</span>
-            <span className="text-[10px] text-gray-500 truncate">Lead Drone Operator</span>
+            <span className="text-xs text-text-muted truncate">Lead Drone Operator</span>
           </div>
-          <span className="material-symbols-outlined text-gray-500 group-hover:text-white">logout</span>
+          <span className="material-symbols-outlined text-text-muted group-hover:text-white">logout</span>
         </button>
       </div>
     </aside>

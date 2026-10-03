@@ -146,7 +146,14 @@ function measureInPage(withLayout) {
       if (parse(getComputedStyle(X).backgroundColor).a >= 0.9) return null;
     }
     keptEls.add(el);
-    const layers = [];
+    // Group opacity (for example disabled:opacity-50) fades a whole subtree, so the button
+    // background AND its label both blend with whatever is behind the group.
+    let G = null;
+    for (let x = el; x; x = x.parentElement) if (parseFloat(getComputedStyle(x).opacity) < 1) G = x;
+    const idxG = G ? stack.indexOf(G) : -1;
+    const P = opacityChain(el);
+    const innerLayers = [];
+    const outerLayers = [];
     let overImage = false, opaque = false;
     if (idx >= 0) {
       for (let i = idx; i < stack.length; i++) {
@@ -155,19 +162,25 @@ function measureInPage(withLayout) {
         const c = getComputedStyle(e);
         if (c.backgroundImage && c.backgroundImage !== 'none') overImage = true;
         const col = parse(c.backgroundColor);
-        const opc = opacityChain(e);
+        const inner = idxG >= 0 && i <= idxG;
         if (col.a > 0) {
-          layers.push({ ...col, a: col.a * (e === el ? 1 : 1) });
-          if (col.a >= 0.99) { opaque = true; break; }
+          (inner ? innerLayers : outerLayers).push(col);
+          if (!inner && col.a >= 0.99) { opaque = true; break; }
         }
-        void opc;
       }
     }
-    const base = opaque ? layers[layers.length - 1] : { r: 255, g: 255, b: 255, a: 1 };
-    let bg = { ...base, a: 1 };
-    for (let i = layers.length - (opaque ? 2 : 1); i >= 0; i--) bg = over(layers[i], bg);
-    const fgBase = { ...fgColor, a: fgColor.a * fgAlpha * opacityChain(el) };
-    const fg = over(fgBase, bg);
+    // backdrop outside the faded group
+    const base = opaque ? outerLayers[outerLayers.length - 1] : { r: 255, g: 255, b: 255, a: 1 };
+    let B = { ...base, a: 1 };
+    for (let i = outerLayers.length - (opaque ? 2 : 1); i >= 0; i--) B = over(outerLayers[i], B);
+    // content of the group: its own background layers, composited together
+    let Cin = { r: 0, g: 0, b: 0, a: 0 };
+    for (let i = innerLayers.length - 1; i >= 0; i--) Cin = over(innerLayers[i], Cin);
+    const mix = (c, alpha) => ({ r: B.r * (1 - alpha) + c.r * alpha, g: B.g * (1 - alpha) + c.g * alpha, b: B.b * (1 - alpha) + c.b * alpha, a: 1 });
+    const bg = mix(Cin, P * Cin.a);
+    const textOver = over({ ...fgColor, a: fgColor.a * fgAlpha }, Cin);
+    const fg = mix(textOver, P * textOver.a);
+    const fgBase = { ...fgColor, a: fgColor.a * fgAlpha * P };
     const size = fontSize * (svgScale || 1);
     const large = size >= 24 || (size >= 18.66 && fontWeight >= 700);
     const needed = large ? 3 : 4.5;
@@ -185,7 +198,7 @@ function measureInPage(withLayout) {
       item.ratioOverBlack = Math.round(ratio(over(fgBase, { r: 0, g: 0, b: 0, a: 1 }), { r: 0, g: 0, b: 0, a: 1 }) * 100) / 100;
       item.ratioOverGrey = Math.round(ratio(over(fgBase, { r: 128, g: 128, b: 128, a: 1 }), { r: 128, g: 128, b: 128, a: 1 }) * 100) / 100;
     }
-    if (withLayout) item._rect = { l: rect.left, t: rect.top, r: rect.right, b: rect.bottom };
+    if (overImage) { el.setAttribute('data-cc', String(items.length)); item._cc = items.length; }
     items.push(item);
     return item;
   };
@@ -244,69 +257,161 @@ function measureInPage(withLayout) {
     if (it) it.placeholder = true;
   }
 
-  // layout checks
-  const layout = { clipped: [], overlaps: [], offscreenRight: [], hScroll: null, scrollers: [] };
-  if (withLayout) {
-    const textEls = new Map();
-    for (const node of nodes) {
-      const text = node.nodeValue.trim();
-      const el = node.parentElement;
-      if (!text || !el || el.closest(skipSel) || hidden(el) || el instanceof SVGElement || !keptEls.has(el)) continue;
-      if (!textEls.has(el)) textEls.set(el, text.slice(0, 40));
-    }
-    for (const [el, text] of textEls) {
-      const cs = getComputedStyle(el);
-      if ((cs.overflowX === 'hidden' || cs.overflowX === 'clip' || cs.textOverflow === 'ellipsis') && el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0) {
-        layout.clipped.push({ text, why: 'text wider than its box (' + el.scrollWidth + ' > ' + el.clientWidth + ')' });
-      }
-      const rect = el.getBoundingClientRect();
-      for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
-        const ac = getComputedStyle(a);
-        if (ac.overflowX === 'hidden' || ac.overflowX === 'clip') {
-          const ar = a.getBoundingClientRect();
-          if (rect.right > ar.right + 2 || rect.left < ar.left - 2) {
-            layout.clipped.push({ text, why: 'cut off by a parent edge (' + Math.round(rect.right - ar.right) + 'px)' });
-            break;
-          }
-        }
-      }
-      if (rect.right > innerWidth + 1) layout.offscreenRight.push({ text, right: Math.round(rect.right) });
-    }
-    // overlapping text boxes from different elements
-    const boxes = [...textEls.keys()].map(el => {
-      const rg = document.createRange(); rg.selectNodeContents(el);
-      const r = rg.getBoundingClientRect();
-      return { el, r, text: textEls.get(el) };
-    }).filter(b => b.r.width > 1 && b.r.height > 1);
-    for (let i = 0; i < boxes.length; i++) {
-      for (let j = i + 1; j < boxes.length; j++) {
-        const A = boxes[i], B = boxes[j];
-        if (A.el.contains(B.el) || B.el.contains(A.el)) continue;
-        const w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left);
-        const h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
-        if (w > 2 && h > 2) {
-          const inter = w * h;
-          const small = Math.min(A.r.width * A.r.height, B.r.width * B.r.height);
-          if (inter / small > 0.25) layout.overlaps.push({ a: A.text, b: B.text });
-        }
-      }
-    }
-    layout.hScroll = document.documentElement.scrollWidth > innerWidth + 1
-      ? { scrollWidth: document.documentElement.scrollWidth, innerWidth } : null;
-    for (const e of document.querySelectorAll('*')) {
-      const c = getComputedStyle(e);
-      if ((c.overflowX === 'auto' || c.overflowX === 'scroll') && e.scrollWidth > e.clientWidth + 1 && e.clientWidth > 0) {
-        layout.scrollers.push({ tag: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), over: e.scrollWidth - e.clientWidth });
-      }
-    }
-  }
+  const layout = null;
   for (const it of items) delete it._rect;
   style.remove();
   return { items, layout };
 }
 
+
+/* Layout problems: clipped, overflowing or overlapping text, using only text that is
+   visible in the current viewport (no scrolling, so scroll side effects cannot show up). */
+function layoutInPage() {
+  const style = document.createElement('style');
+  style.setAttribute('data-contrast-check', '1');
+  style.textContent = '* { pointer-events: auto !important; }';
+  document.head.appendChild(style);
+  const skipSel = 'script,style,noscript,option,optgroup,title,.material-symbols-outlined,[aria-hidden="true"]';
+  const hiddenEl = el => {
+    for (let a = el; a; a = a.parentElement) {
+      const c = getComputedStyle(a);
+      if (c.display === 'none' || c.visibility === 'hidden' || parseFloat(c.opacity) < 0.05) return true;
+    }
+    return false;
+  };
+  const layout = { clipped: [], overlaps: [], offscreenRight: [], hScroll: null, scrollers: [] };
+  const seen = new Map();
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const text = node.nodeValue.trim();
+    const el = node.parentElement;
+    if (!text || !el || el.closest(skipSel) || el instanceof SVGElement || hiddenEl(el) || el.closest('select')) continue;
+    if (seen.has(el)) continue;
+    const rg = document.createRange(); rg.selectNodeContents(el);
+    const r = rg.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    if (r.top < 0 || r.left < 0 || r.bottom > innerHeight + 0.5 || r.right > innerWidth + 0.5) {
+      if (r.right > innerWidth + 1 && r.left < innerWidth) layout.offscreenRight.push({ text: text.slice(0, 40), right: Math.round(r.right) });
+      continue;
+    }
+    const stack = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    const top = stack[0];
+    if (!top || !(top === el || top.contains(el) || el.contains(top))) continue;
+    seen.set(el, { text: text.slice(0, 40), r });
+  }
+  for (const [el, info] of seen) {
+    const cs = getComputedStyle(el);
+    const r = info.r;
+    if ((cs.overflowX === 'hidden' || cs.overflowX === 'clip' || cs.textOverflow === 'ellipsis') && el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0) {
+      layout.clipped.push({ text: info.text, why: 'text wider than its box (' + el.scrollWidth + ' > ' + el.clientWidth + ')' });
+      continue;
+    }
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const ac = getComputedStyle(a);
+      const ar = a.getBoundingClientRect();
+      // Content inside a scroll container that is partly out of view is normal scrolling, not clipping
+      if (((ac.overflowY === 'auto' || ac.overflowY === 'scroll') && (r.bottom > ar.bottom + 2 || r.top < ar.top - 2)) ||
+          ((ac.overflowX === 'auto' || ac.overflowX === 'scroll') && (r.right > ar.right + 2 || r.left < ar.left - 2))) break;
+      const clipX = ac.overflowX === 'hidden' || ac.overflowX === 'clip';
+      const clipY = ac.overflowY === 'hidden' || ac.overflowY === 'clip';
+      if (clipX && (r.right > ar.right + 2 || r.left < ar.left - 2)) {
+        layout.clipped.push({ text: info.text, why: 'cut off at the side by a parent (' + Math.round(Math.max(r.right - ar.right, ar.left - r.left)) + 'px)' });
+        break;
+      }
+      if (clipY && (r.bottom > ar.bottom + 2 || r.top < ar.top - 2)) {
+        layout.clipped.push({ text: info.text, why: 'cut off at top or bottom by a parent (' + Math.round(Math.max(r.bottom - ar.bottom, ar.top - r.top)) + 'px)' });
+        break;
+      }
+    }
+  }
+  const boxes = [...seen.entries()].map(([el, info]) => ({ el, r: info.r, text: info.text }));
+  for (let i = 0; i < boxes.length; i++) {
+    for (let j = i + 1; j < boxes.length; j++) {
+      const A = boxes[i], B = boxes[j];
+      if (A.el.contains(B.el) || B.el.contains(A.el)) continue;
+      const w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left);
+      const h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
+      if (w > 2 && h > 2) {
+        const small = Math.min(A.r.width * A.r.height, B.r.width * B.r.height);
+        if ((w * h) / small > 0.25) layout.overlaps.push({ a: A.text, b: B.text });
+      }
+    }
+  }
+  layout.hScroll = document.documentElement.scrollWidth > innerWidth + 1
+    ? { scrollWidth: document.documentElement.scrollWidth, innerWidth } : null;
+  for (const e of document.querySelectorAll('*')) {
+    const c = getComputedStyle(e);
+    if ((c.overflowX === 'auto' || c.overflowX === 'scroll') && e.scrollWidth > e.clientWidth + 1 && e.clientWidth > 0) {
+      layout.scrollers.push({ tag: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), over: e.scrollWidth - e.clientWidth });
+    }
+  }
+  style.remove();
+  return layout;
+}
+
 /* ------------------------------------------------------------------ driver */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Text over a photo: hide the text, screenshot its box, and judge the real pixels behind it.
+async function sampleOverImage(page, items) {
+  for (const it of items) {
+    if (!it.overImage || it._cc === undefined) continue;
+    const rect = await page.evaluate(id => {
+      const el = document.querySelector('[data-cc="' + id + '"]');
+      if (!el) return null;
+      el.scrollIntoView({ block: 'center', inline: 'nearest' });
+      el.setAttribute('data-cc-style', el.getAttribute('style') || '');
+      el.style.setProperty('color', 'transparent', 'important');
+      el.style.setProperty('-webkit-text-fill-color', 'transparent', 'important');
+      el.style.setProperty('text-shadow', 'none', 'important');
+      const r = el.getBoundingClientRect();
+      return { x: r.left, y: r.top, width: r.width, height: r.height };
+    }, it._cc);
+    if (rect && rect.width >= 1 && rect.height >= 1) {
+      const x = Math.max(0, Math.floor(rect.x)), y = Math.max(0, Math.floor(rect.y));
+      const width = Math.min(Math.ceil(rect.width), VW - x), height = Math.min(Math.ceil(rect.height), VH - y);
+      if (width >= 1 && height >= 1) {
+        const b64 = await page.screenshot({ clip: { x, y, width, height }, encoding: 'base64' });
+        const stats = await page.evaluate(async data => {
+          const img = new Image();
+          img.src = 'data:image/png;base64,' + data;
+          await img.decode();
+          const c = document.createElement('canvas');
+          c.width = img.width; c.height = img.height;
+          const g = c.getContext('2d');
+          g.drawImage(img, 0, 0);
+          const px = g.getImageData(0, 0, c.width, c.height).data;
+          const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          const L = [];
+          for (let i = 0; i < px.length; i += 4) L.push(0.2126 * f(px[i]) + 0.7152 * f(px[i + 1]) + 0.0722 * f(px[i + 2]));
+          L.sort((a, b) => a - b);
+          const at = p => L[Math.min(L.length - 1, Math.floor(L.length * p))];
+          return { p5: at(0.05), p50: at(0.5), p95: at(0.95) };
+        }, b64);
+        // text luminance from the measured colour
+        const hexv = it.fg.replace('#', '');
+        const rgb = [0, 2, 4].map(i => parseInt(hexv.slice(i, i + 2), 16));
+        const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        const Lf = 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
+        const ratioWith = Lp => (Math.max(Lf, Lp) + 0.05) / (Math.min(Lf, Lp) + 0.05);
+        // worst case: light text against the lightest pixels, dark text against the darkest
+        const worstL = Lf > stats.p50 ? stats.p95 : stats.p5;
+        it.sampledWorst = Math.round(ratioWith(worstL) * 100) / 100;
+        it.sampledMedian = Math.round(ratioWith(stats.p50) * 100) / 100;
+      }
+    }
+    await page.evaluate(id => {
+      const el = document.querySelector('[data-cc="' + id + '"]');
+      if (!el) return;
+      const prev = el.getAttribute('data-cc-style');
+      if (prev) el.setAttribute('style', prev); else el.removeAttribute('style');
+      el.removeAttribute('data-cc-style');
+      el.removeAttribute('data-cc');
+    }, it._cc);
+    delete it._cc;
+  }
+}
 
 const clickByText = (page, selector, re) =>
   page.evaluate((sel, src) => {
@@ -331,9 +436,11 @@ async function main() {
   const capture = async name => {
     await sleep(350);
     n += 1;
-    const { items, layout } = await page.evaluate(measureInPage, DO_LAYOUT);
+    const layout = DO_LAYOUT ? await page.evaluate(layoutInPage) : { clipped: [], overlaps: [], offscreenRight: [], hScroll: null, scrollers: [] };
+    const { items } = await page.evaluate(measureInPage, false);
+    await sampleOverImage(page, items);
     // screenshot after measurement (measurement may scroll); scroll back to top first
-    await page.evaluate(() => { document.querySelectorAll('*').forEach(e => { if (e.scrollTop) e.scrollTop = 0; }); });
+    await page.evaluate(() => { document.querySelectorAll("*").forEach(e => { if (e.scrollTop) e.scrollTop = 0; if (e.scrollLeft) e.scrollLeft = 0; }); });
     await sleep(150);
     if (SHOTS) await page.screenshot({ path: path.join(SHOTS, String(n).padStart(2, '0') + '-' + name + '.png') });
     const measured = items.filter(i => !i.disabled);
@@ -344,7 +451,7 @@ async function main() {
       failing: fails.length,
       under12: items.filter(i => i.under12).length,
       overImage: items.filter(i => i.overImage).length,
-      overImageFailing: items.filter(i => i.overImage && !i.disabled && Math.max(i.ratioOverBlack, i.ratioOverGrey) < i.needed).length,
+      overImageFailing: items.filter(i => i.overImage && !i.disabled && i.sampledWorst !== undefined && i.sampledWorst < i.needed).length,
       disabledBelow3: items.filter(i => i.disabled && i.ratio < 3).length,
       failures: fails,
       under12Items: items.filter(i => i.under12).map(i => ({ text: i.text, size: i.size })),
@@ -378,6 +485,17 @@ async function main() {
   await clickByText(page, 'main button', /^2D$/);
   await go('#/fleet', 'fleet');
   await go('#/manual', 'manual-control');
+  // Fault drone selected: the Manual Control buttons are disabled
+  await page.evaluate(() => {
+    const card = [...document.querySelectorAll('aside div')].find(d => d.className.includes('cursor-pointer') && /Surveyor-X/.test(d.innerText));
+    if (card) card.click();
+  });
+  await sleep(400);
+  await capture('manual-control-fault');
+  await page.evaluate(() => {
+    const card = [...document.querySelectorAll('aside div')].find(d => d.className.includes('cursor-pointer') && /Sentinel-1/.test(d.innerText));
+    if (card) card.click();
+  });
   await go('#/patrols', 'patrol-routes');
   await go('#/incidents', 'incidents-list');
   await clickByText(page, 'main button', /tactical analytics/);
@@ -392,7 +510,7 @@ async function main() {
   // Header notifications panel and Header briefing, on the Dashboard
   await page.evaluate(() => { location.hash = '#/'; });
   await sleep(700);
-  await page.evaluate(() => document.querySelector('header button[aria-label="Notifications"], header button .material-symbols-outlined')?.closest('button')?.click());
+  await page.evaluate(() => document.querySelector('header button[aria-label="Notifications"]')?.click());
   await sleep(400);
   const hasPanel = await page.evaluate(() => !!document.querySelector('header .max-h-\\[350px\\]'));
   if (!hasPanel) {
@@ -418,12 +536,12 @@ async function main() {
   // report
   const total = { total: 0, failing: 0, under12: 0, overImage: 0, disabledBelow3: 0 };
   console.log(`\nContrast check (${LABEL}, ${VW}x${VH})`);
-  console.log('state'.padEnd(24) + 'texts'.padStart(7) + 'fail'.padStart(7) + '<12px'.padStart(8) + 'overImg'.padStart(9) + 'disabled<3'.padStart(12));
+  console.log('state'.padEnd(24) + 'texts'.padStart(7) + 'fail'.padStart(7) + '<12px'.padStart(8) + 'overImg'.padStart(9) + 'imgFail'.padStart(9) + 'disabled<3'.padStart(12));
   for (const r of results) {
-    console.log(r.state.padEnd(24) + String(r.total).padStart(7) + String(r.failing).padStart(7) + String(r.under12).padStart(8) + String(r.overImage).padStart(9) + String(r.disabledBelow3).padStart(12));
-    total.total += r.total; total.failing += r.failing; total.under12 += r.under12; total.overImage += r.overImage; total.disabledBelow3 += r.disabledBelow3;
+    console.log(r.state.padEnd(24) + String(r.total).padStart(7) + String(r.failing).padStart(7) + String(r.under12).padStart(8) + String(r.overImage).padStart(9) + String(r.overImageFailing).padStart(9) + String(r.disabledBelow3).padStart(12));
+    total.total += r.total; total.failing += r.failing; total.under12 += r.under12; total.overImage += r.overImage; total.overImageFailing = (total.overImageFailing || 0) + r.overImageFailing; total.disabledBelow3 += r.disabledBelow3;
   }
-  console.log('TOTAL'.padEnd(24) + String(total.total).padStart(7) + String(total.failing).padStart(7) + String(total.under12).padStart(8) + String(total.overImage).padStart(9) + String(total.disabledBelow3).padStart(12));
+  console.log('TOTAL'.padEnd(24) + String(total.total).padStart(7) + String(total.failing).padStart(7) + String(total.under12).padStart(8) + String(total.overImage).padStart(9) + String(total.overImageFailing || 0).padStart(9) + String(total.disabledBelow3).padStart(12));
   if (DO_LAYOUT) {
     console.log('\nLayout problems:');
     for (const r of results) {

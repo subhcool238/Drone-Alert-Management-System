@@ -155,7 +155,7 @@ export const formatSla = (a: Incident): string => mmss(a.slaLimit - a.elapsed);
 export const getSlaUrgency = (a: Incident): string => {
   const remaining = a.slaLimit - a.elapsed;
   const ratio = remaining / a.slaLimit;
-  if (ratio < 0.2) return 'text-danger animate-pulse';
+  if (ratio < 0.2) return 'text-danger-light';
   if (ratio < 0.5) return 'text-warning';
   return 'text-success';
 };

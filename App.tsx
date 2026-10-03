@@ -20,13 +20,13 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
       <div className="bg-panel border border-white/10 rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
         <div className="p-10 border-b border-white/5 shrink-0">
           <h2 className="text-4xl font-display font-bold text-white tracking-tighter">Shift Handover Briefing</h2>
-          <p className="text-[10px] text-primary font-bold uppercase tracking-[0.2em] mt-2">Required Action: System State Synchronization</p>
+          <p className="text-xs text-primary font-bold uppercase tracking-[0.12em] mt-2">Required Action: System State Synchronization</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
           {/* Recent Incidents */}
           <section>
-            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">history</span> Recent Incidents (Last 12h)
             </h4>
             <div className="space-y-3">
@@ -37,13 +37,13 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
               ].map((inc, i) => (
                 <div key={i} className="bg-background border border-white/5 p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
                   <div className="flex items-center gap-6">
-                    <span className="text-[10px] font-mono text-gray-600">{inc.time}</span>
+                    <span className="text-xs font-mono text-text-muted">{inc.time}</span>
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-white uppercase tracking-tight">{inc.type}: {inc.zone}</span>
-                      <span className="text-[9px] text-gray-600 font-bold uppercase mt-0.5">{inc.status}</span>
+                      <span className="text-xs text-text-muted font-bold uppercase mt-0.5">{inc.status}</span>
                     </div>
                   </div>
-                  <span className={`text-[9px] font-black px-3 py-1 rounded-lg ${inc.sev === 'CRITICAL' ? 'bg-danger/20 text-danger' : 'bg-primary/20 text-primary'}`}>{inc.sev}</span>
+                  <span className={`text-xs font-black px-3 py-1 rounded-lg ${inc.sev === 'CRITICAL' ? 'bg-danger/20 text-danger-light' : 'bg-primary/20 text-primary'}`}>{inc.sev}</span>
                 </div>
               ))}
             </div>
@@ -51,7 +51,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
           {/* Fleet Snapshot */}
           <section>
-            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">flight_takeoff</span> Fleet Snapshot
             </h4>
             <div className="grid grid-cols-3 gap-4">
@@ -62,11 +62,11 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
                 color: STATUS_DOT[drone.status]
               })).map((d, i) => (
                 <div key={i} className="bg-background border border-white/5 p-5 rounded-2xl text-center space-y-3">
-                  <p className="text-[10px] font-black text-white uppercase tracking-widest">{d.name}</p>
+                  <p className="text-xs font-black text-white uppercase tracking-wider">{d.name}</p>
                   <div className="text-2xl font-display font-bold text-white">{d.battery}%</div>
                   <div className="flex items-center justify-center gap-2">
                     <span className={`size-1.5 rounded-full ${d.color}`}></span>
-                    <span className="text-[9px] text-gray-500 font-bold uppercase">{d.status}</span>
+                    <span className="text-xs text-text-muted font-bold uppercase">{d.status}</span>
                   </div>
                 </div>
               ))}
@@ -75,31 +75,31 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
           {/* Guard & Patrol Status */}
           <section>
-            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">shield</span> Guard & Patrol Status
             </h4>
             <div className="bg-danger/5 border border-danger/20 p-6 rounded-3xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-white uppercase tracking-tight">Perimeter Alpha</span>
-                <span className="text-[10px] font-bold text-emerald-500 uppercase">Staffed (Pierre L.)</span>
+                <span className="text-xs font-bold text-emerald-500 uppercase">Staffed (Pierre L.)</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-danger uppercase tracking-tight">{COVERAGE_GAP.zone}</span>
-                <span className="text-[10px] font-bold text-danger uppercase animate-pulse">Unpatrolled for {COVERAGE_GAP.minutes} min</span>
+                <span className="text-xs font-bold text-danger-light uppercase tracking-tight">{COVERAGE_GAP.zone}</span>
+                <span className="text-xs font-bold text-danger-light uppercase">Unpatrolled for {COVERAGE_GAP.minutes} min</span>
               </div>
             </div>
           </section>
 
           {/* Director's Notes */}
           <section>
-            <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">sticky_note_2</span> Director's Notes
             </h4>
             <div className="bg-indigo-600/10 border border-indigo-500/20 p-8 rounded-3xl">
               <p className="text-sm text-gray-300 italic leading-relaxed font-medium">
                 "Prioritize West Storage tonight – Picasso delivery; accept slightly higher false-alarm tolerance there. Keep Sentinel-1 dedicated to the roof corridor."
                 <br/>
-                <span className="text-[10px] text-indigo-400 font-black uppercase mt-4 block">— Marc, Security Director</span>
+                <span className="text-xs text-indigo-400 font-black uppercase mt-4 block">— Marc, Security Director</span>
               </p>
             </div>
           </section>
@@ -118,8 +118,8 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           <button 
             disabled={!checked}
             onClick={onAcknowledge}
-            className={`px-10 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-2xl ${
-              checked ? 'bg-primary text-black shadow-primary/20' : 'bg-white/5 text-gray-600 cursor-not-allowed'
+            className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.12em] transition-all shadow-2xl ${
+              checked ? 'bg-primary text-black shadow-primary/20' : 'bg-white/5 text-text-muted cursor-not-allowed'
             }`}
           >
             Acknowledge & go to Dashboard
@@ -136,18 +136,18 @@ const ShiftContextBar: React.FC<{ onOpenBriefing: () => void }> = ({ onOpenBrief
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-[20px]">dark_mode</span>
-          <span className="text-[11px] font-bold text-white uppercase tracking-widest">Night Shift 22:00–06:00</span>
-          <span className="text-[11px] text-gray-600 font-bold uppercase">— Isabelle</span>
+          <span className="text-xs font-bold text-white uppercase tracking-wider">Night Shift 22:00–06:00</span>
+          <span className="text-xs text-text-muted font-bold uppercase">— Isabelle</span>
         </div>
         <div className="h-4 w-px bg-white/5"></div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-indigo-400 font-black uppercase tracking-widest">Priority:</span>
-          <span className="text-[11px] font-bold text-gray-300 uppercase tracking-tight">West Storage (Picasso delivery)</span>
+          <span className="text-xs text-indigo-400 font-black uppercase tracking-wider">Priority:</span>
+          <span className="text-xs font-bold text-gray-300 uppercase tracking-tight">West Storage (Picasso delivery)</span>
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <button onClick={onOpenBriefing} className="text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:text-white transition-colors">[View briefing]</button>
-        <button className="text-[10px] font-bold text-gray-500 uppercase tracking-widest hover:text-white transition-colors">[Message previous shift]</button>
+        <button onClick={onOpenBriefing} className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">[View briefing]</button>
+        <button className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">[Message previous shift]</button>
       </div>
     </div>
   );

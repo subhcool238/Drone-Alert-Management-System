@@ -15,12 +15,12 @@ const CARD_STATUS_TEXT: Record<FleetStatus, string> = {
 const NOT_ACTIVE_BANNER: Record<Exclude<FleetStatus, FleetStatus.ACTIVE>, { text: string; box: string; tone: string; icon: string }> = {
   [FleetStatus.IDLE]: { text: 'Drone docked: ready for deployment', box: 'bg-white/5 border-white/10', tone: 'text-gray-400', icon: 'smart_toy' },
   [FleetStatus.CHARGING]: { text: 'Drone charging: not available for control', box: 'bg-amber-500/10 border-amber-500/20', tone: 'text-warning', icon: 'warning' },
-  [FleetStatus.FAULT]: { text: 'Drone in fault: not available for control', box: 'bg-danger/20 border-danger/30', tone: 'text-danger', icon: 'warning' }
+  [FleetStatus.FAULT]: { text: 'Drone in fault: not available for control', box: 'bg-danger/20 border-danger/30', tone: 'text-danger-light', icon: 'warning' }
 };
 
 // Link quality colour by number: 80 and above green, 50 to 79 amber, below 50 red
 const linkQualityColor = (n: number): string =>
-  n >= 80 ? 'text-emerald-500' : n >= 50 ? 'text-amber-500' : 'text-danger';
+  n >= 80 ? 'text-emerald-500' : n >= 50 ? 'text-amber-500' : 'text-danger-light';
 
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
@@ -129,13 +129,13 @@ const ManualControl: React.FC = () => {
                 <span className="material-symbols-outlined text-primary text-3xl">hourglass_empty</span>
               </div>
               <h2 className="text-xl font-display font-bold text-white mb-2">Request Extension?</h2>
-              <p className="text-xs text-gray-500 uppercase font-bold tracking-widest leading-relaxed">
+              <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
                 Team Lead approval required for +2:00 mins override. ({extensionsUsed}/3 used)
               </p>
             </div>
             <div className="p-6 bg-background/50 grid grid-cols-2 gap-3">
-              <button onClick={() => setShowExtensionModal(false)} className="py-3 rounded-xl border border-white/10 text-[10px] font-bold uppercase tracking-widest text-gray-400">Deny</button>
-              <button onClick={approveExtension} className="py-3 rounded-xl bg-primary text-black text-[10px] font-bold uppercase tracking-widest">Approve</button>
+              <button onClick={() => setShowExtensionModal(false)} className="py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">Deny</button>
+              <button onClick={approveExtension} className="py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider">Approve</button>
             </div>
           </div>
         </div>
@@ -150,13 +150,13 @@ const ManualControl: React.FC = () => {
                 <span className="material-symbols-outlined text-success text-3xl">task_alt</span>
               </div>
               <h2 className="text-xl font-display font-bold text-white mb-2">Manual Session Ended</h2>
-              <p className="text-xs text-gray-500 uppercase font-bold tracking-widest leading-relaxed">
+              <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
                 Control has returned to Autonomy. Resume original route?
               </p>
             </div>
             <div className="p-6 bg-background/50 grid grid-cols-2 gap-3">
-              <button onClick={() => navigate('/patrols')} className="py-3 rounded-xl border border-white/10 text-[10px] font-bold uppercase tracking-widest text-gray-400">New Waypoints</button>
-              <button onClick={() => setShowPostSessionModal(false)} className="py-3 rounded-xl bg-success text-black text-[10px] font-bold uppercase tracking-widest">Resume Patrol</button>
+              <button onClick={() => navigate('/patrols')} className="py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">New Waypoints</button>
+              <button onClick={() => setShowPostSessionModal(false)} className="py-3 rounded-xl bg-success text-black text-xs font-bold uppercase tracking-wider">Resume Patrol</button>
             </div>
           </div>
         </div>
@@ -165,7 +165,7 @@ const ManualControl: React.FC = () => {
       {/* LEFT SIDEBAR: Fleet Selector */}
       <aside className="w-80 flex-none flex flex-col bg-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
         <div className="p-6 flex flex-col h-full">
-          <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6">Mission Assets</h2>
+          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6">Mission Assets</h2>
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
             {DRONES.map(d => ({
               id: d.id,
@@ -183,21 +183,21 @@ const ManualControl: React.FC = () => {
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <span className={`material-symbols-outlined ${drone.active ? 'text-primary' : 'text-gray-600'} text-[22px]`}>flight</span>
+                  <span className={`material-symbols-outlined ${drone.active ? 'text-primary' : 'text-text-muted'} text-[22px]`}>flight</span>
                   <div className="flex-1">
                     <h3 className="text-white font-bold text-sm tracking-tight">{drone.name}</h3>
-                    <p className={`text-[9px] font-bold uppercase tracking-[0.1em] mt-1 ${drone.active ? 'text-primary' : 'text-gray-600'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-[0.1em] mt-1 ${drone.active ? 'text-primary' : 'text-text-muted'}`}>
                       {drone.active && isManual ? 'Manual Control' : CARD_STATUS_TEXT[drone.status]}
                     </p>
                   </div>
                   <div className={`size-1.5 rounded-full ${drone.active ? 'bg-primary animate-pulse' : 'bg-gray-700'}`}></div>
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-gray-500 border-t border-white/5 mt-4 pt-3 font-bold uppercase tracking-widest">
+                <div className="flex items-center justify-between text-xs text-text-muted border-t border-white/5 mt-4 pt-3 font-bold uppercase tracking-wider">
                   <div className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-[16px]">battery_horiz_075</span>
                     <span>{drone.battery}%</span>
                   </div>
-                  <div className={`flex items-center gap-1.5 ${drone.signal === 'Strong' ? 'text-emerald-500' : 'text-gray-500'}`}>
+                  <div className={`flex items-center gap-1.5 ${drone.signal === 'Strong' ? 'text-emerald-500' : 'text-text-muted'}`}>
                     <span className="material-symbols-outlined text-[16px]">podium</span>
                     <span>{drone.signal}</span>
                   </div>
@@ -215,17 +215,17 @@ const ManualControl: React.FC = () => {
           {/* Mode Banner */}
           <div className={`flex-none px-6 py-3 border-b flex items-center justify-between z-10 transition-colors duration-500 ${
             !isManual ? (statusBanner ? statusBanner.box : 'bg-emerald-500/10 border-emerald-500/20') :
-            isCriticalZone ? 'bg-danger/20 border-danger/30 animate-pulse' :
+            isCriticalZone ? 'bg-danger/20 border-danger/30' :
             isWarningZone ? 'bg-warning/20 border-warning/30' : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-center gap-3">
               <span className={`material-symbols-outlined text-[18px] ${
-                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger' : 'text-warning'
+                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger-light' : 'text-warning'
               }`}>
                 {isManual ? 'warning' : (statusBanner ? statusBanner.icon : 'smart_toy')}
               </span>
-              <span className={`font-bold tabular-nums text-[10px] tracking-[0.15em] uppercase ${
-                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger' : 'text-warning'
+              <span className={`font-bold tabular-nums text-xs tracking-[0.1em] uppercase ${
+                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger-light' : 'text-warning'
               }`}>
                 {!isManual ? (statusBanner ? statusBanner.text : 'Mode: Autonomous – Flight path controlled by mission plan') :
                  `Mode: Manual override by Isabelle M. – ${formatTime(elapsedSeconds)} elapsed`}
@@ -243,7 +243,7 @@ const ManualControl: React.FC = () => {
           {/* Video Feed Area */}
           <div className="relative flex-1 bg-black w-full h-full overflow-hidden group">
             <div 
-              className="absolute inset-0 bg-cover bg-center grayscale brightness-[0.4] transition-all duration-1000 group-hover:brightness-50" 
+              className="absolute inset-0 bg-cover bg-center grayscale brightness-[0.3] transition-all duration-1000 group-hover:brightness-[0.35]" 
               style={{ backgroundImage: "url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=1200')" }}
             ></div>
             
@@ -258,11 +258,11 @@ const ManualControl: React.FC = () => {
                  </div>
                  
                  {/* Altimeter Ladder Simulation */}
-                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4 opacity-50">
+                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4">
                     {[20, 15, 10, 5, 0].map(h => (
                       <div key={h} className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-white">{h}</span>
-                        <div className={`h-px w-3 bg-white ${shownAltitude > h - 2 && shownAltitude < h + 2 ? 'w-6 bg-primary' : ''}`}></div>
+                        <span className="text-xs font-mono text-white">{h}</span>
+                        <div className={`h-px w-3 bg-white/50 ${shownAltitude > h - 2 && shownAltitude < h + 2 ? 'w-6 bg-primary' : ''}`}></div>
                       </div>
                     ))}
                  </div>
@@ -272,7 +272,7 @@ const ManualControl: React.FC = () => {
             {/* Overlays */}
             <div className="absolute top-8 left-8 flex flex-col gap-1 z-20">
               <div className="text-[12px] font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
-              <div className="flex gap-3 text-[9px] font-mono text-white/60 font-bold uppercase tracking-widest">
+              <div className="flex gap-3 text-xs font-mono text-text-secondary font-bold uppercase tracking-wider">
                 <span>4K @ 60FPS</span>
                 <span>ISO 400</span>
                 <span>ENC: H.265</span>
@@ -281,12 +281,12 @@ const ManualControl: React.FC = () => {
             
             <div className="absolute top-8 right-8 flex flex-col items-end gap-3 z-20">
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                 <span className={`material-symbols-outlined text-[16px] ${selectedDroneBattery < 20 ? 'text-danger' : 'text-primary'}`}>battery_very_low</span>
-                 <span className="text-[11px] font-mono font-bold text-white">{selectedDrone.battery}%</span>
+                 <span className={`material-symbols-outlined text-[16px] ${selectedDroneBattery < 20 ? 'text-danger-light' : 'text-primary'}`}>battery_very_low</span>
+                 <span className="text-xs font-mono font-bold text-white">{selectedDrone.battery}%</span>
               </div>
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
                  <span className="material-symbols-outlined text-emerald-500 text-[16px]">signal_cellular_alt</span>
-                 <span className="text-[11px] font-mono font-bold text-white">-42 dBm</span>
+                 <span className="text-xs font-mono font-bold text-white">-42 dBm</span>
               </div>
             </div>
 
@@ -300,9 +300,9 @@ const ManualControl: React.FC = () => {
             {/* FPV Controls Bar */}
             <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20">
                <div className="flex flex-col gap-2">
-                 <span className="text-[10px] font-mono text-primary font-bold tracking-[0.2em] uppercase">Telemetry Sync</span>
+                 <span className="text-xs font-mono text-primary font-bold tracking-[0.12em] uppercase">Telemetry Sync</span>
                  <div className="text-[32px] font-mono font-bold text-white leading-none">
-                    {shownAltitude.toFixed(1)} <span className="text-sm text-gray-400">m AGL</span>
+                    {shownAltitude.toFixed(1)} <span className="text-sm text-text-secondary">m AGL</span>
                  </div>
                </div>
                
@@ -310,20 +310,20 @@ const ManualControl: React.FC = () => {
                  {isManual && secondsLeft < 120 && extensionsUsed < 3 && (
                    <button 
                     onClick={requestExtension}
-                    className="bg-primary hover:bg-primary/90 text-black font-bold text-[11px] px-6 py-3 rounded-xl transition-all uppercase tracking-widest shadow-xl shadow-primary/20"
+                    className="bg-primary hover:bg-primary/90 text-black font-bold text-xs px-6 py-3 rounded-xl transition-all uppercase tracking-wider shadow-xl shadow-primary/20"
                    >
                      Request Extension (+2m)
                    </button>
                  )}
                  {controlsLocked && (
-                   <span className="self-center text-[10px] font-bold text-gray-300 uppercase tracking-widest">Not available: {blockReason}</span>
+                   <span className="self-center text-xs font-bold text-gray-300 uppercase tracking-wider">Not available: {blockReason}</span>
                  )}
                  <button
                    onClick={() => isManual ? handleReturnToAutonomy() : setIsManual(true)}
                    disabled={controlsLocked}
                    title={lockedTitle}
-                   className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed ${
-                     isManual ? 'bg-danger text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10 disabled:hover:bg-white'
+                   className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl disabled:opacity-70 disabled:cursor-not-allowed ${
+                     isManual ? 'bg-danger-strong text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10 disabled:hover:bg-white'
                    }`}
                  >
                    {isManual ? 'Return to Autonomy' : 'Take Manual Control'}
@@ -343,16 +343,16 @@ const ManualControl: React.FC = () => {
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
                  <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transform translate-y-4 group-active:-translate-y-10 transition-transform duration-300"></div>
               </div>
-              <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Throttle / Yaw</span>
+              <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Throttle / Yaw</span>
             </div>
 
             {/* Center Switch */}
             <div className="flex flex-col items-center gap-6">
                <div className="flex flex-col gap-1 items-center">
-                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Control Mode</span>
+                 <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Control Mode</span>
                  <div className="bg-background/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
-                   <button onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed ${!isManual ? 'bg-primary text-black' : 'text-gray-500 hover:text-white'}`}>Auto</button>
-                   <button onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isManual ? 'bg-amber-500 text-black' : 'text-gray-500 hover:text-white'}`}>Manual</button>
+                   <button onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed ${!isManual ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}>Auto</button>
+                   <button onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed ${isManual ? 'bg-amber-500 text-black' : 'text-text-muted hover:text-white'}`}>Manual</button>
                  </div>
                </div>
                <div className="size-1 bg-white/5 rounded-full"></div>
@@ -365,7 +365,7 @@ const ManualControl: React.FC = () => {
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
                  <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transition-transform group-active:translate-x-4"></div>
               </div>
-              <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Pitch / Roll</span>
+              <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Pitch / Roll</span>
             </div>
           </div>
         </div>
@@ -374,13 +374,13 @@ const ManualControl: React.FC = () => {
       {/* RIGHT SIDEBAR: Detailed Stats & Safety */}
       <aside className="w-80 flex-none flex flex-col gap-6">
         <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
-          <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
           </h2>
           <div className="space-y-6">
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Altitude (AGL)</span>
-              <div className="font-mono text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m</span></div>
+              <div className="font-mono text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-xs text-text-muted uppercase">m</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
               <div className="bg-primary h-full shadow-[0_0_10px_rgba(6,182,212,0.4)] transition-all duration-300" style={{ width: `${(shownAltitude/50)*100}%` }}></div>
@@ -388,7 +388,7 @@ const ManualControl: React.FC = () => {
             
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Ground Speed</span>
-              <div className="font-mono text-amber-500 text-xl font-bold tracking-tight">{shownSpeed.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m/s</span></div>
+              <div className="font-mono text-amber-500 text-xl font-bold tracking-tight">{shownSpeed.toFixed(1)} <span className="text-xs text-text-muted uppercase">m/s</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
               <div className="bg-amber-500 h-full shadow-[0_0_10px_rgba(245,158,11,0.4)] transition-all duration-300" style={{ width: `${(shownSpeed/20)*100}%` }}></div>
@@ -396,11 +396,11 @@ const ManualControl: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                <div className="flex flex-col gap-1">
-                 <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">GPS Locked</span>
+                 <span className="text-xs text-text-muted font-bold uppercase tracking-wider">GPS Locked</span>
                  <span className="text-white font-mono font-bold text-lg">18 Sats</span>
                </div>
                <div className="flex flex-col gap-1">
-                 <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Link Quality</span>
+                 <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Link Quality</span>
                  <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-mono font-bold text-lg`}>{selectedDrone.linkStrength}%</span>
                </div>
             </div>
@@ -408,22 +408,22 @@ const ManualControl: React.FC = () => {
         </div>
 
         <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
-          <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+          <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-4 flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px] text-primary">security</span> Safety Systems
           </h2>
           <div className="space-y-3">
             <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isAirborne && proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
-              <span className={`material-symbols-outlined ${!isAirborne ? 'text-gray-500' : proximity < 5 ? 'text-danger animate-pulse' : 'text-emerald-500'}`}>sensors</span>
+              <span className={`material-symbols-outlined ${!isAirborne ? 'text-text-muted' : proximity < 5 ? 'text-danger-light' : 'text-emerald-500'}`}>sensors</span>
               <div className="flex-1">
-                 <p className="text-[10px] font-bold text-white uppercase tracking-widest">Proximity</p>
-                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">{!isAirborne ? 'Not in flight' : proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
+                 <p className="text-xs font-bold text-white uppercase tracking-wider">Proximity</p>
+                 <p className="text-xs text-text-muted font-medium mt-0.5">{!isAirborne ? 'Not in flight' : proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
               </div>
             </div>
             <div className="p-4 rounded-xl bg-background border border-white/5 flex items-center gap-4">
-              <span className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-gray-500'}`}>public</span>
+              <span className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-text-muted'}`}>public</span>
               <div className="flex-1">
-                 <p className="text-[10px] font-bold text-white uppercase tracking-widest">Geofence Status</p>
-                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">{isAirborne ? 'Clear - Within Perimeter' : 'Not in flight'}</p>
+                 <p className="text-xs font-bold text-white uppercase tracking-wider">Geofence Status</p>
+                 <p className="text-xs text-text-muted font-medium mt-0.5">{isAirborne ? 'Clear - Within Perimeter' : 'Not in flight'}</p>
               </div>
             </div>
           </div>
@@ -432,19 +432,19 @@ const ManualControl: React.FC = () => {
         <div className="flex-1 flex flex-col justify-end bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-danger/5 pointer-events-none"></div>
           <div className="flex items-start gap-3 mb-6 bg-background/60 p-3 rounded-xl border border-white/10">
-             <span className="material-symbols-outlined text-danger text-[18px]">warning</span>
-             <p className="text-[9px] text-gray-400 font-bold uppercase leading-relaxed tracking-tight">
+             <span className="material-symbols-outlined text-danger-light text-[18px]">warning</span>
+             <p className="text-xs text-gray-400 font-bold uppercase leading-relaxed tracking-tight">
                Emergency actions immediately override all mission logic and safety buffers.
              </p>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all">Return Home</button>
-            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all">Hover Lock</button>
+            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-white/5 transition-all">Return Home</button>
+            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-white/5 transition-all">Hover Lock</button>
           </div>
-          <button className="w-full bg-danger text-white font-bold py-4 rounded-xl text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-danger/20 hover:brightness-110 transition-all">
+          <button className="w-full bg-danger-strong text-white font-bold py-4 rounded-xl text-xs uppercase tracking-[0.12em] shadow-xl shadow-danger/20 hover:brightness-110 transition-all">
             EMERGENCY STOP
           </button>
-          <button className="w-full mt-3 bg-background border border-danger/30 text-danger font-bold py-3.5 rounded-xl text-[10px] uppercase tracking-widest hover:bg-danger/10 transition-all">
+          <button className="w-full mt-3 bg-background border border-danger/30 text-danger-light font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-danger/10 transition-all">
             Declare Emergency
           </button>
         </div>
