@@ -1,9 +1,38 @@
 import { PatrolRoute, FleetStatus, Drone } from '../types';
+import type { Point } from './plan';
 import { DRONES, STATUS_LABEL, getDroneByName } from './drones';
 
 // The one shared coverage gap record. The Dashboard tile, briefing line,
 // Header summary and Patrol Routes all read from here.
 export const COVERAGE_GAP = { zone: 'North Storage Wing', minutes: 45 };
+
+// Waypoints of each route on the museum plan (x and y from 0 to 100), in visiting order.
+// The count of each list equals the "waypoints" number on the route card.
+const gallerySweep = (): Point[] => {
+  const xs = [38, 42, 46, 50, 54, 58];
+  return [50, 60, 70, 80].flatMap((y, row) => (row % 2 === 0 ? xs : [...xs].reverse()).map(x => ({ x, y })));
+};
+
+export const ROUTE_WAYPOINTS: Record<string, Point[]> = {
+  // Perimeter Alpha: once round the fence line, between the fence and the building
+  'PR-01': [
+    { x: 4.5, y: 6 }, { x: 30, y: 6 }, { x: 50, y: 6 }, { x: 72, y: 6 }, { x: 95.5, y: 6 }, { x: 95.5, y: 34 },
+    { x: 95.5, y: 63 }, { x: 95.5, y: 93 }, { x: 70, y: 93 }, { x: 30, y: 93 }, { x: 4.5, y: 93 }, { x: 4.5, y: 50 }
+  ],
+  // North Storage Wing: a loop inside the wing
+  'PR-02': [
+    { x: 65, y: 19.5 }, { x: 74, y: 19.5 }, { x: 83, y: 19.5 }, { x: 92, y: 19.5 },
+    { x: 92, y: 25 }, { x: 83, y: 25 }, { x: 74, y: 25 }, { x: 65, y: 25 }
+  ],
+  // Gallery Sweep: four passes through the Grand Gallery
+  'PR-03': gallerySweep()
+};
+
+// The two blind spots the Patrol Routes card counts ("2 Zones")
+export const BLIND_SPOTS: { id: string; label: string; x: number; y: number; w: number; h: number }[] = [
+  { id: 'BS-1', label: 'Blind spot 1', x: 50, y: 10, w: 11, h: 14 },
+  { id: 'BS-2', label: 'Blind spot 2', x: 7, y: 31, w: 10, h: 12 }
+];
 
 export const PATROL_ROUTES: PatrolRoute[] = [
   {

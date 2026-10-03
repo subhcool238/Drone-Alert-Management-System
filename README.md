@@ -53,6 +53,12 @@ npm run deploy
 
 This builds the app and publishes the `dist` folder to the `gh-pages` branch.
 
+## Museum floor plan
+
+The Dashboard map (2D and an isometric 3D view) and the Patrol Routes map are drawn from one shared floor plan, `components/MuseumPlan.tsx`, with its geometry in `data/plan.ts`. Drone, incident and route-waypoint positions are x and y values (0 to 100) in the data files. The 3D view is plain SVG, no 3D library.
+
+**Prototype-level.** The flowchart does not define any of the following, so treat them as illustrative: the floor plan itself (room shapes and positions, doorways, the courtyard and fence), the camera and motion sensor icons, the six charging dock bays and which bay each docked drone sits in, every drone's and incident's position, the waypoint positions of the three routes, the two blind-spot zones, and the drone heights in 3D (12.4 m for Active drones, 0 for the rest). The photos (drone, gallery feed, courtyard feed) are stand-in images.
+
 ## About the data
 
 All alerts, drones, confidence scores and incidents are simulated sample data. Nothing is connected to real systems.

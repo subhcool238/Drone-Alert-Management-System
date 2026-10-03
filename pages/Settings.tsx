@@ -412,7 +412,7 @@ const Settings: React.FC = () => {
         </nav>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+      <div tabIndex={0} role="region" aria-label="Settings content" className="flex-1 overflow-y-auto p-8 custom-scrollbar">
         <Routes>
           <Route index element={<Navigate to="roles" replace />} />
           <Route path="roles" element={<RolesAndPermissions />} />

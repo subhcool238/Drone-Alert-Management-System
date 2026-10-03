@@ -1,7 +1,8 @@
 import { Drone, FleetStatus, RiskLevel } from '../types';
+import { DRONE_IMAGE } from './images';
 
-// Using a consistent high-quality drone image that matches the requested aesthetic
-export const UNIFIED_DRONE_IMAGE = 'https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&q=80&w=800';
+// One drone photo for the whole fleet (assets/images)
+export const UNIFIED_DRONE_IMAGE = DRONE_IMAGE;
 
 // Single source of truth for the fleet. Every screen reads from this list.
 export const DRONES: Drone[] = [
@@ -25,7 +26,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '4h 12m',
     avgSpeed: 4.2,
     anomalies: ['All systems nominal', 'Vibration within threshold'],
-    nextServiceHours: 124
+    nextServiceHours: 124,
+    x: 4.5, y: 42, altitude: 12.4 // Perimeter Alpha, west side
   },
   {
     id: 'D-004',
@@ -47,7 +49,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '1h 20m',
     avgSpeed: 4.0,
     anomalies: ['All systems nominal', 'Vibration within threshold'],
-    nextServiceHours: 210
+    nextServiceHours: 210,
+    x: 66, y: 73, altitude: 0 // dock bay 1
   },
   {
     id: 'D-005',
@@ -69,7 +72,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '3h 40m',
     avgSpeed: 4.1,
     anomalies: ['All systems nominal', 'Charge rate within threshold'],
-    nextServiceHours: 160
+    nextServiceHours: 160,
+    x: 89, y: 73, altitude: 0 // dock bay 3, charging
   },
   {
     id: 'D-006',
@@ -91,7 +95,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '3h 05m',
     avgSpeed: 4.3,
     anomalies: ['All systems nominal', 'Gimbal calibration within threshold'],
-    nextServiceHours: 140
+    nextServiceHours: 140,
+    x: 48, y: 28, altitude: 12.4 // North Courtyard
   },
   {
     id: 'D-002',
@@ -113,7 +118,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '2h 05m',
     avgSpeed: 3.8,
     anomalies: ['Lens calibration requested', 'Minor GPS drift detected'],
-    nextServiceHours: 12
+    nextServiceHours: 12,
+    x: 80, y: 84, altitude: 0 // dock bay 5
   },
   {
     id: 'D-003',
@@ -135,7 +141,8 @@ export const DRONES: Drone[] = [
     flightTimeToday: '8h 44m',
     avgSpeed: 12.5,
     anomalies: ['Battery cell degradation', 'Telemetry link failure'],
-    nextServiceHours: 0
+    nextServiceHours: 0,
+    x: 32.5, y: 70, altitude: 0 // last known position, West Corridor
   }
 ];
 

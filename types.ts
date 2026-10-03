@@ -52,6 +52,8 @@ export interface Incident {
   isCarriedOver?: boolean;
   previousOwner?: string;
   handoverNote?: string;
+  x?: number; // position on the museum plan, 0 to 100
+  y?: number;
   evidence?: {
     type: 'video' | 'image' | 'log';
     url: string;
@@ -80,6 +82,9 @@ export interface Drone {
   avgSpeed: number;
   anomalies: string[];
   nextServiceHours: number;
+  x: number; // position on the museum plan, 0 to 100
+  y: number;
+  altitude: number; // metres above the floor
 }
 
 export interface PatrolRoute {

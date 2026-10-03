@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Button from '../components/Button';
 import { clickableProps } from '../components/a11y';
 import ModalOverlay from '../components/ModalOverlay';
+import { GALLERY_FEED } from '../data/images';
 import { announce } from '../components/LiveAnnouncer';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
@@ -266,7 +267,7 @@ const ManualControl: React.FC = () => {
           <div className="relative flex-1 bg-black w-full h-full overflow-hidden group">
             <div 
               className="absolute inset-0 bg-cover bg-center grayscale brightness-[0.3] transition-all duration-1000 group-hover:brightness-[0.35]" 
-              style={{ backgroundImage: "url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=1200')" }}
+              style={{ backgroundImage: `url('${GALLERY_FEED}')` }}
             ></div>
             
             {/* HUD Elements */}

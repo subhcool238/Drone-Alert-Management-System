@@ -1,11 +1,13 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Button from '../components/Button';
+import MuseumPlan, { PlanMarker, LegendItem } from '../components/MuseumPlan';
 import { clickableProps } from '../components/a11y';
 import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
-import { countByStatus, getFleetBatteryAvg } from '../data/drones';
-import { COVERAGE_GAP, getCoverageGapCount } from '../data/patrols';
+import { DRONES, STATUS_LABEL, countByStatus, getFleetBatteryAvg } from '../data/drones';
+import { placeAt } from '../data/plan';
+import { COVERAGE_GAP, PATROL_ROUTES, ROUTE_WAYPOINTS, getCoverageGapCount } from '../data/patrols';
 import { COLORS } from '../data/theme';
 import { formatScenarioTime, formatAgo } from '../data/clock';
 import { getOpenIncidents, getElapsed, getSlaState, useSecondsSinceLoad, formatSla, getSlaUrgency } from '../data/incidents';
@@ -19,27 +21,11 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'feed' | 'status' | 'patrols' | 'guards'>('feed');
   const [mapMode, setMapMode] = useState<'2D' | '3D'>('2D');
 
-  // The 2D map is an SVG scaled to its box. Measure the scale so the room labels render at a
-  // readable 12px on screen whatever the window size (label size in SVG units = 12.5px / scale).
-  const mapSvgRef = useRef<SVGSVGElement>(null);
-  const [mapScale, setMapScale] = useState(0.85);
-  useEffect(() => {
-    const svg = mapSvgRef.current;
-    if (mapMode !== '2D' || !svg) return;
-    const update = () => {
-      const r = svg.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) setMapScale(Math.min(r.width / 800, r.height / 500));
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(svg);
-    return () => ro.disconnect();
-  }, [mapMode]);
-  const mapLabelSize = Math.ceil(12.5 / mapScale);
   const [viewMode, setViewMode] = useState<'default' | 'thermal'>('default');
   const [selectedAlertId, setSelectedAlertId] = useState<string | null>('INC-2025-082');
   const [showShiftHandover, setShowShiftHandover] = useState(false);
   const [patrolsPaused, setPatrolsPaused] = useState(false);
+  const [selectedDroneId, setSelectedDroneId] = useState<string | null>(null);
   
   // Filters
   const [severityFilter, setSeverityFilter] = useState('All');
@@ -116,6 +102,51 @@ const Dashboard: React.FC = () => {
       </span>
     );
   };
+
+  // Markers on the museum plan: every drone by status, and the open incidents shown in the live alerts list
+  const DRONE_MARKER: Record<FleetStatus, { tone: PlanMarker['tone']; icon: string }> = {
+    [FleetStatus.ACTIVE]: { tone: 'active', icon: 'flight' },
+    [FleetStatus.IDLE]: { tone: 'idle', icon: 'dock' },
+    [FleetStatus.CHARGING]: { tone: 'charging', icon: 'battery_charging_full' },
+    [FleetStatus.FAULT]: { tone: 'fault', icon: 'warning' }
+  };
+  const planMarkers: PlanMarker[] = [
+    ...DRONES.map(d => ({
+      id: d.id,
+      kind: 'drone' as const,
+      x: d.x, y: d.y, altitude: d.altitude,
+      label: d.name,
+      icon: DRONE_MARKER[d.status].icon,
+      tone: DRONE_MARKER[d.status].tone,
+      ariaLabel: `${d.name}, ${STATUS_LABEL[d.status]}, ${d.battery} percent battery, ${placeAt(d.x, d.y)}`,
+      selected: selectedDroneId === d.id,
+      labelSide: (d.name === 'Watcher-3' || d.name === 'Surveyor-X' || d.name === 'Sentinel-1' ? 'right' : 'below') as 'right' | 'below',
+      onSelect: () => setSelectedDroneId(d.id)
+    })),
+    ...filteredAlerts.map(a => ({
+      id: a.id,
+      kind: 'incident' as const,
+      x: a.x ?? 50, y: a.y ?? 50,
+      label: a.id,
+      badge: a.priority,
+      tone: (a.priority ? a.priority.toLowerCase() : 'p4') as PlanMarker['tone'],
+      ariaLabel: `${a.id}, ${a.priority}, ${a.severity.charAt(0) + a.severity.slice(1).toLowerCase()}, ${a.title}, ${a.location}`,
+      pulse: true,
+      labelSide: ((a.x ?? 50) > 60 ? 'right' : 'below') as 'right' | 'below',
+      selected: selectedAlertId === a.id,
+      onSelect: () => setSelectedAlertId(a.id)
+    }))
+  ];
+  const perimeterRoute = { name: PATROL_ROUTES[0].name, points: ROUTE_WAYPOINTS[PATROL_ROUTES[0].id] };
+  const planLegend: LegendItem[] = [
+    { label: 'Active', swatch: { icon: 'flight', className: 'text-primary' } },
+    { label: 'Idle (dock)', swatch: { icon: 'dock', className: 'text-gray-200' } },
+    { label: 'Charging', swatch: { icon: 'battery_charging_full', className: 'text-caution' } },
+    { label: 'Fault', swatch: { icon: 'warning', className: 'text-danger-light' } },
+    { label: 'Incident P1 P2 P3', swatch: { boxes: ['bg-danger-strong', 'bg-warning', 'bg-caution'] } },
+    { label: 'Coverage gap', swatch: 'hatch' },
+    { label: 'Perimeter Alpha', swatch: 'dash' }
+  ];
 
   return (
     <div className="grid grid-cols-12 gap-5 h-full overflow-hidden p-1 relative">
@@ -255,80 +286,23 @@ const Dashboard: React.FC = () => {
       <div className="col-span-6 flex flex-col gap-5 relative h-full min-h-0 overflow-hidden">
         <div className="relative flex-1 bg-panel rounded-2xl overflow-hidden border border-white/5 group shadow-inner">
           
-          {/* Dynamic Map Background */}
+          {/* Dynamic Map Background: the shared museum plan, flat (2D) or isometric (3D) */}
           {mapMode === '2D' ? (
-            <div className="absolute inset-0 bg-background flex items-center justify-center p-8 overflow-hidden">
+            <div className="absolute inset-0 bg-background overflow-hidden">
               {/* Technical Grid Blueprint */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-              <svg ref={mapSvgRef} className="w-full h-full text-primary/30" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 50 H750 V450 H50 Z" stroke="currentColor" strokeWidth="2" strokeDasharray="10 5"/>
-                <path d="M200 50 V450 M400 50 V450 M600 50 V450 M50 200 H750 M50 300 H750" stroke="currentColor" strokeWidth="1" strokeOpacity="0.2"/>
-                
-                {/* Detailed Hall Outlines */}
-                <g className="text-primary/10">
-                  <rect x="70" y="70" width="120" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="130" y={70 + mapLabelSize * 1.5} textAnchor="middle" fill={COLORS.textMuted} fontSize={mapLabelSize} fontWeight="bold"><tspan x="130" dy={0}>GRAND</tspan><tspan x="130" dy={mapLabelSize * 1.15}>GALLERY</tspan></text>
-                  
-                  <rect x="250" y="70" width="300" height="200" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="400" y={70 + mapLabelSize * 1.5} textAnchor="middle" fill={COLORS.textMuted} fontSize={mapLabelSize} fontWeight="bold"><tspan x="400" dy={0}>NORTH</tspan><tspan x="400" dy={mapLabelSize * 1.15}>COURTYARD</tspan></text>
-                  
-                  <rect x="620" y="70" width="110" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="675" y={70 + mapLabelSize * 1.5} textAnchor="middle" fill={COLORS.textMuted} fontSize={mapLabelSize} fontWeight="bold"><tspan x="675" dy={0}>EAST</tspan><tspan x="675" dy={mapLabelSize * 1.15}>WING</tspan></text>
-                  
-                  <rect x="70" y="320" width="300" height="110" stroke="currentColor" fill="currentColor" fillOpacity="0.03" />
-                  <text x="220" y={320 + mapLabelSize * 1.5} textAnchor="middle" fill={COLORS.textMuted} fontSize={mapLabelSize} fontWeight="bold"><tspan x="220" dy={0}>STORAGE</tspan><tspan x="220" dy={mapLabelSize * 1.15}>WING A</tspan></text>
-                </g>
-                
-                <circle cx="400" cy="250" r="100" stroke="currentColor" strokeDasharray="5 5" strokeOpacity="0.3" />
-              </svg>
+              <MuseumPlan mode="2D" markers={planMarkers} route={perimeterRoute} legend={planLegend} />
             </div>
           ) : (
-            <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
-               {/* Simulated Internal 3D View (Fisheye/Perspective) */}
-               <img 
-                 className={`w-full h-full object-cover transition-all duration-700 scale-110 ${viewMode === 'thermal' ? 'brightness-125 hue-rotate-180 invert' : 'opacity-60 grayscale'}`} 
-                 src="https://images.unsplash.com/photo-1544641974-98c49539304f?auto=format&fit=crop&q=80&w=1200" 
-                 alt="Internal Gallery View" 
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40"></div>
+            <div className="absolute inset-0 bg-black overflow-hidden">
+              <MuseumPlan
+                mode="3D"
+                markers={planMarkers}
+                route={perimeterRoute}
+                legend={planLegend}
+                drawingClassName={`transition-all duration-700 ${viewMode === 'thermal' ? 'brightness-125 hue-rotate-180 invert' : ''}`}
+              />
                
-               {/* HUD Overlays for 3D Drone View */}
-               <div className="absolute inset-0 pointer-events-none p-8 flex flex-col justify-between z-10">
-                  <div className="flex justify-between border-t-2 border-primary/20 pt-4">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-mono text-primary font-bold">MODE: PERSPECTIVE_INT</span>
-                      <span className="text-xs font-mono text-primary font-bold">LENS: 14MM_FISHEYE</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs font-mono text-primary font-bold">LAT: 48.8606° N</span>
-                      <span className="text-xs font-mono text-primary font-bold">LON: 2.3376° E</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="relative size-48 flex items-center justify-center">
-                       <div className="absolute inset-0 border border-primary/10 rounded-full animate-pulse"></div>
-                       <div className="w-24 h-px bg-primary/40"></div>
-                       <div className="h-24 w-px bg-primary/40 absolute"></div>
-                       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 text-xs font-mono text-primary">0°</div>
-                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 text-xs font-mono text-primary">180°</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between border-b-2 border-primary/20 pb-4">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-mono text-primary font-bold uppercase tracking-wider">Signal Locked</span>
-                      <span className="text-[12px] font-mono text-primary font-bold">042° NW</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs font-mono text-primary font-bold uppercase tracking-wider">Stabilized</span>
-                      <span className="text-[12px] font-mono text-primary font-bold">AGL 3.2M</span>
-                    </div>
-                  </div>
-               </div>
-               
-               {/* Scanning Line Effect */}
-               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent h-20 w-full animate-scan pointer-events-none"></div>
             </div>
           )}
 
@@ -349,31 +323,6 @@ const Dashboard: React.FC = () => {
              </Button>
           </div>
 
-          {/* Markers */}
-          {mapLayers.drones && (
-             <div tabIndex={0} role="img" aria-label="Sentinel-1, status: mission active" className="absolute top-[35%] left-[40%] z-20 flex flex-col items-center group cursor-pointer transition-transform hover:scale-110 focus-visible:scale-110">
-                <span aria-hidden="true" className="material-symbols-outlined text-primary text-2xl rotate-45 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">flight</span>
-                <div className="bg-background/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 group-focus-visible:scale-100 transition-transform origin-top min-w-[120px]">
-                   <p className="text-xs font-black text-white uppercase truncate tracking-wider">Sentinel-1</p>
-                   <p className="text-xs text-primary font-bold mt-0.5 uppercase tracking-tighter">Status: MISSION_ACTIVE</p>
-                </div>
-             </div>
-          )}
-
-          {/* Incident Overlay Markers */}
-          {filteredAlerts.map((alert, i) => {
-             const coords = [{ t: '25%', l: '65%' }, { t: '15%', l: '25%' }, { t: '65%', l: '75%' }][i] || { t: '50%', l: '50%' };
-             return (
-               <div key={alert.id} tabIndex={0} role="img" aria-label={`${alert.priority} ${alert.title}, ${alert.location}`} className="absolute z-20 group transition-all" style={{ top: coords.t, left: coords.l }}>
-                 <div className={`size-4 rounded-full border-2 bg-black animate-ping absolute -top-2 -left-2 ${alert.priority === 'P1' ? 'border-danger' : 'border-primary'}`}></div>
-                 <span aria-hidden="true" className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-danger-light' : 'text-primary'}`}>location_on</span>
-                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">
-                    <p className="text-xs font-black text-white uppercase bg-danger/10 px-2 py-0.5 rounded w-fit mb-1">{alert.priority}</p>
-                    <p className="text-xs font-bold text-gray-200">{alert.title}</p>
-                 </div>
-               </div>
-             );
-          })}
         </div>
 
         {/* Live Logs / Tabs */}

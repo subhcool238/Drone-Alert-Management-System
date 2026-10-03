@@ -4,7 +4,8 @@ import Button from '../components/Button';
 import { clickableProps } from '../components/a11y';
 import { PatrolRoute } from '../types';
 import { COLORS } from '../data/theme';
-import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
+import { PATROL_ROUTES, COVERAGE_GAP, ROUTE_WAYPOINTS, BLIND_SPOTS, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
+import MuseumPlan from '../components/MuseumPlan';
 
 const PatrolRoutes: React.FC = () => {
   const [routes, setRoutes] = useState<PatrolRoute[]>(PATROL_ROUTES);
@@ -118,7 +119,7 @@ const PatrolRoutes: React.FC = () => {
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-lg font-bold uppercase tracking-wide ${
                   route.status === 'ACTIVE' ? 'bg-primary text-black' : 
-                  route.status === 'SCHEDULED' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-text-muted'
+                  route.status === 'SCHEDULED' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-white/5 text-text-muted'
                 }`}>
                   {route.status}
                 </span>
@@ -201,10 +202,14 @@ const PatrolRoutes: React.FC = () => {
           </div>
 
           {/* Tactical Map Visualization */}
-          <div className="w-full h-[500px] bg-panel rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl group">
-            <div className="absolute inset-0 grayscale opacity-40 mix-blend-screen contrast-125">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMpS8VcPMFhpUzqs9ZGZChCwCHQ2g_YI0PWfxlgl-wqonY1w1eUh4eU2egEZH6c-dt6E0bmaePV9vJEH247xA11fyHmzQfRuEaUttE3kzyZhHYKBEA7Wi78uwt7p0UnWBb84lyHakzVhSH5TZjTnc8PRRbLhd8S8RKEKbGjLyJHkffu6OsIOkPuFjLW_SsDrnNP4DsG9Dmr3dnOPHX-84esX-PFny9rvN6wMSshNizEfSIr3L4Fm3lY93DdoPGCRV4-_9w8uqzCvA" className="w-full h-full object-cover" alt="Satellite Layout" />
-            </div>
+          <div className="w-full h-[740px] bg-panel rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl group">
+            {/* Museum floor plan: selected route with numbered waypoints, the coverage gap and the blind spots */}
+            <MuseumPlan
+              mode="2D"
+              route={{ name: selectedRoute.name, points: ROUTE_WAYPOINTS[selectedRoute.id] || [], numbered: true }}
+              blindSpots={BLIND_SPOTS}
+              insets={{ top: 164, bottom: 160 }}
+            />
 
             {/* Overlays */}
             <div className="absolute top-8 left-8 z-20 flex flex-col gap-3">
@@ -223,39 +228,7 @@ const PatrolRoutes: React.FC = () => {
               </div>
             </div>
 
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible p-20">
-              {/* Path */}
-              <polyline 
-                points="200,400 400,300 800,350 1000,100 600,150 200,400" 
-                fill="none" 
-                stroke={COLORS.primary} 
-                strokeWidth="3" 
-                strokeDasharray="10 6" 
-                strokeLinecap="round" 
-                className="opacity-40"
-              />
-              
-              {/* Blind Spot Region */}
-              <rect x="700" y="250" width="120" height="120" fill="rgba(239, 68, 68, 0.05)" stroke="rgba(239, 68, 68, 0.2)" strokeDasharray="5 5" strokeWidth="2" className="animate-pulse" />
-              <text x="760" y="320" textAnchor="middle" fill={COLORS.dangerLight} fontSize="13" fontWeight="bold" className="uppercase tracking-wider">Gap &gt;30m</text>
-
-              {/* Numbered Waypoints */}
-              {[
-                { x: 400, y: 300, n: 1 },
-                { x: 800, y: 350, n: 2 },
-                { x: 1000, y: 100, n: 3 },
-                { x: 600, y: 150, n: 4 }
-              ].map(p => (
-                <g key={p.n} transform={`translate(${p.x}, ${p.y})`}>
-                  <circle r="14" fill={COLORS.panel} stroke={COLORS.primary} strokeWidth="2" />
-                  <text y="4" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold">{p.n}</text>
-                </g>
-              ))}
-
-              {/* Drone Position */}
-              <circle cx="900" cy="225" r="18" fill={COLORS.primary} className="animate-pulse shadow-xl" />
-              <path d="M895 220 L905 230 M905 220 L895 230" stroke="white" strokeWidth="2" />
-            </svg>
+            
 
             {/* Bottom Metrics Overlay */}
             <div className="absolute bottom-8 right-8 z-20 flex gap-4">

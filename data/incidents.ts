@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Incident, ThreatType } from '../types';
 import { SLA_SECONDS, formatSlaTier } from './sla';
+import { GALLERY_FEED, COURTYARD_FEED } from './images';
 
 // Single source of truth for incidents. The sidebar badge, Dashboard live alerts,
 // Header briefing and Incidents page all read from this list.
@@ -20,6 +21,7 @@ export const INCIDENTS: Incident[] = [
     severity: 'CRITICAL',
     status: 'Investigating',
     location: 'Storage Area B (North)',
+    x: 66, y: 40,
     slaLimit: SLA_SECONDS.CRITICAL,
     elapsed: 12,
     respondedBy: 'Isabelle M.',
@@ -34,8 +36,8 @@ export const INCIDENTS: Incident[] = [
       { time: '02:37:00', event: 'Operator Acknowledged', details: 'Assigned to Sentinel-1', type: 'action' }
     ],
     evidence: [
-      { type: 'video', url: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80&w=400', caption: 'FPV Sector B' },
-      { type: 'image', url: 'https://images.unsplash.com/photo-1551817958-c5b5d1b74a33?auto=format&fit=crop&q=80&w=400', caption: 'Snapshot 02:36:50' }
+      { type: 'video', url: GALLERY_FEED, caption: 'FPV Sector B' },
+      { type: 'image', url: COURTYARD_FEED, caption: 'Snapshot 02:36:50' }
     ]
   },
   {
@@ -48,6 +50,7 @@ export const INCIDENTS: Incident[] = [
     severity: 'HIGH',
     status: 'Investigating',
     location: 'Watcher-3 @ East Wing',
+    x: 68, y: 58,
     slaLimit: SLA_SECONDS.HIGH,
     elapsed: 25,
     respondedBy: 'System',
@@ -70,6 +73,7 @@ export const INCIDENTS: Incident[] = [
     severity: 'MEDIUM',
     status: 'Investigating',
     location: 'Server Room 4',
+    x: 18, y: 62,
     slaLimit: SLA_SECONDS.MEDIUM,
     elapsed: 50,
     respondedBy: 'System',
@@ -90,6 +94,7 @@ export const INCIDENTS: Incident[] = [
     severity: 'MEDIUM',
     status: 'Resolved',
     location: 'Sector 4',
+    x: 18, y: 81,
     slaLimit: SLA_SECONDS.MEDIUM,
     elapsed: 300,
     respondedBy: 'Auto-dispatch',
@@ -109,6 +114,7 @@ export const INCIDENTS: Incident[] = [
     severity: 'LOW',
     status: 'Closed',
     location: 'Main Gate',
+    x: 48, y: 97,
     slaLimit: SLA_SECONDS.LOW,
     elapsed: 1100,
     respondedBy: 'System Admin',
