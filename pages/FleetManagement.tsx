@@ -374,7 +374,7 @@ const FleetManagement: React.FC = () => {
                 <div className="flex flex-col">
                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">{stat.label}</span>
                   <div className="flex items-baseline gap-2">
-                    <h3 className="text-4xl font-display font-bold text-white tracking-tighter">{stat.val}</h3>
+                    <h3 className="text-4xl font-mono font-bold text-white tracking-tighter">{stat.val}</h3>
                     <span className="text-[11px] text-gray-600 font-bold uppercase tracking-widest">{stat.unit}</span>
                   </div>
                 </div>

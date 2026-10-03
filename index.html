@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FlytBase Security Ops</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <script>
         window.tailwind.config = {
@@ -24,8 +23,9 @@
                         "text-muted": "#94a3b8"
                     },
                     fontFamily: {
-                        display: ["Space Grotesk", "sans-serif"],
-                        body: ["Inter", "sans-serif"]
+                        sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+                        display: ['"Space Grotesk Variable"', '"Space Grotesk"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono Variable"', '"JetBrains Mono"', 'ui-monospace', 'monospace']
                     },
                     animation: {
                         'scan': 'scan 3s linear infinite',
@@ -50,11 +50,13 @@
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .fill-1 { font-variation-settings: 'FILL' 1; }
+        /* Digits keep a fixed width so ticking values do not jump */
+        .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
         .custom-scrollbar::-webkit-scrollbar { width: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
     </style>
 </head>
-<body>
+<body class="bg-background text-gray-100 font-sans text-sm antialiased">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
 </body>

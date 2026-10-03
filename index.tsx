@@ -1,6 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/space-grotesk/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

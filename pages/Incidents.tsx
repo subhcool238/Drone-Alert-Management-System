@@ -198,7 +198,7 @@ const Incidents: React.FC = () => {
                   className="hover:bg-white/5 transition-colors cursor-pointer group"
                 >
                   <td className="px-6 py-5">
-                    <div className="font-bold text-white mb-1">{inc.id}</div>
+                    <div className="font-bold font-mono text-white mb-1">{inc.id}</div>
                     <div className="text-gray-600 font-mono text-[10px]">{inc.timestamp}</div>
                   </td>
                   <td className="px-6 py-5">
@@ -438,7 +438,7 @@ const Incidents: React.FC = () => {
             <div className="p-10 border-b border-white/5 flex justify-between items-start bg-background/20">
                <div className="flex-1 pr-10">
                   <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-4xl font-display font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
+                    <h2 className="text-4xl font-mono font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
                     <span className={`px-4 py-1 rounded-full text-[10px] font-bold border ${
                       selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger' : 'bg-primary/10 border-primary/30 text-primary'
                     }`}>{selectedIncident.severity}</span>

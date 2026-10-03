@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
                         <span className="material-symbols-outlined text-[16px]">reply</span>
                         {alert.assignedTo || 'Unassigned'}
                       </span>
-                      <span className="text-gray-600 font-medium">{alert.detectedSecondsBeforeLoad !== undefined ? formatAgo(alert.detectedSecondsBeforeLoad + secondsSinceLoad) : alert.timestamp}</span>
+                      <span className="text-gray-600 font-medium font-mono">{alert.detectedSecondsBeforeLoad !== undefined ? formatAgo(alert.detectedSecondsBeforeLoad + secondsSinceLoad) : alert.timestamp}</span>
                     </div>
                   </div>
                 );

@@ -224,7 +224,7 @@ const ManualControl: React.FC = () => {
               }`}>
                 {isManual ? 'warning' : (statusBanner ? statusBanner.icon : 'smart_toy')}
               </span>
-              <span className={`font-bold text-[10px] tracking-[0.15em] uppercase ${
+              <span className={`font-bold tabular-nums text-[10px] tracking-[0.15em] uppercase ${
                 !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger' : 'text-warning'
               }`}>
                 {!isManual ? (statusBanner ? statusBanner.text : 'Mode: Autonomous – Flight path controlled by mission plan') :
@@ -271,7 +271,7 @@ const ManualControl: React.FC = () => {
 
             {/* Overlays */}
             <div className="absolute top-8 left-8 flex flex-col gap-1 z-20">
-              <div className="text-[12px] font-display font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
+              <div className="text-[12px] font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
               <div className="flex gap-3 text-[9px] font-mono text-white/60 font-bold uppercase tracking-widest">
                 <span>4K @ 60FPS</span>
                 <span>ISO 400</span>
@@ -301,7 +301,7 @@ const ManualControl: React.FC = () => {
             <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20">
                <div className="flex flex-col gap-2">
                  <span className="text-[10px] font-mono text-primary font-bold tracking-[0.2em] uppercase">Telemetry Sync</span>
-                 <div className="text-[32px] font-display font-bold text-white leading-none">
+                 <div className="text-[32px] font-mono font-bold text-white leading-none">
                     {shownAltitude.toFixed(1)} <span className="text-sm text-gray-400">m AGL</span>
                  </div>
                </div>
@@ -380,7 +380,7 @@ const ManualControl: React.FC = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Altitude (AGL)</span>
-              <div className="font-display text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m</span></div>
+              <div className="font-mono text-white text-xl font-bold tracking-tight">{shownAltitude.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
               <div className="bg-primary h-full shadow-[0_0_10px_rgba(6,182,212,0.4)] transition-all duration-300" style={{ width: `${(shownAltitude/50)*100}%` }}></div>
@@ -388,7 +388,7 @@ const ManualControl: React.FC = () => {
             
             <div className="flex justify-between items-end">
               <span className="text-xs text-gray-400 font-medium">Ground Speed</span>
-              <div className="font-display text-amber-500 text-xl font-bold tracking-tight">{shownSpeed.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m/s</span></div>
+              <div className="font-mono text-amber-500 text-xl font-bold tracking-tight">{shownSpeed.toFixed(1)} <span className="text-[10px] text-gray-500 uppercase">m/s</span></div>
             </div>
             <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-white/5">
               <div className="bg-amber-500 h-full shadow-[0_0_10px_rgba(245,158,11,0.4)] transition-all duration-300" style={{ width: `${(shownSpeed/20)*100}%` }}></div>
@@ -397,11 +397,11 @@ const ManualControl: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                <div className="flex flex-col gap-1">
                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">GPS Locked</span>
-                 <span className="text-white font-display font-bold text-lg">18 Sats</span>
+                 <span className="text-white font-mono font-bold text-lg">18 Sats</span>
                </div>
                <div className="flex flex-col gap-1">
                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Link Quality</span>
-                 <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-display font-bold text-lg`}>{selectedDrone.linkStrength}%</span>
+                 <span className={`${linkQualityColor(selectedDrone.linkStrength)} font-mono font-bold text-lg`}>{selectedDrone.linkStrength}%</span>
                </div>
             </div>
           </div>
