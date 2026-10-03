@@ -54,7 +54,7 @@ const PatrolRoutes: React.FC = () => {
   return (
     <div className="flex h-full gap-0 -m-6 overflow-hidden bg-background">
       {/* LEFT SIDEBAR: Route Library */}
-      <aside className="w-[400px] flex flex-col border-r border-white/5 bg-panel shrink-0 z-30 shadow-2xl">
+      <section aria-label="Route library" className="w-[400px] flex flex-col border-r border-white/5 bg-panel shrink-0 z-30 shadow-2xl">
         <div className="p-8 pb-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Route Library</h2>
@@ -66,6 +66,7 @@ const PatrolRoutes: React.FC = () => {
             <input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search routes"
               className="w-full bg-background border border-white/10 rounded-xl py-3 pl-12 pr-4 text-[12px] text-white focus:border-primary/50 placeholder-text-muted outline-none transition-all" 
               placeholder="Search routes..." 
             />
@@ -73,6 +74,7 @@ const PatrolRoutes: React.FC = () => {
 
           <div className="relative mb-6">
             <select 
+              aria-label="Time scope"
               value={timeScope}
               onChange={e => setTimeScope(e.target.value)}
               className="w-full appearance-none bg-background border border-white/10 text-gray-400 text-xs font-bold rounded-xl px-4 py-3 uppercase tracking-wider outline-none cursor-pointer focus:border-primary/30"
@@ -87,7 +89,7 @@ const PatrolRoutes: React.FC = () => {
                <span className="text-xs text-white font-bold uppercase tracking-tight">Show Coverage Gaps</span>
                <span className="text-xs text-text-muted font-bold uppercase tracking-wider mt-0.5">Highlight &gt;30m Unpatrolled</span>
              </div>
-             <Button variant="toggle" role="switch" aria-checked={showGapsOnly} 
+             <Button variant="toggle" role="switch" aria-label="Show coverage gaps" aria-checked={showGapsOnly} 
  onClick={() => setShowGapsOnly(!showGapsOnly)}
  className={`h-6 w-11 ${showGapsOnly ? 'bg-primary' : 'bg-white/10'}`}>
                 <span className={`inline-block size-4 transform rounded-full bg-white transition-transform ${showGapsOnly ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -157,16 +159,16 @@ const PatrolRoutes: React.FC = () => {
             </div>
           ))}
         </div>
-      </aside>
+      </section>
 
       {/* MAIN CONTENT: Tactical Map & Editor */}
-      <main className="flex-1 flex flex-col bg-background relative overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col bg-background relative overflow-y-auto custom-scrollbar">
         <div className="p-12 max-w-[1500px] mx-auto w-full flex flex-col gap-10">
           
           <div className="flex flex-wrap justify-between items-start gap-4">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-4 mb-4">
-                <h1 className="text-6xl font-display font-bold text-white tracking-tighter">{selectedRoute.name}</h1>
+                <h2 className="text-6xl font-display font-bold text-white tracking-tighter">{selectedRoute.name}</h2>
                 <div className="flex gap-2">
                   <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all ${
                     selectedRoute.type === 'Emergency' ? 'bg-danger/10 border-danger/30 text-danger-light' : 'bg-primary/10 border-primary/30 text-primary'
@@ -207,7 +209,7 @@ const PatrolRoutes: React.FC = () => {
             {/* Overlays */}
             <div className="absolute top-8 left-8 z-20 flex flex-col gap-3">
               <div className="bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl shadow-2xl w-64">
-                <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Tactical Overlays</h4>
+                <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Tactical Overlays</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs text-white">
                     <span className="flex items-center gap-2"><span className="size-2 rounded-full bg-primary"></span> Waypoints</span>
@@ -435,7 +437,7 @@ const PatrolRoutes: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* FOOTER ACTIONS - Floating */}
       <div className="fixed bottom-10 right-10 z-[60] flex gap-3">

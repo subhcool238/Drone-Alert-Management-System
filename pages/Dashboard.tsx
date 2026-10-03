@@ -120,13 +120,14 @@ const Dashboard: React.FC = () => {
       <div className="col-span-3 flex flex-col gap-5 h-full min-h-0">
         <div className="bg-panel border border-white/5 rounded-2xl p-4 flex flex-col gap-5 shadow-sm shrink-0">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em]">Tactical Controls</h3>
+            <h2 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em]">Tactical Controls</h2>
             <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-text-muted cursor-pointer hover:text-white transition-colors">tune</span>
           </div>
           
           <div className="grid grid-cols-2 gap-2">
             <div className="relative">
               <select 
+                aria-label="Filter alerts by severity"
                 value={severityFilter} 
                 onChange={e => setSeverityFilter(e.target.value)}
                 className="w-full appearance-none bg-background text-xs text-gray-300 border border-white/10 rounded-xl pl-2.5 pr-7 py-2.5 tracking-tight outline-none focus:border-primary/50 transition-all cursor-pointer"
@@ -140,6 +141,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="relative">
               <select 
+                aria-label="Filter alerts by threat type"
                 value={threatFilter}
                 onChange={e => setThreatFilter(e.target.value)}
                 className="w-full appearance-none bg-background text-xs text-gray-300 border border-white/10 rounded-xl pl-2.5 pr-7 py-2.5 tracking-tight outline-none focus:border-primary/50 transition-all cursor-pointer"
@@ -181,7 +183,7 @@ const Dashboard: React.FC = () => {
           <div className={`flex flex-col gap-4 h-full pt-${isMultiIncidentMode ? '10' : '0'}`}>
             <div className="flex items-center justify-between mb-1 shrink-0 px-1">
               <div className="flex items-center gap-3">
-                <h3 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Live Alerts</h3>
+                <h2 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Live Alerts</h2>
                 <span className="size-1.5 rounded-full bg-danger animate-pulse"></span>
               </div>
               <span className="text-xs font-bold text-text-muted uppercase tracking-wider">{filteredAlerts.length} Units</span>
@@ -191,8 +193,8 @@ const Dashboard: React.FC = () => {
               <div className="px-1 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl mb-1 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider px-2">Pause routine patrols?</span>
                 <div className="flex gap-2 px-2">
-                  <Button variant="segment" onClick={() => setPatrolsPaused(true)} className={`px-3 py-1 text-xs font-black uppercase ${patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Pause</Button>
-                  <Button variant="segment" onClick={() => setPatrolsPaused(false)} className={`px-3 py-1 text-xs font-black uppercase ${!patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Running</Button>
+                  <Button variant="segment" aria-pressed={patrolsPaused} onClick={() => setPatrolsPaused(true)} className={`px-3 py-1 text-xs font-black uppercase ${patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Pause</Button>
+                  <Button variant="segment" aria-pressed={!patrolsPaused} onClick={() => setPatrolsPaused(false)} className={`px-3 py-1 text-xs font-black uppercase ${!patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Running</Button>
                 </div>
               </div>
             )}
@@ -228,7 +230,7 @@ const Dashboard: React.FC = () => {
                         <div className="mt-1">{renderConfidence(alert.confidence)}</div>
                       </div>
                     </div>
-                    <h4 className="text-sm font-bold text-white mb-0.5 tracking-tight">{alert.title}</h4>
+                    <h3 className="text-sm font-bold text-white mb-0.5 tracking-tight">{alert.title}</h3>
                     <p className="text-xs text-text-muted mb-1 font-medium">{alert.location}</p>
                     <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2 mt-1">
                       <span className="text-primary font-bold uppercase tracking-tight flex items-center gap-1.5">
@@ -328,8 +330,8 @@ const Dashboard: React.FC = () => {
 
           {/* Toggle Controls */}
           <div className="absolute top-5 left-5 flex gap-0.5 bg-background border border-white/10 p-1 rounded-xl z-30 shadow-2xl">
-            <Button variant="segment" onClick={() => setMapMode('2D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '2D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>2D</Button>
-            <Button variant="segment" onClick={() => setMapMode('3D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '3D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>3D</Button>
+            <Button variant="segment" aria-pressed={mapMode === '2D'} onClick={() => setMapMode('2D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '2D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>2D</Button>
+            <Button variant="segment" aria-pressed={mapMode === '3D'} onClick={() => setMapMode('3D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '3D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>3D</Button>
           </div>
 
           <div className="absolute top-5 right-5 flex flex-col gap-2 z-30">
@@ -376,6 +378,7 @@ const Dashboard: React.FC = () => {
             {['feed', 'status', 'patrols', 'guards'].map((tab) => (
               <Button variant="bare" 
  key={tab}
+ aria-pressed={activeTab === tab}
  onClick={() => setActiveTab(tab as any)}
  className={`inline-flex items-center min-h-[24px] text-xs font-bold uppercase tracking-wider relative ${activeTab === tab ? 'text-primary' : 'text-text-muted hover:text-white'}`}>
                 {tab === 'feed' ? 'Live Feed' : tab === 'status' ? 'Drone Status' : tab === 'patrols' ? 'Patrols' : 'Guards'}
@@ -383,7 +386,7 @@ const Dashboard: React.FC = () => {
               </Button>
             ))}
           </div>
-          <div className="flex-1 bg-background/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
+          <div tabIndex={0} role="region" aria-label="Live feed log" className="flex-1 bg-background/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
             <div className="flex gap-4 text-xs items-start">
               <span className="text-text-muted font-mono pt-0.5">{scenarioClock}</span>
               <div className="flex flex-col gap-1">
@@ -398,7 +401,7 @@ const Dashboard: React.FC = () => {
       {/* RIGHT COLUMN: Readiness */}
       <div className="col-span-3 flex flex-col gap-5 h-full min-h-0">
         <div className="bg-panel border border-white/5 rounded-2xl p-6 flex flex-col shadow-sm shrink-0">
-          <h3 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em] mb-6">Readiness Overview</h3>
+          <h2 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em] mb-6">Readiness Overview</h2>
           <div className="flex flex-col gap-7">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400 font-medium">Network Mesh</span>
@@ -419,8 +422,8 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="bg-panel border border-white/5 rounded-2xl p-6 flex flex-col gap-5 shadow-sm flex-1 min-h-0 overflow-hidden">
-          <h3 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em] shrink-0">Connected Systems</h3>
-          <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+          <h2 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em] shrink-0">Connected Systems</h2>
+          <div tabIndex={0} role="region" aria-label="Connected systems list" className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
             <div className="flex flex-col gap-3">
               {[
                 { icon: 'videocam', name: 'CCTV Network', desc: '142/145 Online', status: 'ok' },
@@ -432,7 +435,7 @@ const Dashboard: React.FC = () => {
                     <span aria-hidden="true" className="material-symbols-outlined text-[20px]">{sys.icon}</span>
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-xs font-bold text-white mb-0.5">{sys.name}</h4>
+                    <h3 className="text-xs font-bold text-white mb-0.5">{sys.name}</h3>
                     <p className={`text-xs font-bold uppercase tracking-wider ${sys.status === 'warn' ? 'text-warning' : 'text-text-muted'}`}>{sys.desc}</p>
                   </div>
                 </div>

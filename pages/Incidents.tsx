@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import Button from '../components/Button';
 import { activateOnKey } from '../components/a11y';
+import ModalOverlay from '../components/ModalOverlay';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, PieChart, Pie, LineChart, Line, Legend 
@@ -149,6 +150,7 @@ const Incidents: React.FC = () => {
           <input 
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
+            aria-label="Search incident database"
             className="w-full bg-background border border-white/5 text-white text-xs rounded-xl pl-12 pr-4 py-3 outline-none focus:border-primary/50 transition-all font-bold uppercase tracking-wider placeholder-text-muted" 
             placeholder="Search incident database..."
           />
@@ -157,6 +159,7 @@ const Incidents: React.FC = () => {
           {['Time scope', 'Severity', 'Threat', 'Status'].map((f) => (
             <div key={f} className="relative">
               <select 
+                aria-label={f}
                 value={f === 'Time scope' ? timeScope : undefined}
                 onChange={e => {
                   if (f === 'Time scope') setTimeScope(e.target.value);
@@ -274,7 +277,7 @@ const Incidents: React.FC = () => {
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-12 lg:col-span-8 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-8 shadow-2xl">
           <div className="flex justify-between items-center">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Response Time Trend vs SLA Target</h3>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Response Time Trend vs SLA Target</h2>
             <div className="flex items-center gap-6">
                <div className="flex items-center gap-2">
                  <div className="size-2 rounded-full bg-primary"></div>
@@ -304,7 +307,7 @@ const Incidents: React.FC = () => {
         </div>
 
         <div className="col-span-12 lg:col-span-4 bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-10 shadow-2xl">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Threat Type Distribution</h3>
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em]">Threat Type Distribution</h2>
           <div className="h-[250px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -350,7 +353,7 @@ const Incidents: React.FC = () => {
            <span aria-hidden="true" className="material-symbols-outlined text-primary text-3xl">add</span>
          </div>
          <div className="text-center">
-           <h4 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-1">New Incident Report</h4>
+           <h2 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-1">New Incident Report</h2>
            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Select Incident to Start</p>
          </div>
       </Button>
@@ -362,7 +365,7 @@ const Incidents: React.FC = () => {
             <div className="flex justify-between items-start">
                <div className="flex flex-col gap-1">
                  <span className="text-xs text-text-muted font-bold uppercase tracking-[0.12em]">{rep.id}</span>
-                 <h4 className="text-xl font-display font-bold text-white tracking-tight">{rep.type}</h4>
+                 <h2 className="text-xl font-display font-bold text-white tracking-tight">{rep.type}</h2>
                </div>
                <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
                  rep.status === 'Delivered' ? 'bg-emerald-500/10 text-emerald-500' : 
@@ -416,6 +419,7 @@ const Incidents: React.FC = () => {
           ].map(tab => (
             <Button variant="bare" 
  key={tab.id}
+ aria-pressed={activeTab === tab.id}
  onClick={() => setActiveTab(tab.id as any)}
  className={`pb-4 text-xs font-bold uppercase tracking-[0.12em] transition-all relative ${ activeTab === tab.id ? 'text-primary' : 'text-text-muted hover:text-white' }`}>
               {tab.label}
@@ -435,13 +439,13 @@ const Incidents: React.FC = () => {
 
       {/* DETAIL MODAL */}
       {selectedIncident && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-end bg-black/80 backdrop-blur-md">
+        <ModalOverlay labelledBy="incident-title" onEscape={() => setSelectedIncident(null)} className="fixed inset-0 z-[100] flex items-center justify-end bg-black/80 backdrop-blur-md">
           <div className="w-full max-w-4xl h-full bg-panel border-l border-white/10 flex flex-col shadow-[-40px_0_60px_-15px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-500">
             {/* Modal Header */}
             <div className="p-10 border-b border-white/5 flex justify-between items-start bg-background/20">
                <div className="flex-1 pr-10">
                   <div className="flex items-center gap-4 mb-4">
-                    <h2 className="text-4xl font-mono font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
+                    <h2 id="incident-title" className="text-4xl font-mono font-bold text-white tracking-tighter">{selectedIncident.id}</h2>
                     <span className={`px-4 py-1 rounded-full text-xs font-bold border ${
                       selectedIncident.severity === 'CRITICAL' ? 'bg-danger/10 border-danger/30 text-danger-light' : 'bg-primary/10 border-primary/30 text-primary'
                     }`}>{selectedIncident.severity}</span>
@@ -470,7 +474,7 @@ const Incidents: React.FC = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-12">
+            <div tabIndex={0} role="region" aria-label="Incident details" className="flex-1 overflow-y-auto p-10 custom-scrollbar space-y-12">
                {/* Timeline Section */}
                <section>
                  <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-10">Mission Timeline & Escalations</h4>
@@ -545,7 +549,7 @@ const Incidents: React.FC = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* FLOATING ACTION BUTTON */}

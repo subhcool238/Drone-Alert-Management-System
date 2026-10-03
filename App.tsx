@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Button from './components/Button';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import ModalOverlay from './components/ModalOverlay';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
@@ -17,19 +18,19 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
   const [checked, setChecked] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-xl p-6">
+    <ModalOverlay labelledBy="handover-title" className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-xl p-6">
       <div className="bg-panel border border-white/10 rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
         <div className="p-10 border-b border-white/5 shrink-0">
-          <h2 className="text-4xl font-display font-bold text-white tracking-tighter">Shift Handover Briefing</h2>
+          <h2 id="handover-title" className="text-4xl font-display font-bold text-white tracking-tighter">Shift Handover Briefing</h2>
           <p className="text-xs text-primary font-bold uppercase tracking-[0.12em] mt-2">Required Action: System State Synchronization</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
+        <div tabIndex={0} role="region" aria-label="Briefing details" className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
           {/* Recent Incidents */}
           <section>
-            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-lg">history</span> Recent Incidents (Last 12h)
-            </h4>
+            </h3>
             <div className="space-y-3">
               {[
                 { time: '22:14', type: 'Motion', zone: 'West Corridor', sev: 'CRITICAL', status: 'False alarm - HVAC' },
@@ -52,9 +53,9 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
           {/* Fleet Snapshot */}
           <section>
-            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-lg">flight_takeoff</span> Fleet Snapshot
-            </h4>
+            </h3>
             <div className="grid grid-cols-3 gap-4">
               {DRONES.map(drone => ({
                 name: drone.name,
@@ -76,9 +77,9 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
           {/* Guard & Patrol Status */}
           <section>
-            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-lg">shield</span> Guard & Patrol Status
-            </h4>
+            </h3>
             <div className="bg-danger/5 border border-danger/20 p-6 rounded-3xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-white uppercase tracking-tight">Perimeter Alpha</span>
@@ -93,9 +94,9 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
           {/* Director's Notes */}
           <section>
-            <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
               <span aria-hidden="true" className="material-symbols-outlined text-lg">sticky_note_2</span> Director's Notes
-            </h4>
+            </h3>
             <div className="bg-indigo-600/10 border border-indigo-500/20 p-8 rounded-3xl">
               <p className="text-sm text-gray-300 italic leading-relaxed font-medium">
                 "Prioritize West Storage tonight – Picasso delivery; accept slightly higher false-alarm tolerance there. Keep Sentinel-1 dedicated to the roof corridor."
@@ -110,6 +111,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           <label className="flex items-center gap-4 cursor-pointer group">
             <input 
               type="checkbox" 
+              data-autofocus
               checked={checked} 
               onChange={() => setChecked(!checked)}
               className="size-6 rounded-lg bg-background border-white/10 text-primary focus:ring-primary focus:ring-offset-0 transition-all"
@@ -124,7 +126,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           </Button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 };
 
@@ -151,7 +153,21 @@ const ShiftContextBar: React.FC<{ onOpenBriefing: () => void }> = ({ onOpenBrief
   );
 };
 
+// Page title for the document title and the (visually hidden) page heading
+const PAGE_TITLES: [string, string][] = [
+  ['/fleet', 'Fleet Management'],
+  ['/manual', 'Manual Control'],
+  ['/patrols', 'Patrol Routes'],
+  ['/incidents', 'Incidents'],
+  ['/settings', 'System Settings']
+];
+
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { pathname } = useLocation();
+  const pageTitle = PAGE_TITLES.find(([p]) => pathname.startsWith(p))?.[1] ?? 'Dashboard';
+  useEffect(() => {
+    document.title = `${pageTitle} | FlytBase Security Ops`;
+  }, [pageTitle]);
   const [hasAcknowledgedBriefing, setHasAcknowledgedBriefing] = useState(false);
   const [showBriefingModal, setShowBriefingModal] = useState(true);
 
@@ -175,6 +191,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 h-full">
         <Header />
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden relative p-6 flex flex-col focus:outline-none">
+          <h1 className="sr-only">{pageTitle}</h1>
           {hasAcknowledgedBriefing && <ShiftContextBar onOpenBriefing={() => setShowBriefingModal(true)} />}
           <div className="flex-1 w-full min-h-0">
             {children}

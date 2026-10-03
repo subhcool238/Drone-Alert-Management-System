@@ -18,8 +18,8 @@ const mockIntegrations: Integration[] = [
   { id: 'INT-03', name: 'ServiceNow ITSM', icon: 'confirmation_number', status: 'DEGRADED', lastSync: '14m ago', health: 45, errors: ['API Rate Limit Warning'] },
 ];
 
-const StatusToggle = ({ active, onChange }: { active: boolean; onChange?: () => void }) => (
-  <Button variant="toggle" role="switch" aria-checked={active} 
+const StatusToggle = ({ active, onChange, label }: { active: boolean; onChange?: () => void; label: string }) => (
+  <Button variant="toggle" role="switch" aria-label={label} aria-checked={active} 
  onClick={onChange}
  className={`h-5 w-11 ${active ? 'bg-primary' : 'bg-white/10'}`}>
     <span className={`inline-block size-3.5 transform rounded-full bg-white shadow-sm transition-transform ${active ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -72,22 +72,22 @@ const RolesAndPermissions = () => {
                       <span aria-hidden="true" className="material-symbols-outlined text-lg">shield_person</span>
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-white">{p.role}</h4>
+                      <h3 className="text-sm font-bold text-white">{p.role}</h3>
                       <p className="text-xs text-text-muted font-bold uppercase tracking-tight mt-0.5">{p.description}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canDeploy} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canDeploy} label={`${p.role}: deploy drones`} /></td>
                 <td className="px-1 py-7 text-center">
                   <div className="flex flex-col items-center gap-1.5">
-                    <StatusToggle active={p.canManual} />
+                    <StatusToggle active={p.canManual} label={`${p.role}: manual control`} />
                     {p.canManual && <span className="text-xs font-mono text-primary font-bold">{p.manualLimit}m limit</span>}
                   </div>
                 </td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canApprovePatrols} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canEmergency} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canReport} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canAnalytics} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canApprovePatrols} label={`${p.role}: approve patrols`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canEmergency} label={`${p.role}: emergency actions`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canReport} label={`${p.role}: reports`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canAnalytics} label={`${p.role}: analytics`} /></td>
                 <td className="px-3 py-7 text-right">
                   <Button variant="text" className="text-xs font-bold text-text-muted hover:text-white uppercase tracking-wider">Edit Matrix</Button>
                 </td>
@@ -280,7 +280,7 @@ const NotificationChannels = () => {
                 <span aria-hidden="true" className="material-symbols-outlined">{ch.icon}</span>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white tracking-tight">{ch.name}</h4>
+                <h3 className="text-sm font-bold text-white tracking-tight">{ch.name}</h3>
                 <p className="text-xs text-text-muted font-bold uppercase tracking-wider mt-0.5">{ch.desc}</p>
               </div>
             </div>
@@ -307,9 +307,9 @@ const LanguageAndRegion = () => {
       <div className="bg-panel border border-white/5 rounded-[2rem] p-10 max-w-4xl shadow-2xl space-y-10">
         <div className="grid grid-cols-2 gap-10">
           <div className="space-y-3">
-            <label className="text-xs font-bold text-text-muted uppercase tracking-wider block">Interface Language</label>
+            <label htmlFor="interface-language" className="text-xs font-bold text-text-muted uppercase tracking-wider block">Interface Language</label>
             <div className="relative">
-              <select className="w-full appearance-none bg-background border border-white/10 text-white text-sm font-medium rounded-xl pl-5 pr-12 py-3.5 outline-none focus:border-primary/50 transition-all cursor-pointer">
+              <select id="interface-language" className="w-full appearance-none bg-background border border-white/10 text-white text-sm font-medium rounded-xl pl-5 pr-12 py-3.5 outline-none focus:border-primary/50 transition-all cursor-pointer">
                 <option>English (US)</option>
                 <option>French (FR)</option>
                 <option>Spanish (ES)</option>
@@ -319,9 +319,9 @@ const LanguageAndRegion = () => {
             </div>
           </div>
           <div className="space-y-3">
-            <label className="text-xs font-bold text-text-muted uppercase tracking-wider block">Region / Timezone</label>
+            <label htmlFor="region-timezone" className="text-xs font-bold text-text-muted uppercase tracking-wider block">Region / Timezone</label>
             <div className="relative">
-              <select className="w-full appearance-none bg-background border border-white/10 text-white text-sm font-medium rounded-xl pl-5 pr-12 py-3.5 outline-none focus:border-primary/50 transition-all cursor-pointer">
+              <select id="region-timezone" className="w-full appearance-none bg-background border border-white/10 text-white text-sm font-medium rounded-xl pl-5 pr-12 py-3.5 outline-none focus:border-primary/50 transition-all cursor-pointer">
                 <option>Paris (CET)</option>
                 <option>London (GMT)</option>
                 <option>New York (EST)</option>
@@ -334,10 +334,10 @@ const LanguageAndRegion = () => {
 
         <div className="pt-8 border-t border-white/5 flex items-center justify-between">
           <div className="flex flex-col gap-1">
-            <h4 className="text-sm font-bold text-white">Apply to all operators?</h4>
+            <h3 className="text-sm font-bold text-white">Apply to all operators?</h3>
             <p className="text-xs text-text-muted font-bold uppercase tracking-wider">If unchecked, applies to your profile only.</p>
           </div>
-          <StatusToggle active={isApplyToAll} onChange={() => setIsApplyToAll(!isApplyToAll)} />
+          <StatusToggle active={isApplyToAll} label="Apply to all operators" onChange={() => setIsApplyToAll(!isApplyToAll)} />
         </div>
       </div>
     </div>
@@ -385,8 +385,8 @@ const Settings: React.FC = () => {
 
   return (
     <div className="flex h-full gap-10 -m-6 bg-background">
-      <aside className="w-80 border-r border-white/5 flex flex-col py-10 overflow-y-auto shrink-0 bg-background/50">
-        <nav className="space-y-2 px-6">
+      <div className="w-80 border-r border-white/5 flex flex-col py-10 overflow-y-auto shrink-0 bg-background/50">
+        <nav aria-label="Settings sections" className="space-y-2 px-6">
           {sections.map(section => {
             const fullPath = `/settings/${section.path}`;
             const isActive = location.pathname === fullPath;
@@ -394,6 +394,7 @@ const Settings: React.FC = () => {
               <Link
                 key={section.path}
                 to={fullPath}
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-4 px-5 py-4 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   isActive ? 'text-white bg-white/5 shadow-inner' : 'text-text-muted hover:text-white hover:bg-white/5'
                 }`}
@@ -409,9 +410,9 @@ const Settings: React.FC = () => {
             );
           })}
         </nav>
-      </aside>
+      </div>
 
-      <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
         <Routes>
           <Route index element={<Navigate to="roles" replace />} />
           <Route path="roles" element={<RolesAndPermissions />} />
@@ -431,7 +432,7 @@ const Settings: React.FC = () => {
             </div>
           } />
         </Routes>
-      </main>
+      </div>
 
       {/* GLOBAL HEALTH WIDGET */}
       <div className="fixed bottom-6 left-80 z-[60] flex items-center gap-4 bg-panel/80 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl shadow-2xl group transition-all hover:border-primary/30">

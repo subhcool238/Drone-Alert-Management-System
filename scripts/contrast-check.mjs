@@ -487,13 +487,13 @@ async function main() {
   await go('#/manual', 'manual-control');
   // Fault drone selected: the Manual Control buttons are disabled
   await page.evaluate(() => {
-    const card = [...document.querySelectorAll('aside div')].find(d => d.className.includes('cursor-pointer') && /Surveyor-X/.test(d.innerText));
+    const card = [...document.querySelectorAll('aside div, section div')].find(d => d.className.includes('cursor-pointer') && /Surveyor-X/.test(d.innerText));
     if (card) card.click();
   });
   await sleep(400);
   await capture('manual-control-fault');
   await page.evaluate(() => {
-    const card = [...document.querySelectorAll('aside div')].find(d => d.className.includes('cursor-pointer') && /Sentinel-1/.test(d.innerText));
+    const card = [...document.querySelectorAll('aside div, section div')].find(d => d.className.includes('cursor-pointer') && /Sentinel-1/.test(d.innerText));
     if (card) card.click();
   });
   await go('#/patrols', 'patrol-routes');

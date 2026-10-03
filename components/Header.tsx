@@ -9,6 +9,7 @@ import { formatAgo } from '../data/clock';
 import { COVERAGE_GAP, getCoverageGapCount, getPatrolRecommendation } from '../data/patrols';
 import { buildSystemSummary } from '../data/summary';
 import { clickableProps } from './a11y';
+import ModalOverlay from './ModalOverlay';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -75,11 +76,11 @@ const Header: React.FC = () => {
     <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 shrink-0 z-[60] bg-background">
       {/* Shift Briefing Modal */}
       {showShiftBriefing && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-6">
+        <ModalOverlay labelledBy="header-briefing-title" onEscape={() => setShowShiftBriefing(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-6">
           <div className="bg-panel border border-white/10 rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-10 border-b border-white/5 flex justify-between items-start">
                <div>
-                  <h2 className="text-3xl font-display font-bold text-white tracking-tight">Shift Handover Briefing</h2>
+                  <h2 id="header-briefing-title" className="text-3xl font-display font-bold text-white tracking-tight">Shift Handover Briefing</h2>
                   <p className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] mt-2">Operator: Isabelle M. <span aria-hidden="true">•</span> 22:00 - 06:00</p>
                </div>
                <Button variant="icon" aria-label="Close" onClick={() => setShowShiftBriefing(false)} className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">close</span></Button>
@@ -87,7 +88,7 @@ const Header: React.FC = () => {
             <div className="p-10 grid grid-cols-2 gap-10 bg-background/20">
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-xs font-bold text-danger-light uppercase tracking-wider mb-4">Critical Incidents ({criticalIncidents.length})</h4>
+                  <h3 className="text-xs font-bold text-danger-light uppercase tracking-wider mb-4">Critical Incidents ({criticalIncidents.length})</h3>
                   <div className="space-y-3">
                     {criticalIncidents.map(inc => (
                       <div key={inc.id} className="p-3 rounded-xl bg-danger/10 border border-danger/20">
@@ -103,7 +104,7 @@ const Header: React.FC = () => {
                   </div>
                 </section>
                 <section>
-                   <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-4">Fleet & Maintenance</h4>
+                   <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4">Fleet & Maintenance</h3>
                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
                       <span aria-hidden="true" className="material-symbols-outlined text-primary">engineering</span>
                       <p className="text-xs text-gray-400 leading-tight">
@@ -116,7 +117,7 @@ const Header: React.FC = () => {
               </div>
               <div className="space-y-8">
                 <section>
-                  <h4 className="text-xs font-bold text-warning uppercase tracking-wider mb-4">Coverage Gap</h4>
+                  <h3 className="text-xs font-bold text-warning uppercase tracking-wider mb-4">Coverage Gap</h3>
                   <div className="p-5 rounded-2xl bg-warning/5 border border-warning/20">
                     <div className="text-4xl font-display font-bold text-warning mb-1">{gapCount} {gapCount === 1 ? 'Zone' : 'Zones'}</div>
                     <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Unpatrolled for {COVERAGE_GAP.minutes} min</p>
@@ -126,7 +127,7 @@ const Header: React.FC = () => {
                   </div>
                 </section>
                 <section>
-                   <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Outstanding Tasks</h4>
+                   <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Outstanding Tasks</h3>
                    <div className="space-y-2">
                      <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-indigo-500"></span> 2 Police Reports Pending</div>
                      <div className="flex items-center gap-2 text-xs text-gray-400"><span className="size-1.5 rounded-full bg-gray-600"></span> Night Mode Audit Due</div>
@@ -139,7 +140,7 @@ const Header: React.FC = () => {
               <Button variant="primary" onClick={() => setShowShiftBriefing(false)} className="px-10 py-3 text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary/20">Acknowledge & Sign</Button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       <div className="flex items-center gap-6">
@@ -160,6 +161,7 @@ const Header: React.FC = () => {
             value={searchQuery}
             // DO: Fixed typo - changed setSearchTerm to setSearchQuery to match declared state
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search drones, incidents, guards and patrols"
             className="w-full bg-panel border border-white/10 rounded-2xl py-2.5 pl-12 pr-12 text-white text-sm focus:border-primary/50 focus:ring-0 placeholder-text-muted transition-all outline-none" 
             placeholder="Search Drones, Incidents, Guards, Patrols..."
           />
@@ -197,7 +199,7 @@ const Header: React.FC = () => {
           {showNotifications && (
             <div className="absolute top-full mt-4 right-0 w-[320px] bg-panel border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
               <div className="p-5 border-b border-white/5 flex justify-between items-center bg-background/50">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Active Notifications</h4>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Active Notifications</h3>
                 <Button variant="text" className="text-xs text-primary font-bold uppercase hover:underline">Clear All</Button>
               </div>
               <div className="max-h-[350px] overflow-y-auto custom-scrollbar">

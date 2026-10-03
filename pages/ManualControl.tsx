@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../components/Button';
 import { clickableProps } from '../components/a11y';
+import ModalOverlay from '../components/ModalOverlay';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
@@ -124,13 +125,13 @@ const ManualControl: React.FC = () => {
       
       {/* MODAL: Extension Request */}
       {showExtensionModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <ModalOverlay labelledBy="extension-title" onEscape={() => setShowExtensionModal(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-panel border border-white/10 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95">
             <div className="p-8 text-center">
               <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                 <span aria-hidden="true" className="material-symbols-outlined text-primary text-3xl">hourglass_empty</span>
               </div>
-              <h2 className="text-xl font-display font-bold text-white mb-2">Request Extension?</h2>
+              <h2 id="extension-title" className="text-xl font-display font-bold text-white mb-2">Request Extension?</h2>
               <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
                 Team Lead approval required for +2:00 mins override. ({extensionsUsed}/3 used)
               </p>
@@ -140,18 +141,18 @@ const ManualControl: React.FC = () => {
               <Button variant="primary" onClick={approveExtension} className="py-3 text-xs font-bold uppercase tracking-wider">Approve</Button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* MODAL: Post Session */}
       {showPostSessionModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <ModalOverlay labelledBy="post-session-title" className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-panel border border-white/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95">
             <div className="p-8 text-center">
               <div className="size-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
                 <span aria-hidden="true" className="material-symbols-outlined text-success text-3xl">task_alt</span>
               </div>
-              <h2 className="text-xl font-display font-bold text-white mb-2">Manual Session Ended</h2>
+              <h2 id="post-session-title" className="text-xl font-display font-bold text-white mb-2">Manual Session Ended</h2>
               <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
                 Control has returned to Autonomy. Resume original route?
               </p>
@@ -161,11 +162,11 @@ const ManualControl: React.FC = () => {
               <Button variant="success" onClick={() => setShowPostSessionModal(false)} className="py-3 text-xs font-bold uppercase tracking-wider">Resume Patrol</Button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* LEFT SIDEBAR: Fleet Selector */}
-      <aside className="w-80 max-[1439px]:w-60 flex-none flex flex-col bg-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+      <section aria-label="Mission assets" className="w-80 max-[1439px]:w-60 flex-none flex flex-col bg-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
         <div className="p-6 max-[1439px]:p-4 flex flex-col h-full">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6">Mission Assets</h2>
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
@@ -209,10 +210,10 @@ const ManualControl: React.FC = () => {
             ))}
           </div>
         </div>
-      </aside>
+      </section>
 
       {/* CENTER COLUMN: FPV & Joysticks */}
-      <main className="flex-1 flex flex-col gap-6 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col gap-6 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
         {/* Top HUD Feed */}
         <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[260px] max-[1439px]:min-h-[430px]">
           {/* Mode Banner */}
@@ -350,8 +351,8 @@ const ManualControl: React.FC = () => {
                <div className="flex flex-col gap-1 items-center">
                  <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Control Mode</span>
                  <div className="bg-background/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
-                   <Button variant="segment" onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${!isManual ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}>Auto</Button>
-                   <Button variant="segment" onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${isManual ? 'bg-amber-500 text-black' : 'text-text-muted hover:text-white'}`}>Manual</Button>
+                   <Button variant="segment" aria-pressed={!isManual} onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${!isManual ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}>Auto</Button>
+                   <Button variant="segment" aria-pressed={isManual} onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${isManual ? 'bg-amber-500 text-black' : 'text-text-muted hover:text-white'}`}>Manual</Button>
                  </div>
                </div>
                <div className="size-1 bg-white/5 rounded-full"></div>
@@ -368,10 +369,10 @@ const ManualControl: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* RIGHT SIDEBAR: Detailed Stats & Safety */}
-      <aside className="w-80 max-[1439px]:w-72 flex-none flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
+      <section aria-label="Telemetry and safety" className="w-80 max-[1439px]:w-72 flex-none flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar">
         <div className="bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl shrink-0">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
             <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
@@ -447,7 +448,7 @@ const ManualControl: React.FC = () => {
             Declare Emergency
           </Button>
         </div>
-      </aside>
+      </section>
     </div>
   );
 };

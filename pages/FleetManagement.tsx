@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Button from '../components/Button';
 import { clickableProps } from '../components/a11y';
+import ModalOverlay from '../components/ModalOverlay';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
 import { DRONES as mockDrones, getOnlineCount, STATUS_DOT, STATUS_LABEL } from '../data/drones';
@@ -72,19 +73,19 @@ const FleetManagement: React.FC = () => {
       
       {/* MAINTENANCE MODAL */}
       {isMaintenanceModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <ModalOverlay labelledBy="maintenance-title" onEscape={() => setIsMaintenanceModalOpen(false)} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-panel border border-white/10 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-8 border-b border-white/5 flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-display font-bold text-white">Schedule Maintenance</h2>
+                <h2 id="maintenance-title" className="text-2xl font-display font-bold text-white">Schedule Maintenance</h2>
                 <p className="text-xs text-text-muted mt-1 uppercase tracking-widest font-bold">Drone: {selectedDrone.name}</p>
               </div>
               <Button variant="icon" aria-label="Close" onClick={() => setIsMaintenanceModalOpen(false)} className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">close</span></Button>
             </div>
             <div className="p-8 space-y-6">
               <div className="space-y-3">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em] block">Maintenance Type</label>
-                <div className="grid grid-cols-2 gap-3">
+                <label id="maintenance-type-label" className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em] block">Maintenance Type</label>
+                <div role="group" aria-labelledby="maintenance-type-label" className="grid grid-cols-2 gap-3">
                   {['Routine Check', 'Propeller Replacement', 'Lens Recalibration', 'Firmware Flash'].map(type => (
                     <Button variant="bare" key={type} className="bg-background border border-white/5 p-4 text-xs font-bold text-gray-300 hover:border-primary transition-all text-left rounded-lg">
                       {type}
@@ -103,7 +104,7 @@ const FleetManagement: React.FC = () => {
               <Button variant="primary" onClick={() => setIsMaintenanceModalOpen(false)} className="px-10 py-3 text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">Confirm Schedule</Button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* LEFT LIST: Search & Cards */}
@@ -119,13 +120,14 @@ const FleetManagement: React.FC = () => {
             <input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search drones by ID or designation"
               className="w-full bg-panel border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-[12px] text-white focus:border-primary/50 placeholder-text-muted outline-none transition-all" 
               placeholder="Search by ID or designation..."
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="relative">
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
+              <select aria-label="Filter drones by status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
                 <option>Status: All</option>
                 <option>Active</option>
                 <option>Idle</option>
@@ -135,7 +137,7 @@ const FleetManagement: React.FC = () => {
               <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
             </div>
             <div className="relative">
-              <select value={healthFilter} onChange={e => setHealthFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
+              <select aria-label="Filter drones by health" value={healthFilter} onChange={e => setHealthFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
                 <option>Health: All</option>
                 <option>High</option>
                 <option>Medium</option>
@@ -229,7 +231,7 @@ const FleetManagement: React.FC = () => {
             <div className="flex flex-wrap justify-between items-start gap-x-6 gap-y-6 mb-10">
               <div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
-                  <h1 className="whitespace-nowrap text-6xl font-display font-bold text-white tracking-tighter">{selectedDrone.name}</h1>
+                  <h2 className="whitespace-nowrap text-6xl font-display font-bold text-white tracking-tighter">{selectedDrone.name}</h2>
                   <span className="text-2xl font-mono text-text-muted font-bold">[{selectedDrone.id}]</span>
                 </div>
                 <div className="flex flex-wrap gap-3">
