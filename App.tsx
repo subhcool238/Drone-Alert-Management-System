@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import Button from './components/Button';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -27,7 +28,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           {/* Recent Incidents */}
           <section>
             <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">history</span> Recent Incidents (Last 12h)
+              <span aria-hidden="true" className="material-symbols-outlined text-lg">history</span> Recent Incidents (Last 12h)
             </h4>
             <div className="space-y-3">
               {[
@@ -52,7 +53,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           {/* Fleet Snapshot */}
           <section>
             <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">flight_takeoff</span> Fleet Snapshot
+              <span aria-hidden="true" className="material-symbols-outlined text-lg">flight_takeoff</span> Fleet Snapshot
             </h4>
             <div className="grid grid-cols-3 gap-4">
               {DRONES.map(drone => ({
@@ -76,7 +77,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           {/* Guard & Patrol Status */}
           <section>
             <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">shield</span> Guard & Patrol Status
+              <span aria-hidden="true" className="material-symbols-outlined text-lg">shield</span> Guard & Patrol Status
             </h4>
             <div className="bg-danger/5 border border-danger/20 p-6 rounded-3xl space-y-4">
               <div className="flex items-center justify-between">
@@ -93,7 +94,7 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
           {/* Director's Notes */}
           <section>
             <h4 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-lg">sticky_note_2</span> Director's Notes
+              <span aria-hidden="true" className="material-symbols-outlined text-lg">sticky_note_2</span> Director's Notes
             </h4>
             <div className="bg-indigo-600/10 border border-indigo-500/20 p-8 rounded-3xl">
               <p className="text-sm text-gray-300 italic leading-relaxed font-medium">
@@ -115,15 +116,12 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
             />
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors">I have reviewed and understood this briefing.</span>
           </label>
-          <button 
-            disabled={!checked}
-            onClick={onAcknowledge}
-            className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.12em] transition-all shadow-2xl ${
-              checked ? 'bg-primary text-black shadow-primary/20' : 'bg-white/5 text-text-muted cursor-not-allowed'
-            }`}
-          >
+          <Button variant="bare" 
+ disabled={!checked}
+ onClick={onAcknowledge}
+ className={`px-10 py-4 text-xs font-bold uppercase tracking-[0.12em] transition-all shadow-2xl ${ checked ? 'bg-primary text-black shadow-primary/20' : 'bg-white/5 text-text-muted cursor-not-allowed' } rounded-lg min-h-[32px]`}>
             Acknowledge & go to Dashboard
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -132,10 +130,10 @@ const ShiftHandoverModal: React.FC<{ onAcknowledge: () => void }> = ({ onAcknowl
 
 const ShiftContextBar: React.FC<{ onOpenBriefing: () => void }> = ({ onOpenBriefing }) => {
   return (
-    <div className="mb-6 flex items-center justify-between bg-panel/50 border border-white/5 rounded-2xl px-6 py-3 shrink-0 animate-in slide-in-from-top duration-500">
+    <div className="mb-6 flex items-center justify-between bg-panel/50 border border-white/5 rounded-2xl px-6 py-1.5 shrink-0 animate-in slide-in-from-top duration-500">
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary text-[20px]">dark_mode</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-primary text-[20px]">dark_mode</span>
           <span className="text-xs font-bold text-white uppercase tracking-wider">Night Shift 22:00–06:00</span>
           <span className="text-xs text-text-muted font-bold uppercase">— Isabelle</span>
         </div>
@@ -146,8 +144,8 @@ const ShiftContextBar: React.FC<{ onOpenBriefing: () => void }> = ({ onOpenBrief
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <button onClick={onOpenBriefing} className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">[View briefing]</button>
-        <button className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">[Message previous shift]</button>
+        <Button variant="text" onClick={onOpenBriefing} className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white">[View briefing]</Button>
+        <Button variant="text" className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white">[Message previous shift]</Button>
       </div>
     </div>
   );

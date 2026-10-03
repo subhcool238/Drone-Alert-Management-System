@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import Button from '../components/Button';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, PieChart, Pie, LineChart, Line, Legend 
@@ -130,7 +131,7 @@ const Incidents: React.FC = () => {
         ].map((stat, i) => (
           <div key={i} className="bg-panel border border-white/5 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
             <div className="size-10 rounded-xl bg-background border border-white/5 flex items-center justify-center">
-              <span className={`material-symbols-outlined text-text-muted ${stat.color}`}>{stat.icon}</span>
+              <span aria-hidden="true" className={`material-symbols-outlined text-text-muted ${stat.color}`}>{stat.icon}</span>
             </div>
             <div>
               <p className="text-xs font-bold text-text-muted uppercase tracking-wider">{stat.label}</p>
@@ -143,7 +144,7 @@ const Incidents: React.FC = () => {
       {/* Filter Bar */}
       <div className="bg-panel border border-white/5 p-4 rounded-2xl flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[300px]">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-lg">search</span>
+          <span aria-hidden="true" className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-lg">search</span>
           <input 
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -170,7 +171,7 @@ const Incidents: React.FC = () => {
                 {f === 'Threat' && ['Human', 'Environmental', 'Sensor'].map(o => <option key={o}>{o}</option>)}
                 {f === 'Status' && ['Investigating', 'Responding', 'Resolved', 'Escalated'].map(o => <option key={o}>{o}</option>)}
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-lg">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-lg">expand_more</span>
             </div>
           ))}
         </div>
@@ -206,7 +207,7 @@ const Incidents: React.FC = () => {
                     <div className="flex items-center gap-3 mb-2">
                        <div className="font-bold text-gray-200 leading-tight max-w-[200px]">{inc.title}</div>
                        {inc.isCarriedOver && (
-                          <span className="material-symbols-outlined text-[14px] text-indigo-400" title={`Carried over from: ${inc.previousOwner}`}>sync_alt</span>
+                          <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-indigo-400" title={`Carried over from: ${inc.previousOwner}`}>sync_alt</span>
                        )}
                     </div>
                     <div className="flex gap-2">
@@ -235,8 +236,8 @@ const Incidents: React.FC = () => {
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="material-symbols-outlined text-text-muted hover:text-white transition-colors">description</button>
-                      <button className="material-symbols-outlined text-text-muted hover:text-danger-light transition-colors">flag</button>
+                      <Button variant="icon" aria-label="View incident report" className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">description</span></Button>
+                      <Button variant="icon" aria-label="Flag incident" className="text-text-muted hover:text-danger-light"><span className="material-symbols-outlined" aria-hidden="true">flag</span></Button>
                     </div>
                   </td>
                 </tr>
@@ -340,15 +341,15 @@ const Incidents: React.FC = () => {
 
   const renderReports = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <button className="h-[280px] border-2 border-dashed border-white/5 hover:border-primary/30 hover:bg-primary/5 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all group">
+      <Button variant="bare" className="h-[280px] border-2 border-dashed border-white/5 hover:border-primary/30 hover:bg-primary/5 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all group">
          <div className="size-16 rounded-3xl bg-panel border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-           <span className="material-symbols-outlined text-primary text-3xl">add</span>
+           <span aria-hidden="true" className="material-symbols-outlined text-primary text-3xl">add</span>
          </div>
          <div className="text-center">
            <h4 className="text-[12px] font-bold text-white uppercase tracking-[0.2em] mb-1">New Incident Report</h4>
            <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Select Incident to Start</p>
          </div>
-      </button>
+      </Button>
 
       {reportData.map(rep => {
         const isUrgent = rep.deadlineMins > 0 && rep.deadlineMins <= 5;
@@ -372,7 +373,7 @@ const Incidents: React.FC = () => {
                 isUrgent ? 'bg-danger/10 border-danger/30' : 'bg-background/80 border-white/5'
               }`}>
                 <div className="flex items-center gap-3">
-                  <span className={`material-symbols-outlined text-[18px] ${isUrgent ? 'text-danger-light' : 'text-text-muted'}`}>timer</span>
+                  <span aria-hidden="true" className={`material-symbols-outlined text-[18px] ${isUrgent ? 'text-danger-light' : 'text-text-muted'}`}>timer</span>
                   <span className={`text-xs font-bold uppercase tracking-wider ${isUrgent ? 'text-danger-light' : 'text-text-muted'}`}>Report Deadline</span>
                 </div>
                 <span className={`text-[12px] font-mono font-bold ${isUrgent ? 'text-danger-light' : 'text-white'}`}>{rep.deadlineMins}m remaining</span>
@@ -385,12 +386,12 @@ const Incidents: React.FC = () => {
                  <span className="text-xs font-bold text-gray-400">{rep.incId}</span>
               </div>
               <div className="flex gap-2">
-                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-text-muted hover:text-white transition-all">
-                   <span className="material-symbols-outlined text-lg">download</span>
-                 </button>
-                 <button className="size-10 rounded-xl bg-background border border-white/10 flex items-center justify-center text-text-muted hover:text-white transition-all">
-                   <span className="material-symbols-outlined text-lg">share</span>
-                 </button>
+                 <Button variant="icon" aria-label="Download report" className="size-10 bg-background border border-white/10 text-text-muted hover:text-white">
+                   <span aria-hidden="true" className="material-symbols-outlined text-lg">download</span>
+                 </Button>
+                 <Button variant="icon" aria-label="Share report" className="size-10 bg-background border border-white/10 text-text-muted hover:text-white">
+                   <span aria-hidden="true" className="material-symbols-outlined text-lg">share</span>
+                 </Button>
               </div>
             </div>
           </div>
@@ -409,18 +410,15 @@ const Incidents: React.FC = () => {
             { id: 'analytics', label: 'Tactical Analytics' },
             { id: 'reports', label: 'Report Center' }
           ].map(tab => (
-            <button 
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-4 text-xs font-bold uppercase tracking-[0.12em] transition-all relative ${
-                activeTab === tab.id ? 'text-primary' : 'text-text-muted hover:text-white'
-              }`}
-            >
+            <Button variant="bare" 
+ key={tab.id}
+ onClick={() => setActiveTab(tab.id as any)}
+ className={`pb-4 text-xs font-bold uppercase tracking-[0.12em] transition-all relative ${ activeTab === tab.id ? 'text-primary' : 'text-text-muted hover:text-white' }`}>
               {tab.label}
               {activeTab === tab.id && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_12px_rgba(6,182,212,0.6)] rounded-full"></div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -449,7 +447,7 @@ const Incidents: React.FC = () => {
                     {selectedIncident.isCarriedOver && (
                       <div className="group relative flex items-center">
                         <span className="bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider flex items-center gap-2 cursor-help">
-                          <span className="material-symbols-outlined text-[14px]">sync_alt</span> Carried over from previous shift
+                          <span aria-hidden="true" className="material-symbols-outlined text-[14px]">sync_alt</span> Carried over from previous shift
                         </span>
                         <div className="absolute top-full left-0 mt-2 p-3 bg-panel border border-white/10 rounded-xl shadow-2xl z-50 w-64 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                           <p className="text-xs text-text-muted font-bold uppercase mb-1">Assigned to: {selectedIncident.previousOwner}</p>
@@ -464,7 +462,7 @@ const Incidents: React.FC = () => {
                     <span className="text-xs text-primary font-bold uppercase tracking-wider">{selectedIncident.threat} Threat</span>
                   </div>
                </div>
-               <button onClick={() => setSelectedIncident(null)} className="material-symbols-outlined text-text-muted hover:text-white transition-all text-3xl shrink-0">close</button>
+               <Button variant="icon" aria-label="Close" onClick={() => setSelectedIncident(null)} className="text-text-muted hover:text-white shrink-0"><span className="material-symbols-outlined text-3xl" aria-hidden="true">close</span></Button>
             </div>
 
             {/* Modal Content */}
@@ -499,7 +497,7 @@ const Incidents: React.FC = () => {
                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <span className="text-xs font-bold text-white uppercase tracking-wider">{ev.caption}</span>
-                            <span className="material-symbols-outlined text-white text-lg">fullscreen</span>
+                            <span aria-hidden="true" className="material-symbols-outlined text-white text-lg">fullscreen</span>
                          </div>
                       </div>
                     ))}
@@ -535,12 +533,12 @@ const Incidents: React.FC = () => {
 
             {/* Modal Footer */}
             <div className="p-10 border-t border-white/5 bg-background/20 flex gap-4 shrink-0">
-              <button className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl text-xs uppercase tracking-[0.12em] shadow-2xl shadow-primary/20 transition-all">
+              <Button variant="primary" className="flex-1 font-bold py-4 text-xs uppercase tracking-[0.12em] shadow-2xl shadow-primary/20">
                 Export Detailed PDF
-              </button>
-              <button className="px-10 bg-background border border-white/10 text-white hover:bg-white/5 font-bold py-4 rounded-2xl text-xs uppercase tracking-[0.12em] transition-all">
+              </Button>
+              <Button variant="secondary" className="px-10 bg-background text-white font-bold py-4 text-xs uppercase tracking-[0.12em]">
                 Share Externally
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -548,10 +546,10 @@ const Incidents: React.FC = () => {
 
       {/* FLOATING ACTION BUTTON */}
       <div className="fixed bottom-10 right-10 z-[60]">
-         <button className="bg-primary hover:bg-primary/90 text-black px-10 py-4 rounded-full shadow-2xl flex items-center gap-4 transition-all transform active:scale-95 group overflow-hidden">
-           <span className="material-symbols-outlined text-2xl">add</span>
+         <Button variant="primary" className="px-10 py-4 shadow-2xl gap-4 transform active:scale-95 group overflow-hidden">
+           <span aria-hidden="true" className="material-symbols-outlined text-2xl">add</span>
            <span className="text-xs font-bold uppercase tracking-[0.12em]">Manual Entry</span>
-         </button>
+         </Button>
       </div>
     </div>
   );

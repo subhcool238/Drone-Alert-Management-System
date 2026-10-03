@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Button from '../components/Button';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES, getDroneById, getDroneByName, getManualControlBlock } from '../data/drones';
@@ -126,7 +127,7 @@ const ManualControl: React.FC = () => {
           <div className="bg-panel border border-white/10 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95">
             <div className="p-8 text-center">
               <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <span className="material-symbols-outlined text-primary text-3xl">hourglass_empty</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-primary text-3xl">hourglass_empty</span>
               </div>
               <h2 className="text-xl font-display font-bold text-white mb-2">Request Extension?</h2>
               <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
@@ -134,8 +135,8 @@ const ManualControl: React.FC = () => {
               </p>
             </div>
             <div className="p-6 bg-background/50 grid grid-cols-2 gap-3">
-              <button onClick={() => setShowExtensionModal(false)} className="py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">Deny</button>
-              <button onClick={approveExtension} className="py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider">Approve</button>
+              <Button variant="secondary" onClick={() => setShowExtensionModal(false)} className="py-3 text-xs font-bold uppercase tracking-wider text-gray-400">Deny</Button>
+              <Button variant="primary" onClick={approveExtension} className="py-3 text-xs font-bold uppercase tracking-wider">Approve</Button>
             </div>
           </div>
         </div>
@@ -147,7 +148,7 @@ const ManualControl: React.FC = () => {
           <div className="bg-panel border border-white/10 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95">
             <div className="p-8 text-center">
               <div className="size-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
-                <span className="material-symbols-outlined text-success text-3xl">task_alt</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-success text-3xl">task_alt</span>
               </div>
               <h2 className="text-xl font-display font-bold text-white mb-2">Manual Session Ended</h2>
               <p className="text-xs text-text-muted uppercase font-bold tracking-widest leading-relaxed">
@@ -155,8 +156,8 @@ const ManualControl: React.FC = () => {
               </p>
             </div>
             <div className="p-6 bg-background/50 grid grid-cols-2 gap-3">
-              <button onClick={() => navigate('/patrols')} className="py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">New Waypoints</button>
-              <button onClick={() => setShowPostSessionModal(false)} className="py-3 rounded-xl bg-success text-black text-xs font-bold uppercase tracking-wider">Resume Patrol</button>
+              <Button variant="secondary" onClick={() => navigate('/patrols')} className="py-3 text-xs font-bold uppercase tracking-wider text-gray-400">New Waypoints</Button>
+              <Button variant="success" onClick={() => setShowPostSessionModal(false)} className="py-3 text-xs font-bold uppercase tracking-wider">Resume Patrol</Button>
             </div>
           </div>
         </div>
@@ -183,7 +184,7 @@ const ManualControl: React.FC = () => {
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <span className={`material-symbols-outlined ${drone.active ? 'text-primary' : 'text-text-muted'} text-[22px]`}>flight</span>
+                  <span aria-hidden="true" className={`material-symbols-outlined ${drone.active ? 'text-primary' : 'text-text-muted'} text-[22px]`}>flight</span>
                   <div className="flex-1">
                     <h3 className="text-white font-bold text-sm tracking-tight">{drone.name}</h3>
                     <p className={`text-xs font-bold uppercase tracking-[0.1em] mt-1 ${drone.active ? 'text-primary' : 'text-text-muted'}`}>
@@ -194,11 +195,11 @@ const ManualControl: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs text-text-muted border-t border-white/5 mt-4 pt-3 font-bold uppercase tracking-wider">
                   <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]">battery_horiz_075</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">battery_horiz_075</span>
                     <span>{drone.battery}%</span>
                   </div>
                   <div className={`flex items-center gap-1.5 ${drone.signal === 'Strong' ? 'text-emerald-500' : 'text-text-muted'}`}>
-                    <span className="material-symbols-outlined text-[16px]">podium</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">podium</span>
                     <span>{drone.signal}</span>
                   </div>
                 </div>
@@ -219,7 +220,7 @@ const ManualControl: React.FC = () => {
             isWarningZone ? 'bg-warning/20 border-warning/30' : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-center gap-3">
-              <span className={`material-symbols-outlined text-[18px] ${
+              <span aria-hidden="true" className={`material-symbols-outlined text-[18px] ${
                 !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger-light' : 'text-warning'
               }`}>
                 {isManual ? 'warning' : (statusBanner ? statusBanner.icon : 'smart_toy')}
@@ -281,11 +282,11 @@ const ManualControl: React.FC = () => {
             
             <div className="absolute top-8 right-8 flex flex-col items-end gap-3 z-20">
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                 <span className={`material-symbols-outlined text-[16px] ${selectedDroneBattery < 20 ? 'text-danger-light' : 'text-primary'}`}>battery_very_low</span>
+                 <span aria-hidden="true" className={`material-symbols-outlined text-[16px] ${selectedDroneBattery < 20 ? 'text-danger-light' : 'text-primary'}`}>battery_very_low</span>
                  <span className="text-xs font-mono font-bold text-white">{selectedDrone.battery}%</span>
               </div>
               <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
-                 <span className="material-symbols-outlined text-emerald-500 text-[16px]">signal_cellular_alt</span>
+                 <span aria-hidden="true" className="material-symbols-outlined text-emerald-500 text-[16px]">signal_cellular_alt</span>
                  <span className="text-xs font-mono font-bold text-white">-42 dBm</span>
               </div>
             </div>
@@ -308,26 +309,22 @@ const ManualControl: React.FC = () => {
                
                <div className="flex gap-3">
                  {isManual && secondsLeft < 120 && extensionsUsed < 3 && (
-                   <button 
-                    onClick={requestExtension}
-                    className="bg-primary hover:bg-primary/90 text-black font-bold text-xs px-6 py-3 rounded-xl transition-all uppercase tracking-wider shadow-xl shadow-primary/20"
-                   >
+                   <Button variant="primary" 
+ onClick={requestExtension}
+ className="font-bold text-xs px-6 py-3 uppercase tracking-wider shadow-xl shadow-primary/20">
                      Request Extension (+2m)
-                   </button>
+                   </Button>
                  )}
                  {controlsLocked && (
                    <span className="self-center text-xs font-bold text-gray-300 uppercase tracking-wider">Not available: {blockReason}</span>
                  )}
-                 <button
-                   onClick={() => isManual ? handleReturnToAutonomy() : setIsManual(true)}
-                   disabled={controlsLocked}
-                   title={lockedTitle}
-                   className={`px-10 py-4 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl disabled:opacity-70 disabled:cursor-not-allowed ${
-                     isManual ? 'bg-danger-strong text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10 disabled:hover:bg-white'
-                   }`}
-                 >
+                 <Button variant="bare"
+ onClick={() => isManual ? handleReturnToAutonomy() : setIsManual(true)}
+ disabled={controlsLocked}
+ title={lockedTitle}
+ className={`px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-2xl disabled:opacity-70 disabled:cursor-not-allowed ${ isManual ? 'bg-danger-strong text-white shadow-danger/20' : 'bg-white text-black hover:bg-primary hover:text-black shadow-white/10 disabled:hover:bg-white' } rounded-lg min-h-[32px]`}>
                    {isManual ? 'Return to Autonomy' : 'Take Manual Control'}
-                 </button>
+                 </Button>
                </div>
             </div>
           </div>
@@ -351,8 +348,8 @@ const ManualControl: React.FC = () => {
                <div className="flex flex-col gap-1 items-center">
                  <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Control Mode</span>
                  <div className="bg-background/80 p-1.5 rounded-2xl border border-white/10 flex gap-1">
-                   <button onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed ${!isManual ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}>Auto</button>
-                   <button onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed ${isManual ? 'bg-amber-500 text-black' : 'text-text-muted hover:text-white'}`}>Manual</button>
+                   <Button variant="segment" onClick={() => setIsManual(false)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${!isManual ? 'bg-primary text-black' : 'text-text-muted hover:text-white'}`}>Auto</Button>
+                   <Button variant="segment" onClick={() => setIsManual(true)} disabled={controlsLocked} title={lockedTitle} className={`px-5 py-2 text-xs font-bold uppercase tracking-wider ${isManual ? 'bg-amber-500 text-black' : 'text-text-muted hover:text-white'}`}>Manual</Button>
                  </div>
                </div>
                <div className="size-1 bg-white/5 rounded-full"></div>
@@ -375,7 +372,7 @@ const ManualControl: React.FC = () => {
       <aside className="w-80 flex-none flex flex-col gap-6">
         <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-6 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">analytics</span> Telemetry
           </h2>
           <div className="space-y-6">
             <div className="flex justify-between items-end">
@@ -409,18 +406,18 @@ const ManualControl: React.FC = () => {
 
         <div className="bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl">
           <h2 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em] mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px] text-primary">security</span> Safety Systems
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">security</span> Safety Systems
           </h2>
           <div className="space-y-3">
             <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isAirborne && proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
-              <span className={`material-symbols-outlined ${!isAirborne ? 'text-text-muted' : proximity < 5 ? 'text-danger-light' : 'text-emerald-500'}`}>sensors</span>
+              <span aria-hidden="true" className={`material-symbols-outlined ${!isAirborne ? 'text-text-muted' : proximity < 5 ? 'text-danger-light' : 'text-emerald-500'}`}>sensors</span>
               <div className="flex-1">
                  <p className="text-xs font-bold text-white uppercase tracking-wider">Proximity</p>
                  <p className="text-xs text-text-muted font-medium mt-0.5">{!isAirborne ? 'Not in flight' : proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
               </div>
             </div>
             <div className="p-4 rounded-xl bg-background border border-white/5 flex items-center gap-4">
-              <span className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-text-muted'}`}>public</span>
+              <span aria-hidden="true" className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-text-muted'}`}>public</span>
               <div className="flex-1">
                  <p className="text-xs font-bold text-white uppercase tracking-wider">Geofence Status</p>
                  <p className="text-xs text-text-muted font-medium mt-0.5">{isAirborne ? 'Clear - Within Perimeter' : 'Not in flight'}</p>
@@ -432,21 +429,21 @@ const ManualControl: React.FC = () => {
         <div className="flex-1 flex flex-col justify-end bg-panel rounded-2xl border border-white/5 p-6 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-danger/5 pointer-events-none"></div>
           <div className="flex items-start gap-3 mb-6 bg-background/60 p-3 rounded-xl border border-white/10">
-             <span className="material-symbols-outlined text-danger-light text-[18px]">warning</span>
+             <span aria-hidden="true" className="material-symbols-outlined text-danger-light text-[18px]">warning</span>
              <p className="text-xs text-gray-400 font-bold uppercase leading-relaxed tracking-tight">
                Emergency actions immediately override all mission logic and safety buffers.
              </p>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-white/5 transition-all">Return Home</button>
-            <button className="bg-background border border-white/10 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-white/5 transition-all">Hover Lock</button>
+            <Button variant="secondary" className="bg-background text-white font-bold py-3.5 text-xs uppercase tracking-wider">Return Home</Button>
+            <Button variant="secondary" className="bg-background text-white font-bold py-3.5 text-xs uppercase tracking-wider">Hover Lock</Button>
           </div>
-          <button className="w-full bg-danger-strong text-white font-bold py-4 rounded-xl text-xs uppercase tracking-[0.12em] shadow-xl shadow-danger/20 hover:brightness-110 transition-all">
+          <Button variant="danger" className="w-full font-bold py-4 text-xs uppercase tracking-[0.12em] shadow-xl shadow-danger/20">
             EMERGENCY STOP
-          </button>
-          <button className="w-full mt-3 bg-background border border-danger/30 text-danger-light font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-danger/10 transition-all">
+          </Button>
+          <Button variant="danger-outline" className="w-full mt-3 bg-background font-bold py-3.5 text-xs uppercase tracking-wider">
             Declare Emergency
-          </button>
+          </Button>
         </div>
       </aside>
     </div>

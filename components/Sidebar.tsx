@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Button from './Button';
 import { Link, useLocation } from 'react-router-dom';
 import { getOpenCount } from '../data/incidents';
 
@@ -34,13 +35,13 @@ const Sidebar: React.FC = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 isActive 
                   ? 'bg-primary/10 text-primary border border-primary/20' 
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'fill-1' : 'group-hover:text-primary'}`}>
+              <span aria-hidden="true" className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'fill-1' : 'group-hover:text-primary'}`}>
                 {item.icon}
               </span>
               <span className="text-sm font-medium">{item.label}</span>
@@ -55,14 +56,14 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="pt-6 border-t border-white/5 mt-auto">
-        <button className="flex items-center w-full gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-left group">
+        <Button variant="bare" className="flex items-center w-full gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-left group">
           <div className="size-8 rounded-full bg-cover bg-center ring-2 ring-gray-700" style={{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuBf32ztAlYOtIpntZ8GA11lvp6qLHk4YFeTDSw2GGGzZ_T3fufgI3tj2NFGL64ooFOiqLN5SEnfaHSUCtC4kV99HEw65A0pYFLJfs39KkY_rBVYAMJwFTkKW7BBuzYWb9rulMpCXtkH2QplNzBBbxZ4HsGyB_I-SHQaLYYXHCMdpHrtxwoofh7EE1N5yhhREZ5ee4gdB7ALoDFblzUT6IaQE9VZNMLyL2k0UKWarhn6k-r6CzMy_C1PMSa444Q0y7--XdgSTo0UMwg)' }}></div>
           <div className="flex flex-col flex-1 min-w-0">
             <span className="text-sm font-medium text-white truncate">Isabelle M.</span>
             <span className="text-xs text-text-muted truncate">Lead Drone Operator</span>
           </div>
-          <span className="material-symbols-outlined text-text-muted group-hover:text-white">logout</span>
-        </button>
+          <span aria-hidden="true" className="material-symbols-outlined text-text-muted group-hover:text-white">logout</span>
+        </Button>
       </div>
     </aside>
   );

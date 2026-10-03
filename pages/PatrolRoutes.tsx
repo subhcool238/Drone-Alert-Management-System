@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import Button from '../components/Button';
 import { PatrolRoute } from '../types';
 import { COLORS } from '../data/theme';
 import { PATROL_ROUTES, COVERAGE_GAP, getPatrolRecommendation, getNextRun, PatrolRecommendation } from '../data/patrols';
@@ -60,7 +61,7 @@ const PatrolRoutes: React.FC = () => {
           </div>
 
           <div className="relative mb-4">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">search</span>
+            <span aria-hidden="true" className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">search</span>
             <input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -77,7 +78,7 @@ const PatrolRoutes: React.FC = () => {
             >
               {['Current shift', 'Previous shift', 'Last 24h'].map(o => <option key={o} value={o}>Scope: {o}</option>)}
             </select>
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-lg">expand_more</span>
+            <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-lg">expand_more</span>
           </div>
 
           <div className="flex items-center justify-between px-1">
@@ -85,12 +86,11 @@ const PatrolRoutes: React.FC = () => {
                <span className="text-xs text-white font-bold uppercase tracking-tight">Show Coverage Gaps</span>
                <span className="text-xs text-text-muted font-bold uppercase tracking-wider mt-0.5">Highlight &gt;30m Unpatrolled</span>
              </div>
-             <button 
-              onClick={() => setShowGapsOnly(!showGapsOnly)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${showGapsOnly ? 'bg-primary' : 'bg-white/10'}`}
-             >
+             <Button variant="toggle" role="switch" aria-checked={showGapsOnly} 
+ onClick={() => setShowGapsOnly(!showGapsOnly)}
+ className={`h-6 w-11 ${showGapsOnly ? 'bg-primary' : 'bg-white/10'}`}>
                 <span className={`inline-block size-4 transform rounded-full bg-white transition-transform ${showGapsOnly ? 'translate-x-6' : 'translate-x-1'}`} />
-             </button>
+             </Button>
           </div>
         </div>
 
@@ -122,7 +122,7 @@ const PatrolRoutes: React.FC = () => {
 
               {route.hasCoverageGap && (
                 <div className="bg-danger/10 border border-danger/20 rounded-xl px-3 py-2 mb-4 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-[16px] text-danger-light">warning</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-danger-light">warning</span>
                   <span className="text-xs text-danger-light font-bold uppercase tracking-wider">Gap: {route.gapDuration} Detected</span>
                 </div>
               )}
@@ -130,12 +130,12 @@ const PatrolRoutes: React.FC = () => {
               <div className="flex flex-wrap gap-2 mb-4">
                 {route.drones.map(d => (
                   <div key={d} className="flex items-center gap-1.5 bg-panel border border-white/10 rounded-lg px-2 py-1 text-xs font-bold text-white uppercase">
-                    <span className="material-symbols-outlined text-[14px] text-primary">flight</span> {d}
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-primary">flight</span> {d}
                   </div>
                 ))}
                 {route.guards.map(g => (
                   <div key={g} className="flex items-center gap-1.5 bg-panel border border-white/10 rounded-lg px-2 py-1 text-xs font-bold text-white uppercase">
-                    <span className="material-symbols-outlined text-[14px] text-emerald-500">person</span> {g.split(' ')[0]}
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-emerald-500">person</span> {g.split(' ')[0]}
                   </div>
                 ))}
                 {route.drones.length === 0 && route.guards.length === 0 && (
@@ -145,7 +145,7 @@ const PatrolRoutes: React.FC = () => {
 
               <div className="flex justify-between items-center border-t border-white/5 pt-4 text-xs font-bold uppercase tracking-wider text-text-muted">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">schedule</span>
                   <span>{route.duration}</span>
                 </div>
                 <span className={route.coverage >= 100 ? 'text-emerald-500' : 'text-warning'}>
@@ -180,7 +180,7 @@ const PatrolRoutes: React.FC = () => {
                   )}
                   {isRouteNightShift(selectedRoute) && (
                     <span className="px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[14px]">dark_mode</span> Night Protocol
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">dark_mode</span> Night Protocol
                     </span>
                   )}
                 </div>
@@ -191,8 +191,8 @@ const PatrolRoutes: React.FC = () => {
               </p>
             </div>
             <div className="flex gap-4 shrink-0 mt-2">
-              <button className="bg-background border border-white/10 hover:border-white/30 text-white px-8 py-4 rounded-2xl text-xs font-bold transition-all uppercase tracking-[0.12em] shadow-lg">Edit Configuration</button>
-              <button className="bg-primary hover:bg-primary/90 text-black px-12 py-4 rounded-2xl text-xs font-bold shadow-2xl shadow-primary/20 transition-all uppercase tracking-[0.12em]">Deploy Now</button>
+              <Button variant="secondary" className="bg-background hover:border-white/30 text-white px-8 py-4 text-xs font-bold uppercase tracking-[0.12em] shadow-lg">Edit Configuration</Button>
+              <Button variant="primary" className="px-12 py-4 text-xs font-bold shadow-2xl shadow-primary/20 uppercase tracking-[0.12em]">Deploy Now</Button>
             </div>
           </div>
 
@@ -274,36 +274,36 @@ const PatrolRoutes: React.FC = () => {
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em]">Assignment Matrix</h3>
-                  <button className="text-xs text-primary font-bold uppercase tracking-wider hover:underline">Manage Team</button>
+                  <Button variant="text" className="text-xs text-primary font-bold uppercase tracking-wider hover:underline">Manage Team</Button>
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-panel/50 border border-white/5 rounded-3xl p-8 space-y-6">
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-3">
-                      <span className="material-symbols-outlined text-[18px] text-primary">flight</span> Assigned Drones
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-primary">flight</span> Assigned Drones
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {selectedRoute.drones.length > 0 ? selectedRoute.drones.map(d => (
                         <div key={d} className="bg-background border border-primary/20 rounded-2xl p-4 flex items-center gap-4 flex-1 min-w-[150px] group hover:border-primary transition-all">
                            <div className="size-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                            <span className="text-xs font-bold text-white uppercase tracking-widest">{d}</span>
-                           <span className="material-symbols-outlined text-text-muted ml-auto group-hover:text-danger-light cursor-pointer text-lg">cancel</span>
+                           <span aria-hidden="true" className="material-symbols-outlined text-text-muted ml-auto group-hover:text-danger-light cursor-pointer text-lg">cancel</span>
                         </div>
                       )) : (
-                        <button className="w-full border-2 border-dashed border-white/5 rounded-2xl py-8 text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white hover:border-white/20 transition-all">
+                        <Button variant="bare" className="w-full border-2 border-dashed border-white/5 py-8 text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white hover:border-white/20 transition-all rounded-lg">
                           Add Mission Asset
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
                   <div className="bg-panel/50 border border-white/5 rounded-3xl p-8 space-y-6">
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-3">
-                      <span className="material-symbols-outlined text-[18px] text-emerald-500">person</span> Guard Units
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-emerald-500">person</span> Guard Units
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {selectedRoute.guards.length > 0 ? selectedRoute.guards.map(g => (
                         <div key={g} className="bg-background border border-white/5 rounded-2xl p-4 flex items-center gap-4 flex-1 min-w-[150px]">
                            <div className="size-8 rounded-full bg-gray-800 flex items-center justify-center text-text-muted">
-                             <span className="material-symbols-outlined text-sm">person</span>
+                             <span aria-hidden="true" className="material-symbols-outlined text-sm">person</span>
                            </div>
                            <div className="flex flex-col">
                              <span className="text-xs font-bold text-white uppercase">{g}</span>
@@ -311,9 +311,9 @@ const PatrolRoutes: React.FC = () => {
                            </div>
                         </div>
                       )) : (
-                        <button className="w-full border-2 border-dashed border-white/5 rounded-2xl py-8 text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white hover:border-white/20 transition-all">
+                        <Button variant="bare" className="w-full border-2 border-dashed border-white/5 py-8 text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white hover:border-white/20 transition-all rounded-lg">
                           Task Guard Unit
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -352,13 +352,12 @@ const PatrolRoutes: React.FC = () => {
                <section className="space-y-6">
                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="text-xs font-bold text-text-muted uppercase tracking-[0.12em]">Route Recommendations</h3>
-                    <button
-                      onClick={handleRecommendation}
-                      className="bg-indigo-600 hover:bg-indigo-600 text-white text-xs font-bold px-6 py-2.5 rounded-full uppercase tracking-wider transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-70 flex items-center gap-2"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">lightbulb</span>
+                    <Button variant="indigo"
+ onClick={handleRecommendation}
+ className="text-xs font-bold px-6 py-2.5 uppercase tracking-wider shadow-xl shadow-indigo-600/20 gap-2">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[16px]">lightbulb</span>
                       Get Recommendation
-                    </button>
+                    </Button>
                  </div>
 
                  {recommendation ? (
@@ -366,7 +365,7 @@ const PatrolRoutes: React.FC = () => {
                      <div className="absolute top-0 left-0 w-1 h-full bg-indigo-600"></div>
                      <div className="flex gap-6">
                        <div className="size-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
-                         <span className="material-symbols-outlined text-indigo-400">lightbulb</span>
+                         <span aria-hidden="true" className="material-symbols-outlined text-indigo-400">lightbulb</span>
                        </div>
                        <div>
                          <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Rule-based recommendation</h4>
@@ -376,7 +375,7 @@ const PatrolRoutes: React.FC = () => {
                              {isApplied ? (
                                <p className="mt-6 text-xs text-emerald-500 font-bold uppercase tracking-wider">Applied: {recommendation.drone.name} assigned to {recommendation.route.name}</p>
                              ) : (
-                               <button onClick={handleApplyRecommendation} className="mt-6 text-xs text-white font-bold bg-indigo-600 px-6 py-2 rounded-xl uppercase tracking-wider hover:brightness-110 transition-all">Apply Recommendation</button>
+                               <Button variant="indigo" onClick={handleApplyRecommendation} className="mt-6 text-xs font-bold px-6 py-2 uppercase tracking-wider">Apply Recommendation</Button>
                              )}
                            </>
                          ) : (
@@ -398,7 +397,7 @@ const PatrolRoutes: React.FC = () => {
                  <section className="bg-danger/10 border border-danger/20 rounded-[2rem] p-8 space-y-4">
                    <div className="flex items-center gap-4">
                       <div className="size-10 rounded-xl bg-danger/20 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-danger-light">crisis_alert</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-danger-light">crisis_alert</span>
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-danger-light uppercase tracking-wider">Coverage Criticality</h4>
@@ -410,8 +409,8 @@ const PatrolRoutes: React.FC = () => {
                      Recommend adding a high-altitude waypoint at [Sector 4] or tasking a manual guard sweep.
                    </p>
                    <div className="flex gap-3 pt-2">
-                     <button className="bg-danger-strong hover:brightness-110 text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wider transition-all">Task Guard</button>
-                     <button className="bg-white/5 border border-white/10 text-white text-xs font-bold px-4 py-2 rounded-lg uppercase tracking-wider hover:bg-white/10 transition-all">Ignore Once</button>
+                     <Button variant="danger" className="text-xs font-bold px-4 py-2 uppercase tracking-wider">Task Guard</Button>
+                     <Button variant="secondary" className="bg-white/5 text-white text-xs font-bold px-4 py-2 uppercase tracking-wider hover:bg-white/10">Ignore Once</Button>
                    </div>
                  </section>
                )}
@@ -419,16 +418,16 @@ const PatrolRoutes: React.FC = () => {
                {isRouteNightShift(selectedRoute) && (
                  <section className="bg-indigo-900/10 border border-indigo-500/20 rounded-[2rem] p-8 space-y-4">
                    <div className="flex items-center gap-4 text-indigo-400">
-                      <span className="material-symbols-outlined text-2xl">bedtime</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-2xl">bedtime</span>
                       <h4 className="text-xs font-bold uppercase tracking-wider">Night Operation Constraints</h4>
                    </div>
                    <p className="text-xs text-gray-400 leading-relaxed font-medium">
                      This route includes non-critical zones during silent hours (22:00–06:00). Safety protocol requires 
                      Team Lead approval for non-critical flight pathing at night.
                    </p>
-                   <button className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2 hover:translate-x-1 transition-transform">
-                     Request Override <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                   </button>
+                   <Button variant="text" className="text-xs font-bold text-indigo-400 uppercase tracking-wider gap-2 hover:translate-x-1 transition-transform">
+                     Request Override <span aria-hidden="true" className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                   </Button>
                  </section>
                )}
             </div>
@@ -438,13 +437,13 @@ const PatrolRoutes: React.FC = () => {
 
       {/* FOOTER ACTIONS - Floating */}
       <div className="fixed bottom-10 right-10 z-[60] flex gap-3">
-         <button className="size-14 rounded-full bg-panel border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/30 transition-all shadow-2xl">
-           <span className="material-symbols-outlined text-[24px]">content_copy</span>
-         </button>
-         <button className="bg-primary hover:bg-primary/90 text-black font-bold px-10 rounded-full shadow-2xl flex items-center justify-center gap-3 group transition-all transform active:scale-95">
-           <span className="material-symbols-outlined text-2xl">add</span>
+         <Button variant="icon" aria-label="Duplicate route" className="size-14 bg-panel border border-white/10 text-gray-400 hover:text-white hover:border-white/30 shadow-2xl">
+           <span aria-hidden="true" className="material-symbols-outlined text-[24px]">content_copy</span>
+         </Button>
+         <Button variant="primary" className="font-bold px-10 shadow-2xl gap-3 group transform active:scale-95">
+           <span aria-hidden="true" className="material-symbols-outlined text-2xl">add</span>
            <span className="text-xs font-bold uppercase tracking-[0.12em]">New Tactical Route</span>
-         </button>
+         </Button>
       </div>
     </div>
   );

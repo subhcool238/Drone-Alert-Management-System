@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import { Guard, FleetStatus } from '../types';
 import { countByStatus, getFleetBatteryAvg } from '../data/drones';
@@ -119,7 +120,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-panel border border-white/5 rounded-2xl p-4 flex flex-col gap-5 shadow-sm shrink-0">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-gray-200 uppercase tracking-[0.1em]">Tactical Controls</h3>
-            <span className="material-symbols-outlined text-[18px] text-text-muted cursor-pointer hover:text-white transition-colors">tune</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px] text-text-muted cursor-pointer hover:text-white transition-colors">tune</span>
           </div>
           
           <div className="grid grid-cols-2 gap-2">
@@ -134,7 +135,7 @@ const Dashboard: React.FC = () => {
                 <option>High</option>
                 <option>Medium</option>
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
             </div>
             <div className="relative">
               <select 
@@ -147,7 +148,7 @@ const Dashboard: React.FC = () => {
                 <option>Environmental</option>
                 <option>Sensor</option>
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
             </div>
           </div>
 
@@ -170,7 +171,7 @@ const Dashboard: React.FC = () => {
           {isMultiIncidentMode && (
             <div className="absolute top-0 left-0 right-0 z-20 bg-danger/10 border-b border-danger/20 p-2 text-center animate-in slide-in-from-top duration-300">
               <p className="text-xs font-bold text-danger-light uppercase tracking-wider flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-[14px]">priority_high</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[14px]">priority_high</span>
                 Multi-incident mode active
               </p>
             </div>
@@ -189,8 +190,8 @@ const Dashboard: React.FC = () => {
               <div className="px-1 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl mb-1 flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider px-2">Pause routine patrols?</span>
                 <div className="flex gap-2 px-2">
-                  <button onClick={() => setPatrolsPaused(true)} className={`px-3 py-1 rounded text-xs font-black uppercase ${patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Pause</button>
-                  <button onClick={() => setPatrolsPaused(false)} className={`px-3 py-1 rounded text-xs font-black uppercase ${!patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Running</button>
+                  <Button variant="segment" onClick={() => setPatrolsPaused(true)} className={`px-3 py-1 text-xs font-black uppercase ${patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Pause</Button>
+                  <Button variant="segment" onClick={() => setPatrolsPaused(false)} className={`px-3 py-1 text-xs font-black uppercase ${!patrolsPaused ? 'bg-indigo-600 text-white' : 'bg-white/5 text-text-muted'}`}>Running</Button>
                 </div>
               </div>
             )}
@@ -229,7 +230,7 @@ const Dashboard: React.FC = () => {
                     <p className="text-xs text-text-muted mb-1 font-medium">{alert.location}</p>
                     <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2 mt-1">
                       <span className="text-primary font-bold uppercase tracking-tight flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[16px]">reply</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[16px]">reply</span>
                         {alert.assignedTo || 'Unassigned'}
                       </span>
                       <span className="text-text-muted font-medium font-mono">{alert.detectedSecondsBeforeLoad !== undefined ? formatAgo(alert.detectedSecondsBeforeLoad + secondsSinceLoad) : alert.timestamp}</span>
@@ -325,28 +326,25 @@ const Dashboard: React.FC = () => {
 
           {/* Toggle Controls */}
           <div className="absolute top-5 left-5 flex gap-0.5 bg-background border border-white/10 p-1 rounded-xl z-30 shadow-2xl">
-            <button onClick={() => setMapMode('2D')} className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${mapMode === '2D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>2D</button>
-            <button onClick={() => setMapMode('3D')} className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${mapMode === '3D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>3D</button>
+            <Button variant="segment" onClick={() => setMapMode('2D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '2D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>2D</Button>
+            <Button variant="segment" onClick={() => setMapMode('3D')} className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${mapMode === '3D' ? 'bg-primary/20 text-primary shadow-inner' : 'text-gray-400 hover:text-white'}`}>3D</Button>
           </div>
 
           <div className="absolute top-5 right-5 flex flex-col gap-2 z-30">
-             <button className="size-10 rounded-xl flex items-center justify-center bg-background/90 backdrop-blur-md border border-white/10 text-gray-400 hover:text-white transition-all shadow-xl">
-               <span className="material-symbols-outlined text-[20px]">layers</span>
-             </button>
-             <button 
-              onClick={() => setViewMode(viewMode === 'thermal' ? 'default' : 'thermal')}
-              className={`size-10 rounded-xl flex items-center justify-center bg-background/90 backdrop-blur-md border transition-all shadow-xl ${
-                viewMode === 'thermal' ? 'border-orange-500/50 text-orange-400' : 'border-white/10 text-gray-400'
-              }`}
-            >
-               <span className="material-symbols-outlined text-[20px]">local_fire_department</span>
-             </button>
+             <Button variant="icon" aria-label="Map layers" className="size-10 bg-background/90 backdrop-blur-md border border-white/10 text-gray-400 hover:text-white shadow-xl">
+               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">layers</span>
+             </Button>
+             <Button variant="icon" aria-label="Thermal view" aria-pressed={viewMode === 'thermal'} 
+ onClick={() => setViewMode(viewMode === 'thermal' ? 'default' : 'thermal')}
+ className={`size-10 bg-background/90 backdrop-blur-md border shadow-xl ${ viewMode === 'thermal' ? 'border-orange-500/50 text-orange-400' : 'border-white/10 text-gray-400' }`}>
+               <span aria-hidden="true" className="material-symbols-outlined text-[20px]">local_fire_department</span>
+             </Button>
           </div>
 
           {/* Markers */}
           {mapLayers.drones && (
              <div className="absolute top-[35%] left-[40%] z-20 flex flex-col items-center group cursor-pointer transition-transform hover:scale-110">
-                <span className="material-symbols-outlined text-primary text-2xl rotate-45 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">flight</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-primary text-2xl rotate-45 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">flight</span>
                 <div className="bg-background/95 backdrop-blur-md border border-white/10 rounded-lg p-2 mt-2 shadow-2xl scale-0 group-hover:scale-100 transition-transform origin-top min-w-[120px]">
                    <p className="text-xs font-black text-white uppercase truncate tracking-wider">Sentinel-1</p>
                    <p className="text-xs text-primary font-bold mt-0.5 uppercase tracking-tighter">Status: MISSION_ACTIVE</p>
@@ -360,7 +358,7 @@ const Dashboard: React.FC = () => {
              return (
                <div key={alert.id} className="absolute z-20 group transition-all" style={{ top: coords.t, left: coords.l }}>
                  <div className={`size-4 rounded-full border-2 bg-black animate-ping absolute -top-2 -left-2 ${alert.priority === 'P1' ? 'border-danger' : 'border-primary'}`}></div>
-                 <span className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-danger-light' : 'text-primary'}`}>location_on</span>
+                 <span aria-hidden="true" className={`material-symbols-outlined text-2xl drop-shadow-lg ${alert.priority === 'P1' ? 'text-danger-light' : 'text-primary'}`}>location_on</span>
                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-background/95 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-2xl min-w-[140px] opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-xs font-black text-white uppercase bg-danger/10 px-2 py-0.5 rounded w-fit mb-1">{alert.priority}</p>
                     <p className="text-xs font-bold text-gray-200">{alert.title}</p>
@@ -374,14 +372,13 @@ const Dashboard: React.FC = () => {
         <div className="h-44 bg-panel border border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-sm shrink-0">
           <div className="flex items-center gap-8 border-b border-white/5 pb-3">
             {['feed', 'status', 'patrols', 'guards'].map((tab) => (
-              <button 
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === tab ? 'text-primary' : 'text-text-muted hover:text-white'}`}
-              >
+              <Button variant="bare" 
+ key={tab}
+ onClick={() => setActiveTab(tab as any)}
+ className={`inline-flex items-center min-h-[24px] text-xs font-bold uppercase tracking-wider relative ${activeTab === tab ? 'text-primary' : 'text-text-muted hover:text-white'}`}>
                 {tab === 'feed' ? 'Live Feed' : tab === 'status' ? 'Drone Status' : tab === 'patrols' ? 'Patrols' : 'Guards'}
-                {activeTab === tab && <div className="absolute -bottom-[13px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_rgba(6,182,212,0.4)]"></div>}
-              </button>
+                {activeTab === tab && <div className="absolute -bottom-[9px] left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_rgba(6,182,212,0.4)]"></div>}
+              </Button>
             ))}
           </div>
           <div className="flex-1 bg-background/50 rounded-xl border border-white/5 p-4 overflow-y-auto custom-scrollbar">
@@ -430,7 +427,7 @@ const Dashboard: React.FC = () => {
               ].map((sys, i) => (
                 <div key={i} className="bg-background border border-white/5 rounded-xl p-4 flex items-center gap-4 transition-all hover:border-white/10 group">
                   <div className={`size-10 rounded-xl flex items-center justify-center bg-background border border-white/5 ${sys.status === 'warn' ? 'text-warning' : 'text-text-muted group-hover:text-primary'}`}>
-                    <span className="material-symbols-outlined text-[20px]">{sys.icon}</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px]">{sys.icon}</span>
                   </div>
                   <div className="flex-1">
                     <h4 className="text-xs font-bold text-white mb-0.5">{sys.name}</h4>
@@ -443,10 +440,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-3 shrink-0 pt-2 pb-1">
-          <button onClick={() => navigate('/fleet')} className="w-full bg-primary hover:bg-primary/90 transition-all text-black font-bold py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-primary/10">Deploy Drone</button>
+          <Button variant="primary" onClick={() => navigate('/fleet')} className="w-full font-bold py-4 text-xs uppercase tracking-widest shadow-xl shadow-primary/10">Deploy Drone</Button>
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => navigate('/patrols')} className="bg-slate-800 text-white font-bold py-3 rounded-xl border border-white/10 text-xs uppercase tracking-wider hover:bg-white/10 transition-all">Patrols</button>
-            <button onClick={() => setShowShiftHandover(true)} className="bg-indigo-600/90 text-white font-bold py-3 rounded-xl border border-white/10 text-xs uppercase tracking-wider hover:bg-indigo-600 transition-all">Handover</button>
+            <Button variant="secondary" onClick={() => navigate('/patrols')} className="bg-slate-800 text-white font-bold py-3 text-xs uppercase tracking-wider hover:bg-white/10">Patrols</Button>
+            <Button variant="indigo" onClick={() => setShowShiftHandover(true)} className="font-bold py-3 border border-white/10 text-xs uppercase tracking-wider">Handover</Button>
           </div>
         </div>
       </div>

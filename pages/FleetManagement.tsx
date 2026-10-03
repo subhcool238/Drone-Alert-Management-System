@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Button from '../components/Button';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
 import { DRONES as mockDrones, getOnlineCount, STATUS_DOT, STATUS_LABEL } from '../data/drones';
@@ -77,16 +78,16 @@ const FleetManagement: React.FC = () => {
                 <h2 className="text-2xl font-display font-bold text-white">Schedule Maintenance</h2>
                 <p className="text-xs text-text-muted mt-1 uppercase tracking-widest font-bold">Drone: {selectedDrone.name}</p>
               </div>
-              <button onClick={() => setIsMaintenanceModalOpen(false)} className="material-symbols-outlined text-text-muted hover:text-white transition-colors">close</button>
+              <Button variant="icon" aria-label="Close" onClick={() => setIsMaintenanceModalOpen(false)} className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">close</span></Button>
             </div>
             <div className="p-8 space-y-6">
               <div className="space-y-3">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-[0.12em] block">Maintenance Type</label>
                 <div className="grid grid-cols-2 gap-3">
                   {['Routine Check', 'Propeller Replacement', 'Lens Recalibration', 'Firmware Flash'].map(type => (
-                    <button key={type} className="bg-background border border-white/5 p-4 rounded-2xl text-xs font-bold text-gray-300 hover:border-primary transition-all text-left">
+                    <Button variant="bare" key={type} className="bg-background border border-white/5 p-4 text-xs font-bold text-gray-300 hover:border-primary transition-all text-left rounded-lg">
                       {type}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -97,8 +98,8 @@ const FleetManagement: React.FC = () => {
               </div>
             </div>
             <div className="p-8 bg-background/50 flex justify-end gap-3">
-              <button onClick={() => setIsMaintenanceModalOpen(false)} className="px-8 py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider hover:bg-white/5 text-gray-400">Cancel</button>
-              <button onClick={() => setIsMaintenanceModalOpen(false)} className="px-10 py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">Confirm Schedule</button>
+              <Button variant="secondary" onClick={() => setIsMaintenanceModalOpen(false)} className="px-8 py-3 text-xs font-bold uppercase tracking-wider text-gray-400">Cancel</Button>
+              <Button variant="primary" onClick={() => setIsMaintenanceModalOpen(false)} className="px-10 py-3 text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/20">Confirm Schedule</Button>
             </div>
           </div>
         </div>
@@ -113,7 +114,7 @@ const FleetManagement: React.FC = () => {
         
         <div className="flex flex-col gap-3 px-1">
           <div className="relative group">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
+            <span aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
             <input 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -130,7 +131,7 @@ const FleetManagement: React.FC = () => {
                 <option>Charging</option>
                 <option>Fault</option>
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
             </div>
             <div className="relative">
               <select value={healthFilter} onChange={e => setHealthFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
@@ -139,7 +140,7 @@ const FleetManagement: React.FC = () => {
                 <option>Medium</option>
                 <option>Low</option>
               </select>
-              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-sm">expand_more</span>
             </div>
           </div>
         </div>
@@ -196,7 +197,7 @@ const FleetManagement: React.FC = () => {
 
               <div className="flex items-center justify-between mt-1 text-xs font-bold text-text-muted uppercase tracking-wider">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[14px]">wifi</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[14px]">wifi</span>
                   <span>{drone.link} Link</span>
                 </div>
                 <div>{drone.cyclesRemaining} Cycles Left</div>
@@ -244,12 +245,12 @@ const FleetManagement: React.FC = () => {
             </div>
 
             <div className="flex gap-4 mt-auto">
-              <button onClick={() => navigate(`/manual?id=${selectedDrone.id}`)} className="flex-1 bg-primary hover:bg-primary/90 transition-all text-black font-bold text-xs py-5 rounded-2xl flex items-center justify-center gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
-                <span className="material-symbols-outlined text-[20px]">rocket_launch</span> Deploy Manual Mission
-              </button>
-              <button className="bg-background border border-white/10 text-white hover:bg-white/5 transition-all font-bold text-xs px-12 py-5 rounded-2xl flex items-center gap-3 uppercase tracking-widest">
-                <span className="material-symbols-outlined text-[20px]">settings</span> Advanced Config
-              </button>
+              <Button variant="primary" onClick={() => navigate(`/manual?id=${selectedDrone.id}`)} className="flex-1 font-bold text-xs py-5 gap-3 uppercase tracking-[0.15em] shadow-xl shadow-primary/10">
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">rocket_launch</span> Deploy Manual Mission
+              </Button>
+              <Button variant="secondary" className="bg-background text-white font-bold text-xs px-12 py-5 gap-3 uppercase tracking-widest">
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">settings</span> Advanced Config
+              </Button>
             </div>
           </div>
         </div>
@@ -259,19 +260,18 @@ const FleetManagement: React.FC = () => {
           <div className="flex items-center justify-between">
              <div className="flex items-center gap-4">
                 <div className="bg-primary/10 p-3 rounded-2xl border border-primary/20">
-                  <span className="material-symbols-outlined text-primary text-[28px]">analytics</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-primary text-[28px]">analytics</span>
                 </div>
                 <div>
                   <h3 className="text-[13px] font-bold text-white uppercase tracking-[0.25em]">Maintenance Diagnostics</h3>
                   <p className="text-xs text-text-muted font-medium uppercase mt-1">Fleet Health Report</p>
                 </div>
              </div>
-             <button 
-               onClick={() => setIsMaintenanceModalOpen(true)}
-               className="text-xs font-bold text-white border border-white/10 hover:bg-white/5 px-8 py-4 rounded-2xl uppercase tracking-[0.1em] transition-all bg-background/50 shadow-sm"
-              >
+             <Button variant="secondary" 
+ onClick={() => setIsMaintenanceModalOpen(true)}
+ className="text-xs font-bold text-white px-8 py-4 uppercase tracking-[0.1em] bg-background/50 shadow-sm">
               Schedule Maintenance
-            </button>
+            </Button>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -319,14 +319,14 @@ const FleetManagement: React.FC = () => {
             
             <div className="lg:col-span-5 bg-panel/30 border border-white/5 rounded-3xl p-8 flex flex-col">
               <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                <span className="material-symbols-outlined text-text-muted text-[20px]">rule</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-text-muted text-[20px]">rule</span>
                 <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Anomaly Detection Flags</p>
               </div>
               <div className="flex-1 space-y-6">
                 {selectedDrone.anomalies.map((a, i) => (
                   <div key={i} className="flex gap-5 items-start animate-in fade-in slide-in-from-left duration-500" style={{ animationDelay: `${i * 100}ms` }}>
                     <div className={`size-8 rounded-xl flex items-center justify-center shrink-0 ${selectedDrone.health < 60 ? 'bg-danger/10 text-danger-light border border-danger/20' : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'}`}>
-                      <span className="material-symbols-outlined text-[18px]">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
                         {selectedDrone.health < 60 ? 'error' : 'task_alt'}
                       </span>
                     </div>
@@ -338,9 +338,9 @@ const FleetManagement: React.FC = () => {
                 ))}
               </div>
               <div className="mt-8 pt-6 border-t border-white/5">
-                 <button className="text-xs font-bold text-primary uppercase tracking-[0.12em] flex items-center gap-2 hover:translate-x-1 transition-transform">
-                   Run Deep Diagnostic <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                 </button>
+                 <Button variant="text" className="text-xs font-bold text-primary uppercase tracking-[0.12em] gap-2 hover:translate-x-1 transition-transform">
+                   Run Deep Diagnostic <span aria-hidden="true" className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                 </Button>
               </div>
             </div>
           </div>
@@ -350,7 +350,7 @@ const FleetManagement: React.FC = () => {
         <div className="space-y-8">
           <div className="flex items-center gap-4">
              <div className="bg-emerald-500/10 p-3 rounded-2xl border border-emerald-500/20">
-               <span className="material-symbols-outlined text-emerald-500 text-[28px]">sensors</span>
+               <span aria-hidden="true" className="material-symbols-outlined text-emerald-500 text-[28px]">sensors</span>
              </div>
              <div>
                <h3 className="text-[13px] font-bold text-white uppercase tracking-[0.25em]">Real-Time Telemetry</h3>
@@ -367,7 +367,7 @@ const FleetManagement: React.FC = () => {
               <div key={i} className="bg-background/60 border border-white/5 rounded-3xl p-8 flex flex-col gap-6 group hover:border-primary/20 hover:bg-background transition-all shadow-inner">
                 <div className="flex justify-between items-start">
                    <div className="size-12 rounded-2xl bg-panel border border-white/10 flex items-center justify-center text-text-muted group-hover:text-primary group-hover:border-primary/30 transition-all">
-                     <span className="material-symbols-outlined text-[24px]">{stat.icon}</span>
+                     <span aria-hidden="true" className="material-symbols-outlined text-[24px]">{stat.icon}</span>
                    </div>
                    <div className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
                 </div>

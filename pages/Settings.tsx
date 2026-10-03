@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import Button from '../components/Button';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { UserPermission, Integration, ThreatType } from '../types';
 import { SLA_SECONDS, formatSlaTier } from '../data/sla';
@@ -18,12 +19,11 @@ const mockIntegrations: Integration[] = [
 ];
 
 const StatusToggle = ({ active, onChange }: { active: boolean; onChange?: () => void }) => (
-  <button 
-    onClick={onChange}
-    className={`relative inline-flex h-5 w-11 items-center rounded-full transition-colors ${active ? 'bg-primary' : 'bg-white/10'}`}
-  >
+  <Button variant="toggle" role="switch" aria-checked={active} 
+ onClick={onChange}
+ className={`h-5 w-11 ${active ? 'bg-primary' : 'bg-white/10'}`}>
     <span className={`inline-block size-3.5 transform rounded-full bg-white shadow-sm transition-transform ${active ? 'translate-x-6' : 'translate-x-1'}`} />
-  </button>
+  </Button>
 );
 
 const RolesAndPermissions = () => {
@@ -34,9 +34,9 @@ const RolesAndPermissions = () => {
           <h2 className="text-2xl font-display font-bold text-white tracking-tight">Security Hierarchy</h2>
           <p className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] mt-2">Roles, Overrides, and Operational Limits</p>
         </div>
-        <button className="bg-primary hover:bg-primary/90 text-black font-bold text-xs px-8 py-3 rounded-2xl shadow-xl shadow-primary/20 transition-all uppercase tracking-wider">
+        <Button variant="primary" className="font-bold text-xs px-8 py-3 shadow-xl shadow-primary/20 uppercase tracking-wider">
           Create Custom Role
-        </button>
+        </Button>
       </div>
 
       <div className="bg-panel border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -59,7 +59,7 @@ const RolesAndPermissions = () => {
                 <td className="px-4 py-7">
                   <div className="flex items-center gap-4">
                     <div className="size-10 rounded-2xl bg-background border border-white/5 flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
-                      <span className="material-symbols-outlined text-lg">shield_person</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-lg">shield_person</span>
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white">{p.role}</h4>
@@ -79,7 +79,7 @@ const RolesAndPermissions = () => {
                 <td className="px-2 py-7 text-center"><StatusToggle active={p.canReport} /></td>
                 <td className="px-2 py-7 text-center"><StatusToggle active={p.canAnalytics} /></td>
                 <td className="px-4 py-7 text-right">
-                  <button className="text-xs font-bold text-text-muted hover:text-white uppercase tracking-wider transition-all">Edit Matrix</button>
+                  <Button variant="text" className="text-xs font-bold text-text-muted hover:text-white uppercase tracking-wider">Edit Matrix</Button>
                 </td>
               </tr>
             ))}
@@ -138,7 +138,7 @@ const AlertRulesAndSLA = () => {
                        <span className="text-xs text-text-muted font-bold uppercase tracking-wider block">Response Level</span>
                        <span className="text-xs font-bold text-primary uppercase">{map.sev}</span>
                      </div>
-                     <span className="material-symbols-outlined text-text-muted">arrow_forward</span>
+                     <span aria-hidden="true" className="material-symbols-outlined text-text-muted">arrow_forward</span>
                      <div className="bg-background border border-white/10 px-6 py-2 rounded-xl text-xs font-bold text-white uppercase tracking-wider">{map.action}</div>
                   </div>
                 </div>
@@ -166,13 +166,13 @@ const AlertRulesAndSLA = () => {
 
               <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-[2rem] space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-emerald-500">tune</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-emerald-500">tune</span>
                   <h4 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Threshold Suggestion (sample)</h4>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed font-medium uppercase tracking-tight">
                   Suggested threshold change from logged false alarms (sample data): 12 HVAC vibrations in Sector B, raise 5%.
                 </p>
-                <button className="w-full py-3 bg-emerald-500 text-black text-xs font-bold uppercase tracking-wider rounded-xl transition-all hover:brightness-110">Review Suggestion</button>
+                <Button variant="success" className="w-full py-3 text-xs font-bold uppercase tracking-wider">Review Suggestion</Button>
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ const Integrations = () => (
         <h2 className="text-2xl font-display font-bold text-white tracking-tight">System Integrations</h2>
         <p className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] mt-2">External Monitoring and Ticketing Hubs</p>
       </div>
-      <button className="bg-background border border-white/10 text-white font-bold text-xs px-8 py-3 rounded-2xl hover:bg-white/5 transition-all uppercase tracking-wider">Connect New System</button>
+      <Button variant="secondary" className="bg-background text-white font-bold text-xs px-8 py-3 uppercase tracking-wider">Connect New System</Button>
     </div>
     
     <div className="grid grid-cols-3 gap-8">
@@ -215,7 +215,7 @@ const Integrations = () => (
         <div key={int.id} className="bg-panel border border-white/5 rounded-[2.5rem] p-10 flex flex-col gap-8 shadow-2xl group hover:border-white/10 transition-all">
           <div className="flex justify-between items-start">
             <div className="size-16 rounded-[1.5rem] bg-background border border-white/5 flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-4xl">{int.icon}</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-4xl">{int.icon}</span>
             </div>
             <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
               int.status === 'CONNECTED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-danger/10 text-danger-light border-danger/20'
@@ -240,7 +240,7 @@ const Integrations = () => (
               ))}
             </div>
           )}
-          <button className="w-full py-4 rounded-2xl border border-white/10 text-xs font-bold text-white uppercase tracking-wider hover:bg-white/5 transition-all mt-auto">Manage Integration</button>
+          <Button variant="secondary" className="w-full py-4 text-xs font-bold text-white uppercase tracking-wider mt-auto">Manage Integration</Button>
         </div>
       ))}
     </div>
@@ -267,16 +267,16 @@ const NotificationChannels = () => {
           <div key={ch.name} className="bg-panel border border-white/5 rounded-2xl p-6 flex items-center justify-between group hover:border-white/10 transition-all shadow-lg">
             <div className="flex items-center gap-6">
               <div className="size-12 rounded-xl bg-background border border-white/5 flex items-center justify-center text-text-muted group-hover:text-primary transition-colors">
-                <span className="material-symbols-outlined">{ch.icon}</span>
+                <span aria-hidden="true" className="material-symbols-outlined">{ch.icon}</span>
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white tracking-tight">{ch.name}</h4>
                 <p className="text-xs text-text-muted font-bold uppercase tracking-wider mt-0.5">{ch.desc}</p>
               </div>
             </div>
-            <button className="text-xs font-bold text-text-muted hover:text-primary uppercase tracking-wider transition-colors px-4 py-2">
+            <Button variant="text" className="text-xs font-bold text-text-muted hover:text-primary uppercase tracking-wider px-4 py-2">
               Configure
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -305,7 +305,7 @@ const LanguageAndRegion = () => {
                 <option>Spanish (ES)</option>
                 <option>German (DE)</option>
               </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
             </div>
           </div>
           <div className="space-y-3">
@@ -317,7 +317,7 @@ const LanguageAndRegion = () => {
                 <option>New York (EST)</option>
                 <option>Tokyo (JST)</option>
               </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+              <span aria-hidden="true" className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
             </div>
           </div>
         </div>
@@ -384,14 +384,14 @@ const Settings: React.FC = () => {
               <Link
                 key={section.path}
                 to={fullPath}
-                className={`flex items-center gap-4 px-5 py-4 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all relative group ${
+                className={`flex items-center gap-4 px-5 py-4 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   isActive ? 'text-white bg-white/5 shadow-inner' : 'text-text-muted hover:text-white hover:bg-white/5'
                 }`}
               >
                 {isActive && (
                   <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-primary rounded-r-full shadow-[0_0_15px_rgba(6,182,212,0.8)]"></div>
                 )}
-                <span className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'text-primary' : 'group-hover:text-primary'}`}>
+                <span aria-hidden="true" className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'text-primary' : 'group-hover:text-primary'}`}>
                   {section.icon}
                 </span>
                 {section.label}
@@ -412,7 +412,7 @@ const Settings: React.FC = () => {
           <Route path="about" element={<AboutSection />} />
           <Route path="*" element={
             <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto animate-in fade-in duration-700">
-              <span className="material-symbols-outlined text-7xl text-white/5 mb-10 scale-125">construction</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-7xl text-white/5 mb-10 scale-125">construction</span>
               <h2 className="text-2xl font-display font-bold text-white mb-3 uppercase tracking-widest">Module Scaling</h2>
               <p className="text-xs text-text-muted leading-relaxed font-bold uppercase tracking-tight">
                 Our infrastructure team is configuring this channel. 

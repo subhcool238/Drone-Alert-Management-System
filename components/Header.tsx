@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import Button from './Button';
 import { useLocation } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES } from '../data/drones';
@@ -80,7 +81,7 @@ const Header: React.FC = () => {
                   <h2 className="text-3xl font-display font-bold text-white tracking-tight">Shift Handover Briefing</h2>
                   <p className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] mt-2">Operator: Isabelle M. <span aria-hidden="true">•</span> 22:00 - 06:00</p>
                </div>
-               <button onClick={() => setShowShiftBriefing(false)} className="material-symbols-outlined text-text-muted hover:text-white transition-colors">close</button>
+               <Button variant="icon" aria-label="Close" onClick={() => setShowShiftBriefing(false)} className="text-text-muted hover:text-white"><span className="material-symbols-outlined" aria-hidden="true">close</span></Button>
             </div>
             <div className="p-10 grid grid-cols-2 gap-10 bg-background/20">
               <div className="space-y-8">
@@ -103,7 +104,7 @@ const Header: React.FC = () => {
                 <section>
                    <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-4">Fleet & Maintenance</h4>
                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
-                      <span className="material-symbols-outlined text-primary">engineering</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-primary">engineering</span>
                       <p className="text-xs text-gray-400 leading-tight">
                         {outOfServiceDrones.length > 0
                           ? outOfServiceDrones.map(d => `${d.name} out of service: ${d.anomalies.join(', ')}.`).join(' ')
@@ -119,7 +120,7 @@ const Header: React.FC = () => {
                     <div className="text-4xl font-display font-bold text-warning mb-1">{gapCount} {gapCount === 1 ? 'Zone' : 'Zones'}</div>
                     <p className="text-xs text-text-muted font-bold uppercase tracking-wider">Unpatrolled for {COVERAGE_GAP.minutes} min</p>
                     {recommendation.ok && (
-                      <button className="mt-4 text-xs text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all">Assign {recommendation.drone.name}</button>
+                      <Button variant="bare" className="mt-4 text-xs text-warning font-bold bg-warning/10 px-4 py-2 rounded-lg border border-warning/20 hover:bg-warning/20 transition-all min-h-[32px]">Assign {recommendation.drone.name}</Button>
                     )}
                   </div>
                 </section>
@@ -133,8 +134,8 @@ const Header: React.FC = () => {
               </div>
             </div>
             <div className="p-10 flex justify-end gap-4 bg-background/50 border-t border-white/5">
-              <button onClick={() => setShowShiftBriefing(false)} className="px-8 py-3 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-wider text-gray-400">Back to Ops</button>
-              <button onClick={() => setShowShiftBriefing(false)} className="px-10 py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary/20">Acknowledge & Sign</button>
+              <Button variant="secondary" onClick={() => setShowShiftBriefing(false)} className="px-8 py-3 text-xs font-bold uppercase tracking-wider text-gray-400">Back to Ops</Button>
+              <Button variant="primary" onClick={() => setShowShiftBriefing(false)} className="px-10 py-3 text-xs font-bold uppercase tracking-wider shadow-xl shadow-primary/20">Acknowledge & Sign</Button>
             </div>
           </div>
         </div>
@@ -142,7 +143,7 @@ const Header: React.FC = () => {
 
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3 group cursor-pointer">
-          <span className="material-symbols-outlined text-primary text-2xl group-hover:rotate-180 transition-transform duration-500">hexagon</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-primary text-2xl group-hover:rotate-180 transition-transform duration-500">hexagon</span>
           <div className="flex flex-col">
             <span className="text-white text-lg font-bold tracking-tight font-display">Musée d'Art Précieux CC</span>
             <span className="text-xs text-text-muted font-bold uppercase tracking-[0.12em] leading-none mt-1">Command Center v1.2.3</span>
@@ -153,7 +154,7 @@ const Header: React.FC = () => {
 
       <div className="flex-1 max-w-2xl mx-12 relative">
         <div className="relative group">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
+          <span aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[20px] group-focus-within:text-primary transition-colors">search</span>
           <input 
             value={searchQuery}
             // DO: Fixed typo - changed setSearchTerm to setSearchQuery to match declared state
@@ -161,20 +162,20 @@ const Header: React.FC = () => {
             className="w-full bg-panel border border-white/10 rounded-2xl py-2.5 pl-12 pr-12 text-white text-sm focus:border-primary/50 focus:ring-0 placeholder-text-muted transition-all outline-none" 
             placeholder="Search Drones, Incidents, Guards, Patrols..."
           />
-          <button onClick={handleSummary} className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined text-[20px]">summarize</span>
-          </button>
+          <Button variant="icon" aria-label="Show rule-based summary" onClick={handleSummary} className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 hover:text-primary">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">summarize</span>
+          </Button>
         </div>
 
         {summary && (
           <div className="absolute top-full mt-3 left-0 right-0 bg-indigo-600 border border-indigo-500/30 p-4 rounded-2xl shadow-2xl z-[70] animate-in slide-in-from-top-2">
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-white text-lg mt-0.5">info</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-white text-lg mt-0.5">info</span>
               <div className="flex-1">
                 <p className="text-xs text-white/60 font-bold uppercase tracking-wider mb-1">Rule-based summary</p>
                 <p className="text-xs text-white/90 font-bold leading-relaxed">{summary}</p>
               </div>
-              <button onClick={() => setSummary(null)} className="text-white/40 hover:text-white"><span className="material-symbols-outlined text-sm">close</span></button>
+              <Button variant="icon" aria-label="Close summary" onClick={() => setSummary(null)} className="text-white/40 hover:text-white"><span aria-hidden="true" className="material-symbols-outlined text-sm">close</span></Button>
             </div>
           </div>
         )}
@@ -182,31 +183,28 @@ const Header: React.FC = () => {
 
       <div className="flex items-center gap-4">
         <div className="relative" ref={notificationsRef}>
-          <button
-            ref={bellRef}
-            aria-expanded={showNotifications}
-            aria-label="Notifications"
-            onClick={() => setShowNotifications(!showNotifications)}
-            className={`size-10 rounded-2xl border flex items-center justify-center transition-all relative ${
-              showNotifications ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-panel border-white/10 text-gray-400 hover:text-white'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[20px]">notifications</span>
+          <Button variant="icon"
+ ref={bellRef}
+ aria-expanded={showNotifications}
+ aria-label="Notifications"
+ onClick={() => setShowNotifications(!showNotifications)}
+ className={`size-10 border relative ${ showNotifications ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-panel border-white/10 text-gray-400 hover:text-white' }`}>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">notifications</span>
             <span className="absolute top-2.5 right-2.5 size-1.5 rounded-full bg-danger ring-4 ring-background"></span>
-          </button>
+          </Button>
 
           {showNotifications && (
             <div className="absolute top-full mt-4 right-0 w-[320px] bg-panel border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
               <div className="p-5 border-b border-white/5 flex justify-between items-center bg-background/50">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">Active Notifications</h4>
-                <button className="text-xs text-primary font-bold uppercase hover:underline">Clear All</button>
+                <Button variant="text" className="text-xs text-primary font-bold uppercase hover:underline">Clear All</Button>
               </div>
               <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                 {notifications.map(n => (
                   <div key={n.id} className="p-5 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group">
                     <div className="flex items-start gap-4">
                       <div className={`size-8 rounded-xl bg-background border border-white/5 flex items-center justify-center shrink-0 ${n.color}`}>
-                        <span className="material-symbols-outlined text-lg">{n.icon}</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-lg">{n.icon}</span>
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-baseline mb-1">
@@ -220,7 +218,7 @@ const Header: React.FC = () => {
                 ))}
               </div>
               <div className="p-4 text-center bg-background/50">
-                <button className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition-colors">View All Activities</button>
+                <Button variant="text" className="text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white">View All Activities</Button>
               </div>
             </div>
           )}
@@ -235,7 +233,7 @@ const Header: React.FC = () => {
             <span className="text-xs font-bold text-white group-hover:text-primary transition-colors leading-none">Isabelle M.</span>
             <span className="text-xs text-text-muted font-bold uppercase tracking-wider mt-1">Lead Drone Operator</span>
           </div>
-          <span className="material-symbols-outlined text-text-muted text-[18px] ml-2 group-hover:text-white">expand_more</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-text-muted text-[18px] ml-2 group-hover:text-white">expand_more</span>
         </div>
       </div>
     </header>
