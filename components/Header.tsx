@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FleetStatus } from '../types';
 import { DRONES } from '../data/drones';
 import { INCIDENTS, getOpenIncidents, getSlaState, useSecondsSinceLoad } from '../data/incidents';
@@ -9,6 +10,36 @@ import { buildSystemSummary } from '../data/summary';
 
 const Header: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const bellRef = useRef<HTMLButtonElement>(null);
+  const { pathname } = useLocation();
+
+  // Close the notifications panel when the page changes
+  useEffect(() => {
+    setShowNotifications(false);
+  }, [pathname]);
+
+  // While open: close on a click outside it, or on Escape (focus returns to the bell)
+  useEffect(() => {
+    if (!showNotifications) return;
+    const onMouseDown = (e: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+        bellRef.current?.focus();
+      }
+    };
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [showNotifications]);
   const [showShiftBriefing, setShowShiftBriefing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [summary, setSummary] = useState<string | null>(null);
@@ -150,8 +181,11 @@ const Header: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <button 
+        <div className="relative" ref={notificationsRef}>
+          <button
+            ref={bellRef}
+            aria-expanded={showNotifications}
+            aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
             className={`size-10 rounded-2xl border flex items-center justify-center transition-all relative ${
               showNotifications ? 'bg-primary/20 border-primary/50 text-primary' : 'bg-panel border-white/10 text-gray-400 hover:text-white'

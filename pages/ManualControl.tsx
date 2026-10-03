@@ -11,6 +11,13 @@ const CARD_STATUS_TEXT: Record<FleetStatus, string> = {
   [FleetStatus.FAULT]: 'Fault'
 };
 
+// Mode banner text and existing colours for a drone that is not Active
+const NOT_ACTIVE_BANNER: Record<Exclude<FleetStatus, FleetStatus.ACTIVE>, { text: string; box: string; tone: string; icon: string }> = {
+  [FleetStatus.IDLE]: { text: 'Drone docked: ready for deployment', box: 'bg-white/5 border-white/10', tone: 'text-gray-400', icon: 'smart_toy' },
+  [FleetStatus.CHARGING]: { text: 'Drone charging: not available for control', box: 'bg-amber-500/10 border-amber-500/20', tone: 'text-warning', icon: 'warning' },
+  [FleetStatus.FAULT]: { text: 'Drone in fault: not available for control', box: 'bg-danger/20 border-danger/30', tone: 'text-danger', icon: 'warning' }
+};
+
 // Link quality colour by number: 80 and above green, 50 to 79 amber, below 50 red
 const linkQualityColor = (n: number): string =>
   n >= 80 ? 'text-emerald-500' : n >= 50 ? 'text-amber-500' : 'text-danger';
@@ -46,6 +53,11 @@ const ManualControl: React.FC = () => {
   const isAirborne = selectedDrone.status === FleetStatus.ACTIVE;
   const shownAltitude = isAirborne ? altitude : 0;
   const shownSpeed = isAirborne ? speed : 0;
+
+  // Mode banner for a drone that is not Active (only while no manual session is running)
+  const statusBanner = !isManual && !isAirborne
+    ? NOT_ACTIVE_BANNER[selectedDrone.status as Exclude<FleetStatus, FleetStatus.ACTIVE>]
+    : null;
   const [proximity, setProximity] = useState(18.5);
 
   // Battery of the currently selected drone
@@ -202,20 +214,20 @@ const ManualControl: React.FC = () => {
         <div className="flex-1 bg-panel rounded-3xl border border-white/5 flex flex-col shadow-2xl relative overflow-hidden min-h-[450px]">
           {/* Mode Banner */}
           <div className={`flex-none px-6 py-3 border-b flex items-center justify-between z-10 transition-colors duration-500 ${
-            !isManual ? 'bg-emerald-500/10 border-emerald-500/20' : 
+            !isManual ? (statusBanner ? statusBanner.box : 'bg-emerald-500/10 border-emerald-500/20') :
             isCriticalZone ? 'bg-danger/20 border-danger/30 animate-pulse' :
             isWarningZone ? 'bg-warning/20 border-warning/30' : 'bg-amber-500/10 border-amber-500/20'
           }`}>
             <div className="flex items-center gap-3">
               <span className={`material-symbols-outlined text-[18px] ${
-                !isManual ? 'text-emerald-500' : isCriticalZone ? 'text-danger' : 'text-warning'
+                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger' : 'text-warning'
               }`}>
-                {isManual ? 'warning' : 'smart_toy'}
+                {isManual ? 'warning' : (statusBanner ? statusBanner.icon : 'smart_toy')}
               </span>
               <span className={`font-bold text-[10px] tracking-[0.15em] uppercase ${
-                !isManual ? 'text-emerald-500' : isCriticalZone ? 'text-danger' : 'text-warning'
+                !isManual ? (statusBanner ? statusBanner.tone : 'text-emerald-500') : isCriticalZone ? 'text-danger' : 'text-warning'
               }`}>
-                {!isManual ? 'Mode: Autonomous – Flight path controlled by mission plan' : 
+                {!isManual ? (statusBanner ? statusBanner.text : 'Mode: Autonomous – Flight path controlled by mission plan') :
                  `Mode: Manual override by Isabelle M. – ${formatTime(elapsedSeconds)} elapsed`}
               </span>
             </div>
@@ -400,18 +412,18 @@ const ManualControl: React.FC = () => {
             <span className="material-symbols-outlined text-[18px] text-primary">security</span> Safety Systems
           </h2>
           <div className="space-y-3">
-            <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
-              <span className={`material-symbols-outlined ${proximity < 5 ? 'text-danger animate-pulse' : 'text-emerald-500'}`}>sensors</span>
+            <div className={`p-4 rounded-xl border flex items-center gap-4 transition-all ${isAirborne && proximity < 5 ? 'bg-danger/10 border-danger/30' : 'bg-background border-white/5'}`}>
+              <span className={`material-symbols-outlined ${!isAirborne ? 'text-gray-500' : proximity < 5 ? 'text-danger animate-pulse' : 'text-emerald-500'}`}>sensors</span>
               <div className="flex-1">
                  <p className="text-[10px] font-bold text-white uppercase tracking-widest">Proximity</p>
-                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">{proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
+                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">{!isAirborne ? 'Not in flight' : proximity < 5 ? `Obstacle at ${proximity.toFixed(1)}m` : 'Clear Path'}</p>
               </div>
             </div>
             <div className="p-4 rounded-xl bg-background border border-white/5 flex items-center gap-4">
-              <span className="material-symbols-outlined text-emerald-500">public</span>
+              <span className={`material-symbols-outlined ${isAirborne ? 'text-emerald-500' : 'text-gray-500'}`}>public</span>
               <div className="flex-1">
                  <p className="text-[10px] font-bold text-white uppercase tracking-widest">Geofence Status</p>
-                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">Clear - Within Perimeter</p>
+                 <p className="text-[10px] text-gray-500 font-medium mt-0.5">{isAirborne ? 'Clear - Within Perimeter' : 'Not in flight'}</p>
               </div>
             </div>
           </div>

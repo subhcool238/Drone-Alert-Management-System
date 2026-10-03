@@ -278,7 +278,7 @@ const PatrolRoutes: React.FC = () => {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="bg-panel/50 border border-white/5 rounded-3xl p-8 space-y-6">
                     <h4 className="text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-3">
-                      <span className="material-symbols-outlined text-[18px] text-primary">flight</span> Active Drones
+                      <span className="material-symbols-outlined text-[18px] text-primary">flight</span> Assigned Drones
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {selectedRoute.drones.length > 0 ? selectedRoute.drones.map(d => (

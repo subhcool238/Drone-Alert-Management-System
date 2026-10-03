@@ -2,7 +2,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FleetStatus, RiskLevel, Drone } from '../types';
-import { DRONES as mockDrones, getOnlineCount } from '../data/drones';
+import { DRONES as mockDrones, getOnlineCount, STATUS_DOT, STATUS_LABEL } from '../data/drones';
+
+// Detail badge follows the selected drone's status, in the existing status colours
+const FLIGHT_BADGE: Record<FleetStatus, { label: string; box: string; text: string }> = {
+  [FleetStatus.ACTIVE]: { label: 'In Flight', box: 'bg-emerald-500/20 border-emerald-500/30', text: 'text-emerald-500' },
+  [FleetStatus.IDLE]: { label: 'Flight Ready', box: 'bg-primary/20 border-primary/30', text: 'text-primary' },
+  [FleetStatus.CHARGING]: { label: 'Charging', box: 'bg-warning/20 border-warning/30', text: 'text-warning' },
+  [FleetStatus.FAULT]: { label: 'Grounded', box: 'bg-danger/20 border-danger/30', text: 'text-danger' }
+};
 
 const FleetManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -205,8 +213,8 @@ const FleetManagement: React.FC = () => {
             <img className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src={selectedDrone.image} alt={selectedDrone.name}/>
             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
             <div className="absolute bottom-6 left-6 flex items-center gap-3">
-               <div className="bg-primary/20 backdrop-blur-md border border-primary/30 px-4 py-2 rounded-xl">
-                 <span className="text-xs font-bold text-primary uppercase tracking-widest">Flight Ready</span>
+               <div className={`${FLIGHT_BADGE[selectedDrone.status].box} backdrop-blur-md border px-4 py-2 rounded-xl`}>
+                 <span className={`text-xs font-bold ${FLIGHT_BADGE[selectedDrone.status].text} uppercase tracking-widest`}>{FLIGHT_BADGE[selectedDrone.status].label}</span>
                </div>
                <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-white font-mono text-xs">
                  {selectedDrone.fwVersion}
@@ -222,7 +230,7 @@ const FleetManagement: React.FC = () => {
                   <span className="text-2xl font-mono text-gray-600 font-bold opacity-40">[{selectedDrone.id}]</span>
                 </div>
                 <div className="flex gap-3">
-                  <span className="bg-primary text-black text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">Active Fleet</span>
+                  <span className={`${STATUS_DOT[selectedDrone.status]} ${selectedDrone.status === FleetStatus.FAULT ? 'text-white' : 'text-black'} text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest`}>{STATUS_LABEL[selectedDrone.status]}</span>
                   <span className="bg-background text-gray-400 border border-white/10 text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">{selectedDrone.type}</span>
                   <div className={`px-4 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest ${getRiskColor(selectedDrone.risk)}`}>
                     {selectedDrone.risk} Risk Level
@@ -351,8 +359,8 @@ const FleetManagement: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: 'altitude', label: 'Altitude', val: '124.8', unit: 'Meters' },
-              { icon: 'speed', label: 'Ground Speed', val: selectedDrone.avgSpeed, unit: 'm/s' },
+              { icon: 'altitude', label: 'Altitude', val: selectedDrone.status === FleetStatus.ACTIVE ? '12.4' : '0', unit: 'Meters' },
+              { icon: 'speed', label: 'Ground Speed', val: selectedDrone.status === FleetStatus.ACTIVE ? selectedDrone.avgSpeed : 0, unit: 'm/s' },
               { icon: 'satellite_alt', label: 'GPS Satellites', val: 18, unit: 'Locked' },
               { icon: 'wifi_tethering', label: 'Link Quality', val: selectedDrone.linkStrength, unit: '%' }
             ].map((stat, i) => (
