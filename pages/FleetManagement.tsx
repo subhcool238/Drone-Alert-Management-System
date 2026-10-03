@@ -128,7 +128,7 @@ const FleetManagement: React.FC = () => {
           <div className="grid grid-cols-2 gap-3">
             <div className="relative">
               <select aria-label="Filter drones by status" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
-                <option>Status: All</option>
+                <option value="All">Status: All</option>
                 <option>Active</option>
                 <option>Idle</option>
                 <option>Charging</option>
@@ -138,7 +138,7 @@ const FleetManagement: React.FC = () => {
             </div>
             <div className="relative">
               <select aria-label="Filter drones by health" value={healthFilter} onChange={e => setHealthFilter(e.target.value)} className="w-full appearance-none bg-panel border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-400 outline-none focus:border-primary/30 cursor-pointer">
-                <option>Health: All</option>
+                <option value="All">Health: All</option>
                 <option>High</option>
                 <option>Medium</option>
                 <option>Low</option>

@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
                 onChange={e => setSeverityFilter(e.target.value)}
                 className="w-full appearance-none bg-background text-xs text-gray-300 border border-white/10 rounded-xl pl-2.5 pr-7 py-2.5 tracking-tight outline-none focus:border-primary/50 transition-all cursor-pointer"
               >
-                <option>Severity: All</option>
+                <option value="All">Severity: All</option>
                 <option>Critical</option>
                 <option>High</option>
                 <option>Medium</option>
@@ -181,7 +181,7 @@ const Dashboard: React.FC = () => {
                 onChange={e => setThreatFilter(e.target.value)}
                 className="w-full appearance-none bg-background text-xs text-gray-300 border border-white/10 rounded-xl pl-2.5 pr-7 py-2.5 tracking-tight outline-none focus:border-primary/50 transition-all cursor-pointer"
               >
-                <option>Threat: All</option>
+                <option value="All">Threat: All</option>
                 <option>Human</option>
                 <option>Environmental</option>
                 <option>Sensor</option>
@@ -297,6 +297,7 @@ const Dashboard: React.FC = () => {
             <div className="absolute inset-0 bg-black overflow-hidden">
               <MuseumPlan
                 mode="3D"
+                rotatable
                 markers={planMarkers}
                 route={perimeterRoute}
                 legend={planLegend}

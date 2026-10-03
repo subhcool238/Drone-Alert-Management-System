@@ -37,6 +37,9 @@ const SCROLL_SHADOW: React.CSSProperties = {
 };
 
 const RolesAndPermissions = () => {
+  const [perms, setPerms] = useState<UserPermission[]>(mockPermissions);
+  const flip = (role: string, key: 'canDeploy' | 'canManual' | 'canApprovePatrols' | 'canEmergency' | 'canReport' | 'canAnalytics') =>
+    setPerms(prev => prev.map(x => (x.role === role ? { ...x, [key]: !x[key] } : x)));
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-10">
@@ -64,7 +67,7 @@ const RolesAndPermissions = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {mockPermissions.map(p => (
+            {perms.map(p => (
               <tr key={p.role} className="hover:bg-white/5 transition-colors group">
                 <td className="px-3 py-7">
                   <div className="flex items-center gap-3">
@@ -77,17 +80,17 @@ const RolesAndPermissions = () => {
                     </div>
                   </div>
                 </td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canDeploy} label={`${p.role}: deploy drones`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canDeploy} onChange={() => flip(p.role, 'canDeploy')} label={`${p.role}: deploy drones`} /></td>
                 <td className="px-1 py-7 text-center">
                   <div className="flex flex-col items-center gap-1.5">
-                    <StatusToggle active={p.canManual} label={`${p.role}: manual control`} />
+                    <StatusToggle active={p.canManual} onChange={() => flip(p.role, 'canManual')} label={`${p.role}: manual control`} />
                     {p.canManual && <span className="text-xs font-mono text-primary font-bold">{p.manualLimit}m limit</span>}
                   </div>
                 </td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canApprovePatrols} label={`${p.role}: approve patrols`} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canEmergency} label={`${p.role}: emergency actions`} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canReport} label={`${p.role}: reports`} /></td>
-                <td className="px-1 py-7 text-center"><StatusToggle active={p.canAnalytics} label={`${p.role}: analytics`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canApprovePatrols} onChange={() => flip(p.role, 'canApprovePatrols')} label={`${p.role}: approve patrols`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canEmergency} onChange={() => flip(p.role, 'canEmergency')} label={`${p.role}: emergency actions`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canReport} onChange={() => flip(p.role, 'canReport')} label={`${p.role}: reports`} /></td>
+                <td className="px-1 py-7 text-center"><StatusToggle active={p.canAnalytics} onChange={() => flip(p.role, 'canAnalytics')} label={`${p.role}: analytics`} /></td>
                 <td className="px-3 py-7 text-right">
                   <Button variant="text" className="text-xs font-bold text-text-muted hover:text-white uppercase tracking-wider">Edit Matrix</Button>
                 </td>
@@ -166,7 +169,19 @@ const AlertRulesAndSLA = () => {
                   <span className="text-xs text-text-muted font-bold uppercase tracking-wider">Motion Trigger Confidence</span>
                   <span className="text-2xl font-display font-bold text-white">{confidence}%</span>
                 </div>
-                <div role="meter" aria-label="Motion trigger confidence" aria-valuemin={0} aria-valuemax={100} aria-valuenow={confidence} className="relative h-1.5 w-full bg-background rounded-full p-0.5">
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Motion trigger confidence"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={confidence}
+                  aria-valuetext={`${confidence} percent`}
+                  onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); const r = e.currentTarget.getBoundingClientRect(); setConfidence(Math.round(Math.min(100, Math.max(0, ((e.clientX - r.left) / r.width) * 100)))); }}
+                  onPointerMove={e => { if (e.buttons !== 1) return; const r = e.currentTarget.getBoundingClientRect(); setConfidence(Math.round(Math.min(100, Math.max(0, ((e.clientX - r.left) / r.width) * 100)))); }}
+                  onKeyDown={e => { if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); setConfidence(c => Math.min(100, c + 1)); } if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); setConfidence(c => Math.max(0, c - 1)); } if (e.key === 'Home') { e.preventDefault(); setConfidence(0); } if (e.key === 'End') { e.preventDefault(); setConfidence(100); } }}
+                  style={{ touchAction: 'none' }}
+                  className="relative h-1.5 w-full bg-background rounded-full p-0.5 cursor-pointer before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']">
                    <div className="absolute inset-0 bg-primary/20 rounded-full"></div>
                    <div className="h-full bg-primary rounded-full relative" style={{width: `${confidence}%`}}>
                      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-4 bg-white rounded-full shadow-xl shadow-primary/40 cursor-pointer"></div>

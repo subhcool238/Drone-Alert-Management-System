@@ -521,7 +521,7 @@ const Incidents: React.FC = () => {
                  <div className="grid grid-cols-2 gap-6">
                     {selectedIncident.evidence?.map((ev, i) => (
                       <div key={i} className="group relative rounded-3xl overflow-hidden aspect-video bg-background border border-white/5 shadow-inner">
-                         <img src={ev.url} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" alt={ev.caption}/>
+                         <img src={ev.url} className="w-full h-full object-cover" alt={ev.caption}/>
                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <span className="text-xs font-bold text-white uppercase tracking-wider">{ev.caption}</span>

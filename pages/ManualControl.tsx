@@ -30,6 +30,63 @@ const linkQualityColor = (n: number): string =>
 // Spoken form of the link quality colour
 const linkQualityWord = (n: number): string => (n >= 80 ? 'good' : n >= 50 ? 'fair' : 'poor');
 
+// A joystick: drag the knob (mouse, touch or arrow keys); it springs back to the centre on release.
+const Stick: React.FC<{ label: string }> = ({ label }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+
+  const maxTravel = () => {
+    const r = ref.current?.getBoundingClientRect();
+    return r ? (r.width - 56) / 2 : 28; // knob is 56px
+  };
+  const moveTo = (clientX: number, clientY: number) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const max = maxTravel();
+    let dx = clientX - (r.left + r.width / 2);
+    let dy = clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy);
+    if (d > max) { dx = (dx / d) * max; dy = (dy / d) * max; }
+    setPos({ x: dx, y: dy });
+  };
+  const release = () => { setDragging(false); setPos({ x: 0, y: 0 }); };
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const step = maxTravel();
+    const k: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+    if (!k[e.key]) return;
+    e.preventDefault();
+    setPos({ x: k[e.key][0] * step, y: k[e.key][1] * step });
+  };
+
+  return (
+    <div
+      ref={ref}
+      role="group"
+      aria-roledescription="joystick"
+      aria-label={label}
+      tabIndex={0}
+      onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); setDragging(true); moveTo(e.clientX, e.clientY); }}
+      onPointerMove={e => { if (dragging) moveTo(e.clientX, e.clientY); }}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onKeyDown={onKeyDown}
+      onKeyUp={release}
+      onBlur={release}
+      style={{ touchAction: 'none' }}
+      className="size-28 min-[1536px]:size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner cursor-grab active:cursor-grabbing select-none"
+    >
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-white/5"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
+      <div
+        aria-hidden="true"
+        className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl"
+        style={{ transform: `translate(${pos.x}px, ${pos.y}px)`, transition: dragging ? 'none' : 'transform 160ms ease-out' }}
+      ></div>
+    </div>
+  );
+};
+
 const ManualControl: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -265,10 +322,12 @@ const ManualControl: React.FC = () => {
 
           {/* Video Feed Area */}
           <div className="relative flex-1 bg-black w-full h-full overflow-hidden group">
-            <div 
-              className="absolute inset-0 bg-cover bg-center grayscale brightness-[0.3] transition-all duration-1000 group-hover:brightness-[0.35]" 
+            <div
+              className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url('${GALLERY_FEED}')` }}
             ></div>
+            {/* Light touch: 10% dark over the feed; the text blocks carry their own small dark pads */}
+            <div aria-hidden="true" className="absolute inset-0 bg-black/10 pointer-events-none"></div>
             
             {/* HUD Elements */}
             <div className="absolute inset-0 border-[40px] border-transparent pointer-events-none z-10">
@@ -281,7 +340,7 @@ const ManualControl: React.FC = () => {
                  </div>
                  
                  {/* Altimeter Ladder Simulation */}
-                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4 max-[1439px]:hidden">
+                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-4 max-[1535px]:hidden isolate before:content-[''] before:absolute before:-inset-2 before:-z-10 before:rounded-2xl before:bg-black/75 before:shadow-[0_0_16px_10px_rgba(0,0,0,0.75)]">
                     {[20, 15, 10, 5, 0].map(h => (
                       <div key={h} className="flex items-center gap-2">
                         <span className="text-xs font-mono text-white">{h}</span>
@@ -293,7 +352,7 @@ const ManualControl: React.FC = () => {
             </div>
 
             {/* Overlays */}
-            <div className="absolute top-8 left-8 flex flex-col gap-1 z-20">
+            <div className="absolute top-8 left-8 flex flex-col gap-1 z-20 isolate before:content-[''] before:absolute before:-inset-2 before:-z-10 before:rounded-2xl before:bg-black/75 before:shadow-[0_0_16px_10px_rgba(0,0,0,0.75)]">
               <div className="text-[12px] font-bold text-white uppercase tracking-widest drop-shadow-lg">{selectedDrone.name} // CAM-01</div>
               <div className="flex gap-3 text-xs font-mono text-text-secondary font-bold uppercase tracking-wider max-[1439px]:hidden">
                 <span>4K @ 60FPS</span>
@@ -321,15 +380,15 @@ const ManualControl: React.FC = () => {
             )}
 
             {/* FPV Controls Bar */}
-            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20 max-[1439px]:flex-col max-[1439px]:items-center max-[1439px]:gap-3">
-               <div className="flex flex-col gap-2 max-[1439px]:items-center">
+            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-20 max-[1535px]:flex-col max-[1535px]:items-center max-[1535px]:gap-3">
+               <div className="relative flex flex-col gap-2 max-[1535px]:items-center isolate before:content-[''] before:absolute before:-inset-2 before:-z-10 before:rounded-2xl before:bg-black/75 before:shadow-[0_0_16px_10px_rgba(0,0,0,0.75)]">
                  <span className="text-xs font-mono text-primary font-bold tracking-[0.12em] uppercase">Telemetry Sync</span>
                  <div className="text-[32px] font-mono font-bold text-white leading-none">
                     {shownAltitude.toFixed(1)} <span className="text-sm text-text-secondary">m AGL</span>
                  </div>
                </div>
                
-               <div className="flex flex-wrap justify-end max-[1439px]:justify-center gap-3">
+               <div className="flex flex-wrap justify-end max-[1535px]:justify-center gap-3">
                  {isManual && secondsLeft < 120 && extensionsUsed < 3 && (
                    <Button variant="primary" 
  onClick={requestExtension}
@@ -338,7 +397,7 @@ const ManualControl: React.FC = () => {
                    </Button>
                  )}
                  {controlsLocked && (
-                   <span className="self-center text-xs font-bold text-gray-300 uppercase tracking-wider">Not available: {blockReason}</span>
+                   <span className="relative self-center text-xs font-bold text-gray-300 uppercase tracking-wider isolate before:content-[''] before:absolute before:-inset-2 before:-z-10 before:rounded-2xl before:bg-black/75 before:shadow-[0_0_16px_10px_rgba(0,0,0,0.75)]">Not available: {blockReason}</span>
                  )}
                  <Button variant="bare"
  onClick={() => isManual ? handleReturnToAutonomy() : setIsManual(true)}
@@ -357,11 +416,7 @@ const ManualControl: React.FC = () => {
           <div className="flex-1 flex flex-wrap items-center justify-around gap-x-4 gap-y-4">
             {/* Left Joystick: Throttle/Yaw */}
             <div className="flex flex-col items-center gap-4">
-              <div className="size-28 min-[1536px]:size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-white/5"></div>
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
-                 <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transform translate-y-4 group-active:-translate-y-10 transition-transform duration-300"></div>
-              </div>
+              <Stick label="Throttle and yaw stick" />
               <span className="whitespace-nowrap text-xs font-bold text-text-muted uppercase tracking-wider">Throttle / Yaw</span>
             </div>
 
@@ -379,11 +434,7 @@ const ManualControl: React.FC = () => {
 
             {/* Right Joystick: Pitch/Roll */}
             <div className="flex flex-col items-center gap-4">
-              <div className="size-28 min-[1536px]:size-36 rounded-full bg-background border border-white/10 flex items-center justify-center relative shadow-inner group cursor-crosshair">
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-full bg-white/5"></div>
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-white/5"></div>
-                 <div className="size-14 rounded-full bg-panel border border-primary/20 shadow-2xl transition-transform group-active:translate-x-4"></div>
-              </div>
+              <Stick label="Pitch and roll stick" />
               <span className="whitespace-nowrap text-xs font-bold text-text-muted uppercase tracking-wider">Pitch / Roll</span>
             </div>
           </div>
@@ -448,7 +499,7 @@ const ManualControl: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-auto shrink-0 flex flex-col justify-end bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl relative overflow-hidden">
+        <div className="flex-none flex flex-col bg-panel rounded-2xl border border-white/5 p-3 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-danger/5 pointer-events-none"></div>
           <div className="flex items-start gap-3 mb-3 bg-background/60 p-3 rounded-xl border border-white/10">
              <span aria-hidden="true" className="material-symbols-outlined text-danger-light text-[18px]">warning</span>

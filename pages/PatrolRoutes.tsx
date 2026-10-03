@@ -202,13 +202,14 @@ const PatrolRoutes: React.FC = () => {
           </div>
 
           {/* Tactical Map Visualization */}
-          <div className="w-full h-[740px] bg-panel rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl group">
+          <div className="w-full bg-panel rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl group">
             {/* Museum floor plan: selected route with numbered waypoints, the coverage gap and the blind spots */}
             <MuseumPlan
               mode="2D"
               route={{ name: selectedRoute.name, points: ROUTE_WAYPOINTS[selectedRoute.id] || [], numbered: true }}
               blindSpots={BLIND_SPOTS}
-              insets={{ top: 164, bottom: 160 }}
+              fitWidth
+              insets={{ top: 176, bottom: 164 }}
             />
 
             {/* Overlays */}

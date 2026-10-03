@@ -178,7 +178,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-background overflow-hidden text-gray-100">
+    <div className="flex h-screen w-screen bg-background overflow-clip text-gray-100">
       <a
         href="#main-content"
         onClick={(e) => { e.preventDefault(); document.getElementById('main-content')?.focus(); }}
@@ -190,9 +190,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {showBriefingModal && <ShiftHandoverModal onAcknowledge={handleAcknowledge} />}
       
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 h-full">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-clip">
         <Header />
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden relative p-6 flex flex-col focus:outline-none">
+        <main id="main-content" tabIndex={-1} className="flex-1 min-h-0 min-w-0 overflow-clip relative p-6 flex flex-col focus:outline-none">
           <h1 className="sr-only">{pageTitle}</h1>
           {hasAcknowledgedBriefing && <ShiftContextBar onOpenBriefing={() => setShowBriefingModal(true)} />}
           <div className="flex-1 w-full min-h-0">
